@@ -1,5 +1,6 @@
 @echo off
 rem generalte vc10-12 vcxproj for wxWidgets 3.0 Samples
+setlocal
 
 set VcName=
 if "%CcName%"=="" (
@@ -32,11 +33,11 @@ if not exist %SRC_PROJFILE%.vcproj goto :EOF
 copy %SRC_PROJFILE%.vcproj %DST_PROJFILE%.vcproj
 for %%i in (%DST_PROJFILE%.vcproj) do (
   devenv /Upgrade %%i
-)
-if exist %DST_PROJFILE%.vcproj del %DST_PROJFILE%.vcproj
-if exist Backup (
-  del UpgradeLog.htm
-  del /S /F /Q Backup\*.*
-  rmdir Backup
+  if exist %%i del %%~ni.vcproj
+  if exist UpgradeLog.htm del UpgradeLog.htm
+  if exist Backup (
+    del /S /F /Q Backup\*.*
+    rmdir Backup*
+  )
 )
 exit /b
