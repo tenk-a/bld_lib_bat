@@ -10,7 +10,7 @@ if not exist %CcMiscLibDir% mkdir %CcMiscLibDir%
 if not "%1"=="" set "CcGlfwDir=%1"
 
 if "%CcGlfwDir%"=="" (
-  for /f %%i in ('dir /b /on /ad glfw-*') do set CcGlfwDir=%%i
+  for /f %%i in ('dir /b /on /ad glfw*') do set CcGlfwDir=%%i
 )
 
 if "%CcGlfwDir%"=="" (

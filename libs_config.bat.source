@@ -1,0 +1,32 @@
+rem @echo off
+rem This batch-file license: boost software license version 1.0
+rem ==========================================================================
+rem user setting
+
+rem vc8,vc9,vc10,vc11,vc12,vc13
+set CcName=
+
+rem (VC++ Express Edition: CcHasX64=0 CcNoRtStatic=1)
+set CcHasX64=1
+set CcNoRtStatic=
+
+rem for glfw, libjpeg-turbo
+rem set CcCMakeDir=%ProgramFiles(x86)%\CMake\bin
+
+rem for libjpeg-turbo
+rem set CcNasmDir=c:\nasm
+
+
+rem ==========================================================================
+rem
+
+set CcLibDir=.\lib
+set CcLibPrefix=vc_
+set CcLibStrDebug=_debug
+set CcLibStrRelease=
+set CcLibStrDll=_dll
+set CcLibStrStatic=
+set CcLibStrRtDll=_rtdll
+
+set CcMiscIncDir=misc_inc
+set CcMiscLibDir=misc_lib

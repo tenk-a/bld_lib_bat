@@ -7,7 +7,7 @@ cd ..
 if not "%1"=="" set "CcWxWidgetsDir=%1"
 
 if "%CcWxWidgetsDir%"=="" (
-  for /f %%i in ('dir /b /on /ad wxWidgets-*') do set CcWxWidgetsDir=%%i
+  for /f %%i in ('dir /b /on /ad wxWidgets*') do set CcWxWidgetsDir=%%i
 )
 
 if "%CcWxWidgetsDir%"=="" (

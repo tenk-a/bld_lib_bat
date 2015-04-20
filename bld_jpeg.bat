@@ -10,7 +10,7 @@ if not exist %CcMiscLibDir% mkdir %CcMiscLibDir%
 if not "%1"=="" set "CcLibJpegDir=%1"
 
 if "%CcLibJpegDir%"=="" (
-  for /f %%i in ('dir /b /on /ad jpeg-*') do set CcLibJpegDir=%%i
+  for /f %%i in ('dir /b /on /ad jpeg*') do set CcLibJpegDir=%%i
 )
 
 if "%CcLibJpegDir%"=="" (

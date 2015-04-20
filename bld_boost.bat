@@ -7,7 +7,7 @@ cd ..
 if not "%1"=="" set CcBoostDir=%1
 
 if "%CcBoostDir%"=="" (
-  for /f %%i in ('dir /b /on /ad boost_*') do set CcBoostDir=%%i
+  for /f %%i in ('dir /b /on /ad boost*') do set CcBoostDir=%%i
 )
 
 if "%CcBoostDir%"=="" (

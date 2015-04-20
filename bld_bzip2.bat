@@ -10,7 +10,7 @@ if not exist %CcMiscLibDir% mkdir %CcMiscLibDir%
 if not "%1"=="" set "CcBzip2Dir=%1"
 
 if "%CcBzip2Dir%"=="" (
-  for /f %%i in ('dir /b /on /ad bzip2-*') do set CcBzip2Dir=%%i
+  for /f %%i in ('dir /b /on /ad bzip2*') do set CcBzip2Dir=%%i
 )
 
 if "%CcBzip2Dir%"=="" (
