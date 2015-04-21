@@ -63,7 +63,7 @@ if "%HasRel%%HasDbg%"=="" (
 )
 
 if "%StrRel%%StrDbg%"==""     set StrDbg=_debug
-if "%StrRtSta%%StrRtDll%"=="" set StrRtDll=_rtdll
+if "%StrRtSta%%StrRtDll%"=="" set StrRtSta=_static
 
 if "%LibDir%"=="" set LibDir=lib
 if not exist %LibDir% mkdir %LibDir%
@@ -96,14 +96,24 @@ if "%BldType%"=="dbg" (
 
 set DstDir=%LibDir%\%Target%
 
-set CPPFLAGS=-I..\include
+set ZlibIncDir=%CcMiscIncDir%
+if "%ZlibIncDir%"=="" (
+  for /D %%i in (..\*.*) do set ZlibIncDir=%%i
+  set ZlibLibDir=%ZlibIncDir%\lib\%Target%
+) else (
+  set ZlibIncDir=..\%ZlibIncDir%\zlib
+  set ZlibLibDir=..\%CcMiscLibDir%\%Target%
+)
+
+set CPPFLAGS=-I%ZlibIncDir%
 set CFLAGS=-nologo -D_CRT_SECURE_NO_DEPRECATE -D_CRT_SECURE_NO_WARNINGS -W3 %RtOpts% %BldOpts%
 
 nmake -f scripts/makefile.vcwin32 "CFLAGS=%CFLAGS%" "CPPFLAGS=%CPPFLAGS%"
 if errorlevel 1 goto :EOF
 
-if exist ..\lib\zlib\%Target%\zlib.lib (
-  cl %CPPFLAGS% %CFLAGS% pngtest.c libpng.lib ..\lib\zlib\%Target%\zlib.lib
+set ZlibFile=%ZlibLibDir%\zlib.lib
+if exist %ZlibFile% (
+  cl %CPPFLAGS% %CFLAGS% pngtest.c libpng.lib %ZlibFile%
   .\pngtest.exe
   if errorlevel 1 (
     echo ERROR: png test

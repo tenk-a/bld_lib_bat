@@ -18,8 +18,8 @@ if "%CcLibJpegDir%"=="" (
   goto END
 )
 
-call :gen_header_jpeglib %CcLibJpegDir% >%CcMiscIncDir%\jpeglib.h.official
-if not exist %CcMiscIncDir%\jpeglib.h copy %CcMiscIncDir%\jpeglib.h.official %CcMiscIncDir%\jpeglib.h
+if not exist %CcMiscIncDir%\jpeg mkdir %CcMiscIncDir%\jpeg
+call :gen_header %CcLibJpegDir% >%CcMiscIncDir%\jpeg\jpeglib.h
 
 set Arg=libcopy:%CD%\%CcMiscLibDir%
 if "%CcNoRtStatic%"=="1" set Arg=%Arg% rtdll
@@ -35,10 +35,10 @@ cd ..
 goto :END
 
 
-:gen_header_jpeglib
+:gen_header
 echo /// jpeglib.h wrapper (official version)
 echo #pragma once
-echo #include "../%1/jpeglib.h"
+echo #include "../../%1/jpeglib.h"
 echo #ifdef _MSC_VER
 echo   #pragma comment(lib, "libjpeg.lib")
 echo #endif

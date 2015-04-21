@@ -21,12 +21,13 @@ rem ==========================================================================
 rem
 
 set CcLibDir=.\lib
-set CcLibPrefix=vc_
+rem set CcLibPrefix=vc_
+set CcLibPrefix=%CcName%_
 set CcLibStrDebug=_debug
 set CcLibStrRelease=
 set CcLibStrDll=_dll
-set CcLibStrStatic=
-set CcLibStrRtDll=_rtdll
+set CcLibStrStatic=_static
+set CcLibStrRtDll=
 
 set CcMiscIncDir=misc_inc
 set CcMiscLibDir=misc_lib

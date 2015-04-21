@@ -5,3 +5,5 @@ if exist bld_lpng.bat           call bld_lpng.bat
 if exist bld_libjpeg-turbo.bat  call bld_libjpeg-turbo.bat
 if exist bld_jpeg.bat           call bld_jpeg.bat
 if exist bld_glfw.bat           call bld_glfw.bat
+if exist bld_libogg.bat         call bld_libogg.bat
+if exist bld_tiff.bat           call bld_tiff.bat

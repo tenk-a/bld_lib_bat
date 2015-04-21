@@ -18,7 +18,7 @@ if "%CcBzip2Dir%"=="" (
   goto END
 )
 
-call bld_lib_bat\gen_header.bat bzlib.h %CcBzip2Dir% libbz2.lib >%CcMiscIncDir%\bzlib.h
+call bld_lib_bat\gen_header.bat bzlib.h %CcBzip2Dir% libbz2.lib %CcMiscIncDir%\bzip2
 
 set Arg=libcopy:%CD%\%CcMiscLibDir%
 if "%CcNoRtStatic%"=="1" set Arg=%Arg% rtdll

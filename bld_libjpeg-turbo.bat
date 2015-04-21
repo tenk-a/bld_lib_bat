@@ -18,9 +18,9 @@ if "%CcLibJpegTurboDir%"=="" (
   goto END
 )
 
-call :gen_header_turbojpeg %CcLibJpegTurboDir% >%CcMiscIncDir%\turbojpeg.h
-call :gen_header_jpeglib   %CcLibJpegTurboDir% >%CcMiscIncDir%\jpeglib.h.turbo
-if not exist %CcMiscIncDir%\jpeglib.h copy %CcMiscIncDir%\jpeglib.h.turbo %CcMiscIncDir%\jpeglib.h
+if not exist %CcMiscIncDir%\jpeg-turbo mkdir %CcMiscIncDir%\jpeg-turbo
+call :gen_header_turbojpeg %CcLibJpegTurboDir% >%CcMiscIncDir%\jpeg-turbo\turbojpeg.h
+call :gen_header_jpeglib   %CcLibJpegTurboDir% >%CcMiscIncDir%\jpeg-turbo\jpeglib.h
 
 set Arg=libcopy:%CD%\%CcMiscLibDir%
 
@@ -37,7 +37,7 @@ goto END
 :gen_header_turbojpeg
 echo /// turbojpeg.h wrapper
 echo #pragma once
-echo #include "../%1/turbojpeg.h"
+echo #include "../../%1/turbojpeg.h"
 echo #ifdef _MSC_VER
 echo  #ifdef DLLDEFINE
 echo   #pragma comment(lib, "turbojpeg.lib")
@@ -50,7 +50,7 @@ exit /b
 :gen_header_jpeglib
 echo /// jpeglib.h wrapper (turbo version)
 echo #pragma once
-echo #include "../%1/jpeglib.h"
+echo #include "../../%1/jpeglib.h"
 echo #ifdef _MSC_VER
 echo   #pragma comment(lib, "jpeg-static.lib")
 echo #endif

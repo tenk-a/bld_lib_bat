@@ -18,7 +18,8 @@ if "%CcLibPngDir%"=="" (
   goto END
 )
 
-call bld_lib_bat\gen_header.bat libpng.h %CcLibPngDir% libpng.lib >%CcMiscIncDir%\libpng.h
+if not exist %CcMiscIncDir%\libpng mkdir %CcMiscIncDir%\libpng
+call :gen_header libpng.h %CcLibPngDir%  >%CcMiscIncDir%\libpng\libpng.h
 
 set Arg=libcopy:%CD%\%CcMiscLibDir%
 if "%CcNoRtStatic%"=="1" set Arg=%Arg% rtdll
@@ -31,6 +32,19 @@ if "%CcHasX64%"=="1" (
   call ..\bld_lib_bat\bld1_lpng.bat x64 %Arg%
 )
 cd ..
+
+endlocal
+goto :EOF
+
+:gen_header
+echo /// %1 wrapper
+echo #pragma once
+echo #include "../../%2/%1"
+echo #ifdef _MSC_VER
+echo #pragma comment(lib, "libpng.lib")
+echo #pragma comment(lib, "zlib.lib")
+echo #endif
+exit /b
 
 :END
 cd bld_lib_bat

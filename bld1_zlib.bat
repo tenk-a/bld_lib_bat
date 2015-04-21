@@ -64,7 +64,7 @@ if "%HasRel%%HasDbg%"=="" (
 )
 
 if "%StrRel%%StrDbg%"==""     set StrDbg=_debug
-if "%StrRtSta%%StrRtDll%"=="" set StrRtDll=_rtdll
+if "%StrRtSta%%StrRtDll%"=="" set StrRtSta=_static
 
 if "%LibDir%"=="" set LibDir=lib
 if not exist %LibDir% mkdir %LibDir%

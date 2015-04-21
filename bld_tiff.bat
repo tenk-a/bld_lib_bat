@@ -1,4 +1,4 @@
-@echo off
+rem @echo off
 rem This batch-file license: boost software license version 1.0
 setlocal
 call libs_config.bat
@@ -22,11 +22,11 @@ if "%CcLibJpegDir%"=="" (
   for /f %%i in ('dir /b /on /ad jpeg*') do set CcLibJpegDir=%%i
 )
 
-
-call :gen_header tiffio.h     %CcLibTiffDir% >%CcMiscIncDir%\tiffio.h
-call :gen_header tiffiop.h    %CcLibTiffDir% >%CcMiscIncDir%\tiffiop.h
-call :gen_header tif_config.h %CcLibTiffDir% >%CcMiscIncDir%\tif_config.h
-call :gen_header tiffio.hxx   %CcLibTiffDir% >%CcMiscIncDir%\tiffio.hxx
+if not exist %CcLibTiffDir%\tiff mkdir %CcLibTiffDir%\tiff
+call :gen_header tiffio.h     %CcLibTiffDir% >%CcMiscIncDir%\tiff\tiffio.h
+call :gen_header tiffiop.h    %CcLibTiffDir% >%CcMiscIncDir%\tiff\tiffiop.h
+call :gen_header tif_config.h %CcLibTiffDir% >%CcMiscIncDir%\tiff\tif_config.h
+call :gen_header tiffio.hxx   %CcLibTiffDir% >%CcMiscIncDir%\tiff\tiffio.hxx
 
 set Arg=libcopy:%CD%\%CcMiscLibDir% zlibinc:%CD%\%CcMiscIncDir% zliblib:%CD%\%CcMiscLibDir% jpeginc:%CD%\%CcLibJpegDir% jpeglib:%CD%\%CcMiscLibDir%
 if "%CcNoRtStatic%"=="1" set Arg=%Arg% rtdll
@@ -44,7 +44,7 @@ goto :END
 :gen_header
 echo /// %1 wrapper
 echo #pragma once
-echo #include "../%2/libtiff/%1"
+echo #include "../../%2/libtiff/%1"
 echo #ifdef _MSC_VER
 echo   #pragma comment(lib, "libtiff.lib")
 echo #endif

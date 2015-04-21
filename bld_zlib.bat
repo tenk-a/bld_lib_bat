@@ -18,8 +18,9 @@ if "%CcZlibDir%"=="" (
   goto END
 )
 
-call :gen_header zlib.h  %CcZlibDir% >%CcMiscIncDir%\zlib.h
-call :gen_header zconf.h %CcZlibDir% >%CcMiscIncDir%\zconf.h
+if not exist %CcMiscIncDir%\zlib mkdir %CcMiscIncDir%\zlib
+call :gen_header zlib  %CcZlibDir% >%CcMiscIncDir%\zlib\zlib.h
+call :gen_header zconf %CcZlibDir% >%CcMiscIncDir%\zlib\zconf.h
 
 set Arg=libcopy:%CD%\%CcMiscLibDir%
 if "%CcNoRtStatic%"=="1" set Arg=%Arg% rtdll
@@ -37,7 +38,7 @@ goto END
 :gen_header
 echo /// %1.h
 echo #pragma once
-echo #include "../%2/%1.h"
+echo #include "../../%2/%1.h"
 echo #ifdef _MSC_VER
 echo  #ifdef ZLIB_DLL
 echo   #pragma comment(lib, "zdll.lib")
