@@ -10,7 +10,7 @@ rem (VC++ Express Edition: CcHasX64=0 CcNoRtStatic=1)
 set CcHasX64=1
 set CcNoRtStatic=
 
-rem for glfw, libjpeg-turbo
+rem for glfw, libjpeg-turbo etc
 set CcCMakeDir=%ProgramFiles(x86)%\CMake\bin
 
 rem for libjpeg-turbo
@@ -19,6 +19,12 @@ set CcNasmDir=c:\tools\nasm
 
 rem ==========================================================================
 rem
+
+if "%CcName%"=="" (
+  echo Please set CcName in "libs_config.bat"
+  pause
+  exit
+)
 
 set CcLibDir=.\lib
 rem set CcLibPrefix=vc_
@@ -31,12 +37,3 @@ set CcLibStrRtDll=
 
 set CcMiscIncDir=misc_inc
 set CcMiscLibDir=misc_lib
-
-
-rem set CcZlibDir=zlib-1.2.8
-rem set CcBzip2Dir=bzip2-1.0.6
-rem set CcBoostDir=boost_1_57_0
-rem set CcWxWidgets=wxWidgets-3.0.2
-rem set CcBoostDir=boost_1_57_0
-rem set CcLibJpegDir=jpeg-9a
-rem set CcLibJpegTurboDir=libjpeg-turbo-code-1537-trunk
