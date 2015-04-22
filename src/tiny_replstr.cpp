@@ -1,15 +1,15 @@
 /**
  *  @file   tiny_replstr.cpp
- *  @brief  replace string
+ *  @brief  tiny replace string command
  *  @author Masashi Kitamura (tenka@6809.net)
  *  @date   2015-04-19
  *  @license boost software license version 1.0
  */
-#include <cstdio>
-#include <cstdlib>
 #include <vector>
 #include <string>
-#include <iostream>
+#include <utility>
+#include <stdio.h>
+#include <stdlib.h>
 using namespace std;
 
 class App {
@@ -17,9 +17,11 @@ public:
     App() : dic_mode_(false), one_mode_(true), overwrite_(false) {}
 
     int usage() {
-        cerr << "usage> tiny_replstr [-x] [old-str] [new-str] file" << endl;
-        cerr << "       tiny_replstr [-x] ++ [old1] [new1] [old2] [new2] ...  -- file" << endl;
-        cerr << " -x   Overwite the same file." << endl;
+        fprintf(stderr,
+            "usage> tiny_replstr [opts] [old-str] [new-str] file\n"
+            "       tiny_replstr [opts] ++ [old1] [new1] [old2] [new2] ...  -- file\n"
+            "  opts:
+            "    -x   Overwite the same file.\n");
         return 1;
     }
 
@@ -46,13 +48,13 @@ public:
                     dic_.push_back( Elem(arg, argv[i+1]) );
                     ++i;
                 } else {
-                    cerr << "No new-string:" << arg << endl;
+                    fprintf(stderr, "No new-string: %s\n", arg.c_str());
                     return 1;
                 }
             } else if (fname.empty()) {
                 fname = arg;
             } else {
-                cerr << "Too many arguments.(" << arg << ")" << endl;
+                fprintf(stderr, "Too many arguments.(%s)\n", arg.c_str());
                 return 1;
             }
         }
@@ -66,7 +68,7 @@ private:
     bool conv(string const& fname) {
         string text;
         if (!load(fname, text)) {
-            cerr << fname << " not found." << endl;
+            fprintf(stderr, "File '%s' not found.\n", fname.c_str());
             return false;
         }
         if (!text.empty()) {
@@ -76,7 +78,7 @@ private:
         if (overwrite_) {
             saveSameFile(fname, text);
         } else {
-            cout << text;
+            fprintf(stdout, "%s", text.c_str());
         }
         return true;
     }
@@ -113,7 +115,7 @@ private:
         rename(fname.c_str(), bak_name.c_str());
         fp = fopen(fname.c_str(), "wt");
         if (fwrite(text.c_str(), 1, text.size(), fp) != text.size())
-            cerr << "Write error (" << fname << ")" << endl;
+            fprintf(stderr, "Write error (%s)\n", fname.c_str());
         fclose(fp);
     }
 
