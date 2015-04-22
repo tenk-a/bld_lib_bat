@@ -4,7 +4,6 @@ rem This batch-file license: boost software license version 1.0
 setlocal
 
 set Arch=%CcArch%
-rem set LibDir=%CcLibDir%
 set LibCopyDir=
 set StrPrefix=%CcLibPrefix%
 set StrRel=%CcLibStrRelease%
@@ -17,6 +16,10 @@ set HasDbg=
 set HasRtSta=
 set HasRtDll=
 set Compiler=
+set OggDir=
+set SrcOggVerVc8=1.1.4
+set SrcOggVerVc9=1.1.4
+set SrcOggVerVc10=1.2.0
 
 :ARG_LOOP
   if "%1"=="" goto ARG_LOOP_EXIT
@@ -41,12 +44,14 @@ set Compiler=
 
   set ARG=%1
   if /I "%ARG:~0,8%"=="LibCopy:"    set LibCopyDir=%ARG:~8%
-  rem if /I "%ARG:~0,7%"=="LibDir:"     set LibDir=%ARG:~7%
+  if /I "%ARG:~0,7%"=="LibDir:"     set LibDir=%ARG:~7%
   if /I "%ARG:~0,10%"=="LibPrefix:" set StrPrefix=%ARG:~10%
   if /I "%ARG:~0,9%"=="LibRtStr:"   set StrRtStr=%ARG:~9%
   if /I "%ARG:~0,9%"=="LibRtDll:"   set StrRtDll=%ARG:~9%
   if /I "%ARG:~0,7%"=="LibRel:"     set StrRel=%ARG:~7%
   if /I "%ARG:~0,7%"=="LibDbg:"     set StrDbg=%ARG:~7%
+
+  if /I "%ARG:~0,7%"=="OggDir:"     set OggDir=%ARG:~7%
 
   shift
 goto ARG_LOOP
@@ -96,6 +101,13 @@ if not exist win32\%SlnDir% (
   )
 )
 
+
+if "%OggDir%"=="" (
+  for /f %%i in ('dir /b /on /ad ..\libogg*') do set OggDir=%%i
+)
+set OggVar=%OggDir:libogg-=%
+if "%OggVar%"=="%OggDir%" set OggVar=
+
 if "%HasRtSta%%HasRtDll%"=="" (
   set HasRtSta=S
   set HasRtDll=L
@@ -105,14 +117,12 @@ if "%HasRel%%HasDbg%"=="" (
   set HasDbg=d
 )
 
-if "%StrRel%%StrDbg%"==""     set StrDbg=_debug
 if "%StrRtSta%%StrRtDll%"=="" set StrRtSta=_static
 
 if "%HasRtDll%%HasRel%"=="Lr" call :Bld1 release rtdll  %StrPrefix%%Arch%%StrRtDll%%StrRel%
 if "%HasRtDll%%HasDbg%"=="Ld" call :Bld1 debug   rtdll  %StrPrefix%%Arch%%StrRtDll%%StrDbg%
 if "%HasRtSta%%HasRel%"=="Sr" call :Bld1 release static %StrPrefix%%Arch%%StrRtSta%%StrRel%
 if "%HasRtSta%%HasDbg%"=="Sd" call :Bld1 debug   static %StrPrefix%%Arch%%StrRtSta%%StrDbg%
-:SKIP_RTSTATIC
 
 endlocal
 goto :EOF
@@ -124,14 +134,21 @@ set RtType=%2
 set Target=%3
 
 pushd win32\%SlnDir%
-rem msbuild libogg_static.vcxproj  /t:Rebuild /p:Configuration=%BldType% /p:Platform=%Platform% /p:RuntimeLibrary=%RtStr%
-rem msbuild libogg_dynamic.vcxproj /t:Rebuild /p:Configuration=%BldType% /p:Platform=%Platform% /p:RuntimeLibrary=%RtStr%
-if "%RtType%"=="static" (
-  msbuild libogg_static.sln  /t:Rebuild /p:Configuration=%BldType% /p:Platform=%Platform%
+
+if not "%OggVar%"=="" (
+  if "%Compiler%"=="vc12" ..\..\..\bld_lib_bat\tiny_replstr -x ++ %SrcOggVerVc10% %OggVar% VS2010 VS2013 -- libogg.props
+  if "%Compiler%"=="vc11" ..\..\..\bld_lib_bat\tiny_replstr -x ++ %SrcOggVerVc10% %OggVar% VS2010 VS2012 -- libogg.props
+  if "%Compiler%"=="vc10" ..\..\..\bld_lib_bat\tiny_replstr -x ++ %SrcOggVerVc10% %OggVar% -- libogg.props
+  if "%Compiler%"=="vc9"  ..\..\..\bld_lib_bat\tiny_replstr -x ++ %SrcOggVerVc9%  %OggVar% -- libogg.props
+  if "%Compiler%"=="vc8"  ..\..\..\bld_lib_bat\tiny_replstr -x ++ %SrcOggVerVc8%  %OggVar% -- libogg.props
+)
+if %RtType%==static (
+  call :gen_static
+  msbuild vorbis_static.sln  /t:Rebuild /p:Configuration=%BldType% /p:Platform=%Platform%
 ) else (
-  msbuild libogg_dynamic.sln /t:Rebuild /p:Configuration=%BldType% /p:Platform=%Platform%
   call :gen_rtdll
-  msbuild libogg_rtdll.sln   /t:Rebuild /p:Configuration=%BldType% /p:Platform=%Platform%
+  msbuild vorbis_rtdll.sln   /t:Rebuild /p:Configuration=%BldType% /p:Platform=%Platform%
+  msbuild vorbis_dynamic.sln /t:Rebuild /p:Configuration=%BldType% /p:Platform=%Platform%
 )
 popd
 
@@ -140,17 +157,19 @@ if "%LibCopyDir%"=="" goto ENDIF_LibCopyDir
 if not exist %LibCopyDir% mkdir %LibCopyDir%
 if not exist %LibCopyDir%\%Target% mkdir %LibCopyDir%\%Target%
 if "%RtType%"=="static" (
-  if exist %SrcDir%\libogg_static.lib copy %SrcDir%\libogg_static.lib %LibCopyDir%\%Target%\libogg_static.lib
+  if exist %SrcDir%\libvorbis_static.lib copy %SrcDir%\libvorbis_static.lib %LibCopyDir%\%Target%\
+  if exist %SrcDir%\libvorbisfiles_static.lib copy %SrcDir%\libvorbisfiles_static.lib %LibCopyDir%\%Target%\
 ) else (
-  if exist %SrcDir%\libogg_rtdll.lib copy %SrcDir%\libogg_rtdll.lib %LibCopyDir%\%Target%\libogg_static.lib
-  if exist %SrcDir%\libogg_rtdll.lib copy %SrcDir%\libogg_rtdll.lib %LibCopyDir%\%Target%\libogg_rtdll.lib
-  if exist %SrcDir%\libogg.lib copy %SrcDir%\libogg.lib %LibCopyDir%\%Target%\libogg.lib
-  if exist %SrcDir%\libogg.dll copy %SrcDir%\libogg.dll %LibCopyDir%\%Target%
-  if exist %SrcDir%\libogg.pdb copy %SrcDir%\libogg.pdb %LibCopyDir%\%Target%
+  if exist %SrcDir%\libvorbis_rtdll.lib copy %SrcDir%\libvorbis_rtdll.lib %LibCopyDir%\%Target%\libvorbis_static.lib
+  if exist %SrcDir%\libvorbis_rtdll.lib copy %SrcDir%\libvorbis_rtdll.lib %LibCopyDir%\%Target%\
+  if exist %SrcDir%\libvorbis.lib copy %SrcDir%\libvorbis.lib %LibCopyDir%\%Target%\
+  if exist %SrcDir%\libvorbis.dll copy %SrcDir%\libvorbis.dll %LibCopyDir%\%Target%\
+  if exist %SrcDir%\libvorbis.pdb copy %SrcDir%\libvorbis.pdb %LibCopyDir%\%Target%\
 )
 :ENDIF_LibCopyDir
 
 exit /b
+
 
 :gen_rtdll
 for /R %1 %%i in (*_static.sln *_static.vcxproj) do (
@@ -161,17 +180,25 @@ exit /b
 :gen_rtdll1
 set SrcFile=%1
 set DstFile=%SrcFile:_static=_rtdll%
-..\..\..\bld_lib_bat\tiny_replstr ++ MultiThreaded MultiThreadedDLL MultiThreadedDLLDebug MultiThreadedDebugDLL _static _rtdll -- %SrcFile% >%DstFile%
+..\..\..\bld_lib_bat\tiny_replstr ++ MultiThreadedDLL MultiThreaded MultiThreadedDebugDLL MultiThreadedDebug MultiThreaded MultiThreadedDLL MultiThreadedDLLDebug MultiThreadedDebugDLL _static _rtdll -- %SrcFile% >%DstFile%
 exit /b
+
+
+:gen_static
+for /R %1 %%i in (*_static.vcxproj) do (
+  ..\..\..\bld_lib_bat\tiny_replstr -x ++ MultiThreadedDLL MultiThreaded MultiThreadedDebugDLL MultiThreadedDebug -- %%i
+)
+exit /b
+
 
 :SlnCopyUpd
 cd win32
 mkdir %2
-copy %1\*.* %2\
+xcopy /S /I %1 %2
 cd %2
-devenv /Upgrade libogg_dynamic.sln
+devenv /Upgrade vorbis_dynamic.sln
 call :DelBackup
-devenv /Upgrade libogg_static.sln
+devenv /Upgrade vorbis_static.sln
 call :DelBackup
 cd ..
 cd ..

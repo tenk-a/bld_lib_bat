@@ -40,8 +40,12 @@ goto END
 echo /// %1 wrapper
 echo #pragma once
 echo #include "../../%2/include/ogg/%1"
-echo #ifdef _MSC_VER
-echo  #pragma comment(lib, "libogg.lib")
+echo //#ifdef _MSC_VER
+echo // #if 1
+echo //  #pragma comment(lib, "libogg_static.lib")
+echo // #else
+echo //  #pragma comment(lib, "libogg.lib")
+echo // #endif
 echo #endif
 exit /b
 
