@@ -28,7 +28,8 @@ set HasDll=
   if /I "%1"=="dll"      set HasDll=D
 
   set ARG=%1
-  if /I "%ARG:~0,7%"=="libdir:" set LibDir=%ARG:~7%
+  if /I "%ARG:~0,7%"=="LibDir:"     set LibDir=%ARG:~7%
+  if /I "%ARG:~0,10%"=="LibPrefix:" set StrPrefix=%ARG:~10%
 
   shift
 goto ARG_LOOP

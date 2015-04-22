@@ -1,5 +1,4 @@
 @echo off
-rem This batch-file license: boost software license version 1.0
 setlocal
 call libs_config.bat
 cd ..

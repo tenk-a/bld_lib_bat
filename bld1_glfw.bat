@@ -39,8 +39,13 @@ set CleanMode=
   if /I "%1"=="clean"    set CleanMode=1
 
   set ARG=%1
-  if /I "%ARG:~0,7%"=="libdir:" set LibDir=%ARG:~7%
-  if /I "%ARG:~0,8%"=="libcopy:" set LibCopyDir=%ARG:~8%
+  if /I "%ARG:~0,8%"=="LibCopy:"    set LibCopyDir=%ARG:~8%
+  if /I "%ARG:~0,7%"=="LibDir:"     set LibDir=%ARG:~7%
+  if /I "%ARG:~0,10%"=="LibPrefix:" set StrPrefix=%ARG:~10%
+  if /I "%ARG:~0,9%"=="LibRtStr:"   set StrRtStr=%ARG:~9%
+  if /I "%ARG:~0,9%"=="LibRtDll:"   set StrRtDll=%ARG:~9%
+  if /I "%ARG:~0,7%"=="LibRel:"     set StrRel=%ARG:~7%
+  if /I "%ARG:~0,7%"=="LibDbg:"     set StrDbg=%ARG:~7%
 
   shift
 goto ARG_LOOP
