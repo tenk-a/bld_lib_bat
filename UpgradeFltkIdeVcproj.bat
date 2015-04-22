@@ -3,16 +3,14 @@ rem generalte vc11-12 vcxproj from fltk/IDE/VisualC2010
 setlocal
 
 set VcDirName=
-if "%CcName%"=="" (
-  if /I not "%PATH:Microsoft Visual Studio 13.0=%"=="%PATH%" (
+if /I not "%PATH:Microsoft Visual Studio 13.0=%"=="%PATH%" (
     set VcDirName=VisualC2015
-  )
-  if /I not "%PATH:Microsoft Visual Studio 12.0=%"=="%PATH%" (
+)
+if /I not "%PATH:Microsoft Visual Studio 12.0=%"=="%PATH%" (
     set VcDirName=VisualC2013
-  )
-  if /I not "%PATH:Microsoft Visual Studio 11.0=%"=="%PATH%" (
+)
+if /I not "%PATH:Microsoft Visual Studio 11.0=%"=="%PATH%" (
     set VcDirName=VisualC2012
-  )
 )
 if "%VcDirName%"=="" (
   echo ERROR: not found vc11-12 path.

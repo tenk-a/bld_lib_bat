@@ -1,11 +1,11 @@
-@echo off
+rem @echo off
 rem This batch-file license: boost software license version 1.0
 setlocal
 call libs_config.bat
 
 if not exist tiny_replstr.exe (
-  cl /EHsc /Fetiny_replstr.exe src\tiny_replstr.cpp
-  del *.obj
+  call setcc.bat %CcName% x86
+  call gen_replstr.bat
 )
 
 cd ..
@@ -24,7 +24,7 @@ if "%CcFltkDir%"=="" (
   goto END
 )
 
-set Arg=libcopy:%CD%\%CcMiscLibDir%
+set Arg=
 if "%CcNoRtStatic%"=="1" set Arg=%Arg% rtdll
 
 cd %CcFltkDir%

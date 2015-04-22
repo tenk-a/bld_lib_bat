@@ -1,5 +1,5 @@
 rem @echo off
-rem Compile libogg for vc
+rem Compile fltk for vc
 rem This batch-file license: boost software license version 1.0
 setlocal
 
@@ -34,8 +34,11 @@ set VcSlnDir=
   if /I "%1"=="rtdll"    set HasRtDll=L
 
   set ARG=%1
-  if /I "%ARG:~0,7%"=="libdir:" set LibDir=%ARG:~7%
-  if /I "%ARG:~0,8%"=="libcopy:" set LibCopyDir=%ARG:~8%
+  if /I "%ARG:~0,8%"=="LibCopy:"    set LibCopyDir=%ARG:~8%
+  if /I "%ARG:~0,7%"=="LibDir:"     set LibDir=%ARG:~7%
+  if /I "%ARG:~0,10%"=="LibPrefix:" set StrPrefix=%ARG:~10%
+  if /I "%ARG:~0,9%"=="LibRtStr:"   set StrRtStr=%ARG:~9%
+  if /I "%ARG:~0,9%"=="LibRtDll:"   set StrRtDll=%ARG:~9%
 
   shift
 goto ARG_LOOP
@@ -105,11 +108,9 @@ if "%StrRtSta%%StrRtDll%"=="" set StrRtSta=_static
 if "%LibDir%"=="" set LibDir=lib
 if not exist %LibDir% mkdir %LibDir%
 
-pause
-
 if "%HasRtDll%"=="L" (
-  call :Bld1 release MultiThreadedDLL       %StrPrefix%%Arch%%StrRtDll%
-  call :Bld1 debug   MultiThreadedDebugDLL  %StrPrefix%%Arch%%StrRtDll%
+  call :Bld1 release %StrPrefix%%Arch%%StrRtDll%
+  call :Bld1 debug   %StrPrefix%%Arch%%StrRtDll%
 )
 
 if not "%HasRtSta%"=="S" goto SKIP_STATIC_BLD
@@ -124,10 +125,9 @@ call :Bld1 release %StrPrefix%%Arch%%StrRtSta%
 call :Bld1 debug   %StrPrefix%%Arch%%StrRtSta%
 :SKIP_STATIC_BLD
 
-
-
 endlocal
 goto :EOF
+
 
 
 :Bld1
@@ -187,8 +187,8 @@ exit /b
 set TgtReplFile=%1
 set BakReplFile=%1.bak
 if exist %BakReplFile% del %BakReplFile%
-..\..\..\bld_lib_bat\tiny_replstr.exe Win32 X64 %TgtReplFile% >%BakReplFile%
-..\..\..\bld_lib_bat\tiny_replstr.exe MachineX86 MachineX64 %BakReplFile% >%TgtReplFile%
+move %TgtReplFile% %BakReplFile% 
+..\..\..\bld_lib_bat\tiny_replstr.exe ++ Win32 X64  MachineX86 MachineX64 -- %BakReplFile% >%TgtReplFile%
 del /S *.bak
 exit /b
 
@@ -204,15 +204,13 @@ exit /b
 set TgtReplFile=%1
 set BakReplFile=%1.bak
 if exist %BakReplFile% del %BakReplFile%
-..\..\..\bld_lib_bat\tiny_replstr.exe MultiThreadedDebugDLL MultiThreadedDebug %TgtReplFile% >%BakReplFile%
-..\..\..\bld_lib_bat\tiny_replstr.exe MultiThreadedDLL MultiThreaded %BakReplFile% >%TgtReplFile%
+move %TgtReplFile% %BakReplFile% 
+..\..\..\bld_lib_bat\tiny_replstr.exe ++ MultiThreadedDebugDLL MultiThreadedDebug  MultiThreadedDLL MultiThreaded  "<IgnoreSpecificDefaultLibraries>libcd;" "<IgnoreSpecificDefaultLibraries>"  "<IgnoreSpecificDefaultLibraries>libcmt;" "<IgnoreSpecificDefaultLibraries>"  "<IgnoreSpecificDefaultLibraries>libcmt;" "<IgnoreSpecificDefaultLibraries>"  "<IgnoreSpecificDefaultLibraries>libcmtd;" "<IgnoreSpecificDefaultLibraries>" -- %BakReplFile% >%TgtReplFile%
 del /S *.bak
 exit /b
 
 :Clean
-del /s /f *.bak
-del /s /f *.obj
-del /s /f *.ilk
+del /s /f *.bak *.obj *.ilk
 cd ide
 for /R /D %%i in (*_release *_debug) do (
   del /Q /F /S %%i\*.*
