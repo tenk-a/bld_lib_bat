@@ -6,6 +6,7 @@
  *  @license boost software license version 1.0
  */
 #include <cstdio>
+#include <cstdlib>
 #include <vector>
 #include <string>
 #include <iostream>
@@ -13,39 +14,46 @@ using namespace std;
 
 class App {
 public:
-    App() : dic_mode_(false) {}
+    App() : dic_mode_(false), one_mode_(true), overwrite_(false) {}
+
+    int usage() {
+        cerr << "usage> tiny_replstr [-x] [old-str] [new-str] file" << endl;
+        cerr << "       tiny_replstr [-x] ++ [old1] [new1] [old2] [new2] ...  -- file" << endl;
+        cerr << " -x   Overwite the same file." << endl;
+        return 1;
+    }
 
     int main(int argc, char* argv[]) {
         if (argc <= 1)
             return usage();
 
         string fname;
-        if (argc == 4 && string(argv[1]) != "++") {
-            dic_.push_back( Elem(argv[1], argv[2]) );
-            fname = argv[3];
-        } else {
-            for (int i = 1; i < argc; ++i) {
-                string arg = argv[i];
-                if (arg == "-?" || arg == "-h" || arg == "--help") {
-                    return usage();
-                } else if (arg == "++") {
-                    dic_mode_ = true;
-                } else if (arg == "--") {
-                    dic_mode_ = false;
-                } else if (dic_mode_) {
-                    if (i+1 < argc) {
-                        dic_.push_back( Elem(arg, argv[i+1]) );
-                        ++i;
-                    } else {
-                        cerr << "not pair:" << arg << endl;
-                        return 1;
-                    }
-                } else if (fname.empty()) {
-                    fname = arg;
+        for (int i = 1; i < argc; ++i) {
+            string arg = argv[i];
+            if (arg == "-?" || arg == "-h" || arg == "--help") {
+                return usage();
+            } else if (arg == "-x") {
+                overwrite_ = true;
+            } else if (arg == "++") {
+                dic_mode_ = true;
+                one_mode_ = false;
+            } else if (arg == "--") {
+                dic_mode_ = false;
+                one_mode_ = false;
+            } else if (dic_mode_ || one_mode_) {
+                one_mode_ = false;
+                if (i+1 < argc) {
+                    dic_.push_back( Elem(arg, argv[i+1]) );
+                    ++i;
                 } else {
-                    cerr << "too many arguments.(" << arg << ")" << endl;
+                    cerr << "No new-string:" << arg << endl;
                     return 1;
                 }
+            } else if (fname.empty()) {
+                fname = arg;
+            } else {
+                cerr << "Too many arguments.(" << arg << ")" << endl;
+                return 1;
             }
         }
         if (dic_.empty())
@@ -65,7 +73,11 @@ private:
             for (Dic::iterator it = dic_.begin(); it != dic_.end(); ++it)
                 replaceStr(text, it->first, it->second);
         }
-        cout << text;
+        if (overwrite_) {
+            saveSameFile(fname, text);
+        } else {
+            cout << text;
+        }
         return true;
     }
 
@@ -91,18 +103,27 @@ private:
         }
     }
 
-    int usage() {
-        cerr << "usage> tiny_replstr [old-str] [new-str] file" << endl;
-        cerr << "       tiny_replstr ++ [old1] [new1] [old2] [new2] ...  -- file" << endl;
-        return 1;
+    void saveSameFile(string const& fname, string const& text) {
+        string bak_name = fname + ".bak";
+        FILE* fp = fopen(bak_name.c_str(), "rb");
+        if (fp) {
+            fclose(fp);
+            remove(bak_name.c_str());
+        }
+        rename(fname.c_str(), bak_name.c_str());
+        fp = fopen(fname.c_str(), "wt");
+        if (fwrite(text.c_str(), 1, text.size(), fp) != text.size())
+            cerr << "Write error (" << fname << ")" << endl;
+        fclose(fp);
     }
 
 private:
-    //typedef map<string, string>   Dic;
     typedef pair<string, string>    Elem;
     typedef vector< Elem >          Dic;
     Dic             dic_;
     bool            dic_mode_;
+    bool            one_mode_;
+    bool            overwrite_;
 };
 
 int main(int argc, char* argv[]) {
