@@ -1,5 +1,5 @@
 rem @echo off
-rem bld1_boost [vc??] [x86/x64] [zlib-?.?.?] [bzip2-?.?.?] [stage:"STAGE-DIR"]
+rem bld1_boost [vc??] [x86/x64] [zlib-?.?.?] [bzip2-?.?.?] [stage:"STAGE-DIR"] [LibPrefix:PREFIX]
 rem ex)
 rem cd boost_1_57_0
 rem ..\bld_lib_bat\bld1_boost.bat vc12 x64 zlib-1.2.8 bzip2-1.0.6
@@ -11,8 +11,11 @@ if not exist b2.exe call bootstrap.bat
 
 set Arch=%CcArch%
 
+set StrPrefix=%CcLibPrefix%
+
 set AddrModel=32
 set LibRootDir=%~dp0..
+set ArchLib=
 
 :ARG_LOOP
   if "%1"=="" goto ARG_LOOP_EXIT
@@ -32,6 +35,9 @@ set LibRootDir=%~dp0..
   if /I "%ARG:~0,4%"=="zlib"  set ZlibDir=%1
   if /I "%ARG:~0,5%"=="bzip2" set Bzip2Dir=%1
   if /I "%ARG:~0,6%"=="stage:" set StageDir=%ARG:~6%
+  if /I "%ARG:~0,10%"=="LibPrefix:" set StrPrefix=%ARG:~10%
+
+
   shift
 goto ARG_LOOP
 :ARG_LOOP_EXIT
@@ -73,11 +79,11 @@ set /a ThreadNum=%NUMBER_OF_PROCESSORS%+1
 
 if "%ZlibDir%"==""   set ZlibDir=zlib-1.2.8
 if "%Bzip2Dir%"==""  set Bzip2Dir=bzip2-1.0.6
-if "%CcArchLib%"=="" set CcArchLib=%StrPrefix%%Arch%
+if "%ArchLib%"==""   set ArchLib=%StrPrefix%%Arch%
 
 set ZlibDir=%LibRootDir%\%ZlibDir%
 set Bzip2Dir=%LibRootDir%\%Bzip2Dir%
-if "%StageDir%"=="" set StageDir=stage\%CcArchLib%
+if "%StageDir%"=="" set StageDir=stage\%ArchLib%
 
 set B2Opts=--build-type=complete variant=release,debug address-model=%AddrModel% -j%ThreadNum%
 set B2Opts=%B2Opts% --without-python --without-mpi
