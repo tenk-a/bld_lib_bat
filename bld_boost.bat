@@ -16,14 +16,14 @@ if "%CcBoostDir%"=="" (
 )
 
 if "%CcZlibDir%"=="" (
-  for /f %%i in ('dir /b /on /ad zlib-*') do set CcZlibDir=%%i
+  for /f %%i in ('dir /b /on /ad zlib*') do set CcZlibDir=%CD%\%%i
 )
 if "%CcBzip2Dir%"=="" (
-  for /f %%i in ('dir /b /on /ad bzip2-*') do set CcBzip2Dir=%%i
+  for /f %%i in ('dir /b /on /ad bzip2*') do set CcBzip2Dir=%CD%\%%i
 )
 
 cd %CcBoostDir%
-set Arg=%CcZlibDir% %CcBzip2Dir%
+set Arg=zlib:%CcZlibDir% bzip2:%CcBzip2Dir% LibPrefix:%CcLibPrefix%
 call ..\bld_lib_bat\setcc.bat      %CcName% x86
 call ..\bld_lib_bat\bld1_boost.bat %CcName% x86 %Arg%
 if "%CcHasX64%"=="1" (
