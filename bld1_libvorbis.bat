@@ -46,7 +46,7 @@ set SrcOggVerVc10=1.2.0
   if /I "%ARG:~0,8%"=="LibCopy:"    set LibCopyDir=%ARG:~8%
   if /I "%ARG:~0,7%"=="LibDir:"     set LibDir=%ARG:~7%
   if /I "%ARG:~0,10%"=="LibPrefix:" set StrPrefix=%ARG:~10%
-  if /I "%ARG:~0,9%"=="LibRtStr:"   set StrRtStr=%ARG:~9%
+  if /I "%ARG:~0,9%"=="LibRtSta:"   set StrRtSta=%ARG:~9%
   if /I "%ARG:~0,9%"=="LibRtDll:"   set StrRtDll=%ARG:~9%
   if /I "%ARG:~0,7%"=="LibRel:"     set StrRel=%ARG:~7%
   if /I "%ARG:~0,7%"=="LibDbg:"     set StrDbg=%ARG:~7%
@@ -142,23 +142,29 @@ if not "%OggVar%"=="" (
   if "%Compiler%"=="vc9"  ..\..\..\bld_lib_bat\tiny_replstr -x ++ %SrcOggVerVc9%  %OggVar% -- libogg.props
   if "%Compiler%"=="vc8"  ..\..\..\bld_lib_bat\tiny_replstr -x ++ %SrcOggVerVc8%  %OggVar% -- libogg.props
 )
+call :DelIntDir
 if %RtType%==static (
   call :gen_static
-  msbuild vorbis_static.sln  /t:Rebuild /p:Configuration=%BldType% /p:Platform=%Platform%
+  msbuild vorbis_static.sln  /t:Build /p:Configuration=%BldType% /p:Platform=%Platform%
+  call :ExampleCompile %RtType%
 ) else (
+  msbuild vorbis_dynamic.sln /t:Build /p:Configuration=%BldType% /p:Platform=%Platform%
+  call :ExampleCompile dll
+  call :DelIntDir
   call :gen_rtdll
-  msbuild vorbis_rtdll.sln   /t:Rebuild /p:Configuration=%BldType% /p:Platform=%Platform%
-  msbuild vorbis_dynamic.sln /t:Rebuild /p:Configuration=%BldType% /p:Platform=%Platform%
+  msbuild vorbis_rtdll.sln   /t:Build /p:Configuration=%BldType% /p:Platform=%Platform%
+  call :ExampleCompile %RtType%
 )
+call :DelIntDir
 popd
 
-set SrcDir=win32\%SlnDir%\%Platform%\%BldType%
 if "%LibCopyDir%"=="" goto ENDIF_LibCopyDir
 if not exist %LibCopyDir% mkdir %LibCopyDir%
 if not exist %LibCopyDir%\%Target% mkdir %LibCopyDir%\%Target%
+set SrcDir=win32\%SlnDir%\%Platform%\%BldType%
 if "%RtType%"=="static" (
   if exist %SrcDir%\libvorbis_static.lib copy %SrcDir%\libvorbis_static.lib %LibCopyDir%\%Target%\
-  if exist %SrcDir%\libvorbisfiles_static.lib copy %SrcDir%\libvorbisfiles_static.lib %LibCopyDir%\%Target%\
+  if exist %SrcDir%\libvorbisfile_static.lib copy %SrcDir%\libvorbisfile_static.lib %LibCopyDir%\%Target%\
 ) else (
   if exist %SrcDir%\libvorbis_rtdll.lib copy %SrcDir%\libvorbis_rtdll.lib %LibCopyDir%\%Target%\libvorbis_static.lib
   if exist %SrcDir%\libvorbis_rtdll.lib copy %SrcDir%\libvorbis_rtdll.lib %LibCopyDir%\%Target%\
@@ -191,6 +197,10 @@ for /R %1 %%i in (*_static.vcxproj) do (
 exit /b
 
 
+:DelIntDir
+del /S /Q *.obj *.tlog *.lastbuildstate *.log *.bak
+exit /b
+
 :SlnCopyUpd
 cd win32
 mkdir %2
@@ -208,4 +218,24 @@ exit /b
 del UpgradeLog.htm
 del /S /Q /F Backup\*.*
 rmdir /S /Q Backup
+exit /b
+
+
+:ExampleCompile
+set RtStr=_%1
+if "%RtStr%"=="_dll" "set RtStr="
+set MtStr=-MD
+if "%BldType%"=="debug" set MtStr=%MtStr%d
+if not exist %Platform%\%BldType%\examples mkdir %Platform%\%BldType%\examples
+pushd %Platform%\%BldType%\examples
+  set RelRoot=..\..\..\..\..
+  set EXAMPLE_OPTS=%MtStr% -I%RelRoot%\include -I%RelRoot%\..\%OggDir%\include
+  set EXAMPLE_LIBS=-link-libpath:%RelRoot%\..\%OggDir%\win32\%SlnDir%\%Platform%\%BldType% libogg%RtStr%.lib ..\libvorbis%RtStr%.lib ..\libvorbisfile%RtStr%.lib
+  cl %EXAMPLE_OPTS% -Fechaining_example%RtStr%.exe %RelRoot%\examples\chaining_example.c %EXAMPLE_LIBS%
+  cl %EXAMPLE_OPTS% -Fedecoder_example%RtStr%.exe %RelRoot%\examples\decoder_example.c %EXAMPLE_LIBS%
+  cl %EXAMPLE_OPTS% -Feencoder_example%RtStr%.exe %RelRoot%\examples\encoder_example.c %EXAMPLE_LIBS%
+  cl %EXAMPLE_OPTS% -Doff_t=__int64 -Feseeking_example%RtStr%.exe %RelRoot%\examples\seeking_example.c %EXAMPLE_LIBS%
+  cl %EXAMPLE_OPTS% -Fevorbisfile_example%RtStr%.exe %RelRoot%\examples\vorbisfile_example.c %EXAMPLE_LIBS%
+  cl %EXAMPLE_OPTS% -D_USE_MATH_DEFINES -Dsnprintf=_snprintf -Fetest%RtStr%.exe %RelRoot%\test\test.c %RelRoot%\test\util.c %RelRoot%\test\write_read.c %EXAMPLE_LIBS%
+popd
 exit /b

@@ -1,4 +1,4 @@
-rem @echo off
+@echo off
 rem Compile glfw for vc
 rem usage: bld1_glfw [x86/x64] [debug/release] [clean]
 rem ex)
@@ -42,7 +42,7 @@ set CleanMode=
   if /I "%ARG:~0,8%"=="LibCopy:"    set LibCopyDir=%ARG:~8%
   if /I "%ARG:~0,7%"=="LibDir:"     set LibDir=%ARG:~7%
   if /I "%ARG:~0,10%"=="LibPrefix:" set StrPrefix=%ARG:~10%
-  if /I "%ARG:~0,9%"=="LibRtStr:"   set StrRtStr=%ARG:~9%
+  if /I "%ARG:~0,9%"=="LibRtSta:"   set StrRtSta=%ARG:~9%
   if /I "%ARG:~0,9%"=="LibRtDll:"   set StrRtDll=%ARG:~9%
   if /I "%ARG:~0,7%"=="LibRel:"     set StrRel=%ARG:~7%
   if /I "%ARG:~0,7%"=="LibDbg:"     set StrDbg=%ARG:~7%

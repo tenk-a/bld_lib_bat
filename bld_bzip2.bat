@@ -20,7 +20,15 @@ if "%CcBzip2Dir%"=="" (
 
 call bld_lib_bat\gen_header.bat bzlib.h %CcBzip2Dir% libbz2.lib %CcMiscIncDir%\bzip2
 
-set Arg=libcopy:%CD%\%CcMiscLibDir%
+set Arg=
+set Arg=%Arg% libcopy:%CD%\%CcMiscLibDir%
+set Arg=%Arg% LibDir:lib
+set Arg=%Arg% LibPrefix:%CcLibPrefix%
+set Arg=%Arg% LibRtSta:%CcLibStrStatic%
+set Arg=%Arg% LibRtDll:%CcLibStrRtDll%
+set Arg=%Arg% LibRel:%CcLibStrRelease%
+set Arg=%Arg% LibDbg:%CcLibStrDebug%
+
 if "%CcNoRtStatic%"=="1" set Arg=%Arg% rtdll
 
 cd %CcBzip2Dir%

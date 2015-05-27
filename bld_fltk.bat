@@ -25,6 +25,12 @@ if "%CcFltkDir%"=="" (
 )
 
 set Arg=
+set Arg=%Arg% libcopy:%CD%\%CcMiscLibDir%
+set Arg=%Arg% LibDir:lib
+set Arg=%Arg% LibPrefix:%CcLibPrefix%
+set Arg=%Arg% LibRtSta:%CcLibStrStatic%
+set Arg=%Arg% LibRtDll:%CcLibStrRtDll%
+
 if "%CcNoRtStatic%"=="1" set Arg=%Arg% rtdll
 
 cd %CcFltkDir%

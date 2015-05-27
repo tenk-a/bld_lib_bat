@@ -37,7 +37,7 @@ set VcSlnDir=
   if /I "%ARG:~0,8%"=="LibCopy:"    set LibCopyDir=%ARG:~8%
   if /I "%ARG:~0,7%"=="LibDir:"     set LibDir=%ARG:~7%
   if /I "%ARG:~0,10%"=="LibPrefix:" set StrPrefix=%ARG:~10%
-  if /I "%ARG:~0,9%"=="LibRtStr:"   set StrRtStr=%ARG:~9%
+  if /I "%ARG:~0,9%"=="LibRtSta:"   set StrRtSta=%ARG:~9%
   if /I "%ARG:~0,9%"=="LibRtDll:"   set StrRtDll=%ARG:~9%
 
   shift

@@ -22,7 +22,15 @@ if not exist %CcMiscIncDir%\glfw mkdir %CcMiscIncDir%\glfw
 call :gen_header glfw3.h       %CcGlfwDir% >%CcMiscIncDir%\glfw\glfw3.h
 call :gen_header glfw3native.h %CcGlfwDir% >%CcMiscIncDir%\glfw\glfw3native.h
 
-set Arg=libcopy:%CD%\%CcMiscLibDir%
+set Arg=
+set Arg=%Arg% libcopy:%CD%\%CcMiscLibDir%
+set Arg=%Arg% LibDir:lib
+set Arg=%Arg% LibPrefix:%CcLibPrefix%
+set Arg=%Arg% LibRtSta:%CcLibStrStatic%
+set Arg=%Arg% LibRtDll:%CcLibStrRtDll%
+set Arg=%Arg% LibRel:%CcLibStrRelease%
+set Arg=%Arg% LibDbg:%CcLibStrDebug%
+
 if "%CcNoRtStatic%"=="1" set Arg=%Arg% rtdll
 
 cd %CcGlfwDir%
