@@ -167,7 +167,7 @@ if "%RtType%"=="static" (
   if exist %SrcDir%\libvorbisfile_static.lib copy %SrcDir%\libvorbisfile_static.lib %LibCopyDir%\%Target%\
 ) else (
   if exist %SrcDir%\libvorbis_rtdll.lib copy %SrcDir%\libvorbis_rtdll.lib %LibCopyDir%\%Target%\libvorbis_static.lib
-  if exist %SrcDir%\libvorbis_rtdll.lib copy %SrcDir%\libvorbis_rtdll.lib %LibCopyDir%\%Target%\
+  rem if exist %SrcDir%\libvorbis_rtdll.lib copy %SrcDir%\libvorbis_rtdll.lib %LibCopyDir%\%Target%\
   if exist %SrcDir%\libvorbis.lib copy %SrcDir%\libvorbis.lib %LibCopyDir%\%Target%\
   if exist %SrcDir%\libvorbis.dll copy %SrcDir%\libvorbis.dll %LibCopyDir%\%Target%\
   if exist %SrcDir%\libvorbis.pdb copy %SrcDir%\libvorbis.pdb %LibCopyDir%\%Target%\

@@ -143,7 +143,7 @@ if "%RtType%"=="static" (
   if exist %SrcDir%\libogg_static.lib copy %SrcDir%\libogg_static.lib %LibCopyDir%\%Target%\libogg_static.lib
 ) else (
   if exist %SrcDir%\libogg_rtdll.lib copy %SrcDir%\libogg_rtdll.lib %LibCopyDir%\%Target%\libogg_static.lib
-  if exist %SrcDir%\libogg_rtdll.lib copy %SrcDir%\libogg_rtdll.lib %LibCopyDir%\%Target%\libogg_rtdll.lib
+rem  if exist %SrcDir%\libogg_rtdll.lib copy %SrcDir%\libogg_rtdll.lib %LibCopyDir%\%Target%\libogg_rtdll.lib
   if exist %SrcDir%\libogg.lib copy %SrcDir%\libogg.lib %LibCopyDir%\%Target%\libogg.lib
   if exist %SrcDir%\libogg.dll copy %SrcDir%\libogg.dll %LibCopyDir%\%Target%
   if exist %SrcDir%\libogg.pdb copy %SrcDir%\libogg.pdb %LibCopyDir%\%Target%
