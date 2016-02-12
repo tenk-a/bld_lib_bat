@@ -18,8 +18,8 @@ if "%CcLibPngDir%"=="" (
   goto END
 )
 
-if not exist %CcMiscIncDir%\libpng mkdir %CcMiscIncDir%\libpng
-call :gen_header libpng.h %CcLibPngDir%  >%CcMiscIncDir%\libpng\libpng.h
+if not exist %CcMiscIncDir%\png mkdir %CcMiscIncDir%\png
+call :gen_header png.h %CcLibPngDir%  >%CcMiscIncDir%\png\png.h
 
 set Arg=libcopy:%CD%\%CcMiscLibDir%
 if "%CcNoRtStatic%"=="1" set Arg=%Arg% rtdll

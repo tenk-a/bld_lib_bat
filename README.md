@@ -18,11 +18,11 @@ boost のように ランタイムのstatic/dll, ライブラリ自身のstatic/
 
 ## 方針
 
--展開したライブラリ・ソース中のファイルを編集しない。
+- 展開したライブラリ・ソース中のファイルを編集しない。
 が、ライブラリの出力先等、そのフォルダ内にファイルの追加は有.
 また、Makefileに対し引数でオプション設定変更したりは当然する.
 
--一応バッチのライセンスは boost software license version 1.0 という
+- 一応バッチのライセンスは boost software license version 1.0 という
 ことにしとく(当然 各ライブラリのライセンスはそれぞれ)
 
 - ライブラリを貯めるディレクトリを用意し、そこに各種ライブラリを
@@ -47,39 +47,37 @@ boost のように ランタイムのstatic/dll, ライブラリ自身のstatic/
 を配置.(d:\libs_vc\bld_lib_bat\)
 
 - bld_lib_bat\ にある libs_config.bat.source をコピーして  
-    bld_lib_bat\libs_config.bat  
+        bld_lib_bat\libs_config.bat  
   を作成。  
   エディタで開け、  
-    set CcName=vc8～vc12                            使用するvcコンパイラ.  
-    set CcHasX64=0 or 1                             x86のみなら 0, x64版もビルドするなら 1  
-    set CcNoRtStatic=0 or 1                         staticランタイム版を生成しない場合 1を設定(vc++Expressでは必須)  
-    set CcCMakeDir=%ProgramFiles(x86)%\CMake\bin    libjpeg-turbo や glfw 等cmakeを使う場合, cmakeのディレクトリを設定.  
-    set CcNasmDir=c:\tools\nasm                     libjpeg-turbo 等 nasm を使う場合、nasmのディレクトリを設定.  
-  
+        set CcName=vc8～vc12                         　　使用するvcコンパイラ.  
+        set CcHasX64=0 or 1                          　　x86のみなら 0, x64版もビルドするなら 1  
+        set CcNoRtStatic=0 or 1                      　　staticランタイム版を生成しない場合 1を設定(vc++Expressでは必須)  
+        set CcCMakeDir=%ProgramFiles(x86)%\CMake\bin 　　libjpeg-turbo や glfw 等cmakeを使う場合, cmakeのディレクトリを設定.  
+        set CcNasmDir=c:\tools\nasm                  　　 libjpeg-turbo 等 nasm を使う場合、nasmのディレクトリを設定.  
   を自身の環境に合わせて書き換える.  
   ※ その他 Cc???? はバッチ共通で使うデフォルト値  
 
 
-- ビルドしたいライブラリを入手(ダンロード)して  
-d:\libs_vc\ の直下に解凍.  
-フォルダ名はバージョン番号等含んだデフォルトのままのこと.  
-たとえば zlib だと zlib128.zip を入手＆解凍、  
-  d:\libs_vc\zlib-1.2.8  
-が出来る.  
-d:\libs_vc\bld_lib_bat\ をカレント・ディレクトリにして  
-  bld_zlib.bat  
-を実行.  
-  d:\libs_vc\misc_inc\  
-にヘッダ zlib.h が生成され
-(作られた zlib.h は zlib-1.2.8 にある本物のzlib.h をincludeするだけのラッパー)  
-  d:\libs_vc\misc_lib\vc_x86  
-  d:\libs_vc\misc_lib\vc_x86_debug  
-  d:\libs_vc\misc_lib\vc_x86_rtdll  
-  d:\libs_vc\misc_lib\vc_x86_rtdll_debug  
-  d:\libs_vc\misc_lib\vc_x86  
-  d:\libs_vc\misc_lib\vc_x86_debug  
-  d:\libs_vc\misc_lib\vc_x86_rtdll  
-  d:\libs_vc\misc_lib\vc_x86_rtdll_debug  
-に zlib.lib が生成される.  
-※ ターゲットディレクトリ名はzlib*のように指定して最初に見つかった
-  適当なモノが使われる状態なので、複数のバージョンをそのまま置かないこと.
+- ビルドしたいライブラリを入手(ダンロード)して d:\libs_vc\ の直下に解凍.  
+  フォルダ名はバージョン番号等含んだデフォルトのままのこと.  
+  たとえば zlib だと zlib128.zip を入手＆解凍、  
+    d:\libs_vc\zlib-1.2.8  
+  が出来る.  
+  d:\libs_vc\bld_lib_bat\ をカレント・ディレクトリにして  
+    bld_zlib.bat  
+  を実行.  
+    d:\libs_vc\misc_inc\  
+  にヘッダ zlib.h が生成され
+  (作られた zlib.h は zlib-1.2.8 にある本物のzlib.h をincludeするだけのラッパー)  
+    d:\libs_vc\misc_lib\vc_x86  
+    d:\libs_vc\misc_lib\vc_x86_debug  
+    d:\libs_vc\misc_lib\vc_x86_rtdll  
+    d:\libs_vc\misc_lib\vc_x86_rtdll_debug  
+    d:\libs_vc\misc_lib\vc_x86  
+    d:\libs_vc\misc_lib\vc_x86_debug  
+    d:\libs_vc\misc_lib\vc_x86_rtdll  
+    d:\libs_vc\misc_lib\vc_x86_rtdll_debug  
+  に zlib.lib が生成される.  
+  ※ ターゲットディレクトリ名はzlib*のように指定して最初に見つかった
+     適当なモノが使われる状態なので、複数のバージョンをそのまま置かないこと.
