@@ -17,11 +17,11 @@ boost のように ランタイムのstatic/dll, ライブラリ自身のstatic/
 ## コンパイルするライブラリ
 
 大きいライブラリ
-- 現状 boost, wxWidgets, fltk
+- 現状 boost, wxWidgets, fltk  
 これらは、それらの標準のincludeやlibのパスを使う.
 
 比較的小さいライブラリ
-- 現状 zlib, libbz2, libpng, jpeglib, libjpeg-turbo, libtiff, libharu, glfw3, libogg, libvorbis
+- 現状 zlib, libbz2, libpng, jpeglib, libjpeg-turbo, libtiff, libharu, glfw3, libogg, libvorbis  
 これらは misc_inc/ , misc_lib/ ディレクトリにまとめる.
 
 
@@ -44,7 +44,7 @@ boost のように ランタイムのstatic/dll, ライブラリ自身のstatic/
 ソース環境のまま利用可能(ヘッダ・ファイルをそのまま使う).
 -- ただし生成されたライブラリの配置は、debug|release, static|dllランタイム,
 ターゲットライブラリ自身のstatc|dll, の都合でフォルダ分けし直している.
-(一種類の生成しか想定していないモノが多い)
+(一種類の生成しか想定していないライブラリも多い)
 
 
 ## インストール
@@ -52,8 +52,8 @@ boost のように ランタイムのstatic/dll, ライブラリ自身のstatic/
 - まず 各種ライブラリをまとめて置くフォルダを用意する.
 仮にここでは d:\libs_vc\ としておく.
 
-- そのフォルダ(d:\libs_vc\) の直下に この
-  bld_lib_bat\
+- そのフォルダ(d:\libs_vc\) の直下に この  
+  bld_lib_bat\  
 を配置.(d:\libs_vc\bld_lib_bat\)
 
 - bld_lib_bat\ にある libs_config.bat.source をコピーして  
@@ -150,8 +150,8 @@ cmd.exeの置換機能では対処しきれないケースもあったため、�
 ## bld1_????.bat バッチ
 
 bld_????.bat は実際には bld1_????.bat を呼び出している.
-bld1_????.bat は各ライブラリのビルドを１回行うためのバッチで、何がどれだけ生成されるかは、各ライブラリによって違う.
-(一度に release|debug、static|dllランタイムライブラリ、static|dllライブラリ、のファイルを生成するものもあれば、どれか１,2個の場合もあり)
+bld1_????.bat は各ライブラリのフォルダで それのみ で実際にビルドを行うためのバッチで、一応、それだけでも使えるようにしたつもり。
+x86 と x64 の切り替えはコンパイル環境の切り替えを伴うため、そのへんは bld_????.bat 側で行っている。
 
 
 ## 各ライブラリについて
@@ -161,7 +161,7 @@ bld1_????.bat は各ライブラリのビルドを１回行うためのバッチ
 
 ### misc_inc,misc_lib 配置のもの
 
-* zlib
+#### zlib
 - データ(ファイル)圧縮関係
 - bld_zlib.bat
 - ディレクトリは zlib-?.?.?
@@ -171,7 +171,7 @@ bld1_????.bat は各ライブラリのビルドを１回行うためのバッチ
 - libpng, boost, wxWidgets, openFramework 等 各種ライブラリから ソースなり .lib なりが参照される.
 
 
-* bzip2(libbz2)
+#### bzip2(libbz2)
 - データ(ファイル)圧縮関係
 - bld_bzip2.bat
 - ディレクトリは bzip2-?.?.? 　- 試したバージョンは bzip2-1.0.6
@@ -179,7 +179,7 @@ bld1_????.bat は各ライブラリのビルドを１回行うためのバッチ
 - boost からソースincludeされる.
 
 
-* lpng(libpng)
+#### lpng(libpng)
 - png画像ファイル関係
 - bld_lpng.bat
 - ディレクトリは lpng???? 　- 試したバージョンは lpng1616
@@ -187,14 +187,14 @@ bld1_????.bat は各ライブラリのビルドを１回行うためのバッチ
 - scripts/makefile.vcwin32 の引数でCFLAGS,CPPFLAGSを設定してビルド.
 
 
-* jpeg(libjpeg)
+#### jpeg(libjpeg)
 - jpeg画像ファイル関係
 - bld_jpeg.bat
 - ディレクトリは jpeg-?? 　- 試したバージョンは jpeg-9a
 - makefile.vc の引数で、cflags等の各種設定を変えてビルド。
 
 
-* libjpeg-turbo
+#### libjpeg-turbo
 - jpeg画像ファイル関係. libjpegの派生
 - bld_libjpeg-turbo.bat
 - ディレクトリは libjpeg-turbo-* 　- 試したバージョンは libjpeg-turbo-code-1537-trunk
@@ -203,7 +203,7 @@ bld1_????.bat は各ライブラリのビルドを１回行うためのバッチ
 - DLLランタイム版のビルドは用意されていないので、無理やりバッチ内で、flags.make や CMakeLists.txt を書き換えた別ファイルを生成してビルド.
 
 
-* tiff(libtiff)
+#### tiff(libtiff)
 - tiff画像ファイル関係
 - bld_tiff.bat
 - ディレクトリは tiff-?.?.? 　- 試したバージョンは tiff-4.0.3
@@ -211,7 +211,7 @@ bld1_????.bat は各ライブラリのビルドを１回行うためのバッチ
 - Makefile.vc の引数で各種指定してビルド.
 
 
-* libharu
+#### libharu
 - pdf関係
 - bld_libharu.bat
 - ディレクトリは libharu-* 　- 試したバージョンは libharu-RELEASE_2_3_0
@@ -221,7 +221,7 @@ bld1_????.bat は各ライブラリのビルドを１回行うためのバッチ
 - script/makefile.msvc の引数で、CFLAGS,LDFLAGS等の各種設定を変えてビルド。
 
 
-* glfw3
+#### glfw
 - OpenGL 関係
 - bld_glfw.bat
 - ディレクトリは glfw-3.?.? 　- 試したバージョンは glfw-3.1.1
@@ -230,7 +230,7 @@ bld1_????.bat は各ライブラリのビルドを１回行うためのバッチ
 -- glfw-?.?.?/lib/ の下に vc??_x??[_static][_debug]  のようなディレクトリを作りその下に.libを配置.
 
 
-* libvorbis
+#### libvorbis
 - 音声圧縮関係 (oggで使われる)
 - bld_libvorbis.bat
 - ディレクトリは libvorbis-?.?.? 　- 試したバージョンは libvorbis-1.3.5
@@ -241,7 +241,7 @@ bld1_????.bat は各ライブラリのビルドを１回行うためのバッチ
 - libogg で使う
 
 
-* libogg
+#### libogg
 - ogg関係
 - bld_libogg.bat
 - ディレクトリは libvogg-?.?.? 　- 試したバージョンは libogg-1.3.2
@@ -256,7 +256,7 @@ bld1_????.bat は各ライブラリのビルドを１回行うためのバッチ
 
 ### misc*系に置かないモノ
 
-* boost
+#### boost
 - 巨大汎用ライブラリ
 - bld_boost.bat
 - ディレクトリは boost_?_??_? 　- 試したバージョンは boost_1_58_0
@@ -267,7 +267,7 @@ bld1_????.bat は各ライブラリのビルドを１回行うためのバッチ
 - .lib は libs_vc/boost/stage/vc??_x??[_debug][_static]/ に生成される
 
 
-* wxWidgets v3
+#### wxWidgets v3
 - GUIフレームワーク
 - bld_wxWidgets.bat
 - ディレクトリは wxWidgets-3.?.? 　- 試したバージョンは wxWidgets-3.0.2
@@ -275,7 +275,7 @@ bld1_????.bat は各ライブラリのビルドを１回行うためのバッチ
 - makefile.vc に所定の引数渡してビルド.
 
 
-* fltk
+#### fltk
 - GUIフレームワーク
 - bld_fltk.bat
 - ディレクトリは fltk-?.?.? 　- 試したバージョンは fltk-1.3.3
@@ -283,10 +283,7 @@ bld1_????.bat は各ライブラリのビルドを１回行うためのバッチ
 - dllランタイム版は、msbuild fltk.sln で Configuration, Platform を指定してビルド.
 - static ランタイム版やx64版は用意されていないので、.slnや.vcxprojを無理やり書き換えたものを生成してビルド.
 - zlibやpngライブラリを使っているが、ソースは予め配布ライブラリ内に含まれている.
-- ライブラリの生成場所は元と多少違い、fltk-?.?.?/lib/ 下に以下のディレクトリを作って、その中に.libを配置.
--- vc?_x86/        　　―― x86 dllランタイム版
--- vc?_x86_static/ 　　―― x86 staticランタイム版
--- vc?_x64/        　　―― x64 dllランタイム版
--- vc?_x64_static/ 　　―― x64 staticランタイム版
 - デバッグ用ライブラリについては、元のまま 最後に d がついたモノを使うことになる.
+- .lib は lib/ の下に、misc_lib 同様のサブディレクトリを掘ってそこに入れている.
 - tiny_replstr 使用
+
