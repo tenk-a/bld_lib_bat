@@ -82,13 +82,9 @@ boost のように ランタイムのstatic/dll, ライブラリ自身のstatic/
   (作られた zlib.h は zlib-1.2.8 にある本物のzlib.h をincludeするだけのラッパー)  
     d:\libs_vc\misc_lib\vc_x86  
     d:\libs_vc\misc_lib\vc_x86_debug  
-    d:\libs_vc\misc_lib\vc_x86_rtdll  
-    d:\libs_vc\misc_lib\vc_x86_rtdll_debug  
-    d:\libs_vc\misc_lib\vc_x86  
-    d:\libs_vc\misc_lib\vc_x86_debug  
-    d:\libs_vc\misc_lib\vc_x86_rtdll  
-    d:\libs_vc\misc_lib\vc_x86_rtdll_debug  
-  に zlib.lib が生成される.  
+    d:\libs_vc\misc_lib\vc_x86_static  
+    d:\libs_vc\misc_lib\vc_x86_static_debug  
+  等に zlib.lib が生成される.  
   ※ ターゲットディレクトリ名はzlib*のように指定して、名前ソートで最後に見つかった
      モノを使うが、わかりにくいので複数のバージョンを置くのは避けたほうがよいだろう。
 
@@ -110,14 +106,14 @@ boostやwxWidgetsのように仕分け対応積みのモノもあるが、debug|
 仕分け対応していないライブラリについては、このバッチ群独自にディレクトリ分けしている。
 
 libs_vc/misc_lib/ に入るものについては、
-- vc??_x86
-- vc??_x86_debug
-- vc??_x86_static
-- vc??_x86_static_debug
-- vc??_x86
-- vc??_x86_debug
-- vc??_x86_static
-- vc??_x86_static_debug
+- vc_x86
+- vc_x86_debug
+- vc_x86_static
+- vc_x86_static_debug
+- vc_x64
+- vc_x64_debug
+- vc_x64_static
+- vc_x64_static_debug
 
 のようになる。misc_lib/ の下に作られるディレクトリもそうだし、各ライブラリでのビルドでも
 そのディレクトリ下のlib/ ディレクトリに上記のようなディレクトリを作り、その中に*.libを置く.
@@ -166,7 +162,7 @@ x86 と x64 の切り替えはコンパイル環境の切り替えを伴うた�
 - bld_zlib.bat
 - ディレクトリは zlib-?.?.?
 - 試したバージョンは zlib-1.2.8
-- win32/Makefile.vc の引数でCFLAGS等指定してコンパイルオプションを変えている.
+- バッチ内では、win32/Makefile.vc の引数でCFLAGS等指定してコンパイルオプションを変えている.
 - dllライブラリ版を使用する場合は、zlib.h のinclude前にZLIB_DLLを#defineしておく必要がある.
 - libpng, boost, wxWidgets, openFramework 等 各種ライブラリから ソースなり .lib なりが参照される.
 
@@ -175,7 +171,7 @@ x86 と x64 の切り替えはコンパイル環境の切り替えを伴うた�
 - データ(ファイル)圧縮関係
 - bld_bzip2.bat
 - ディレクトリは bzip2-?.?.? 　- 試したバージョンは bzip2-1.0.6
-- makefile.msc の引数でOPTFLAGS等各種指定してビルド.
+- バッチ内では、makefile.msc の引数でOPTFLAGS等各種指定してビルド.
 - boost からソースincludeされる.
 
 
@@ -191,7 +187,7 @@ x86 と x64 の切り替えはコンパイル環境の切り替えを伴うた�
 - jpeg画像ファイル関係
 - bld_jpeg.bat
 - ディレクトリは jpeg-?? 　- 試したバージョンは jpeg-9a
-- makefile.vc の引数で、cflags等の各種設定を変えてビルド。
+- バッチ内では、makefile.vc の引数で、cflags等の各種設定を変えてビルド。
 
 
 #### libjpeg-turbo
@@ -208,7 +204,7 @@ x86 と x64 の切り替えはコンパイル環境の切り替えを伴うた�
 - bld_tiff.bat
 - ディレクトリは tiff-?.?.? 　- 試したバージョンは tiff-4.0.3
 - zlib, libjeg 利用. なくてもビルドできるが圧縮未対応になるので、予め zlib, libjpeg をビルド済のこと.
-- Makefile.vc の引数で各種指定してビルド.
+- バッチ内では、Makefile.vc の引数で各種指定してビルド.
 
 
 #### libharu
@@ -217,16 +213,15 @@ x86 と x64 の切り替えはコンパイル環境の切り替えを伴うた�
 - ディレクトリは libharu-* 　- 試したバージョンは libharu-RELEASE_2_3_0
 - zlib, lpng 必須. 予め ビルド済みのこと.
 - demo をコンパイルすると jpfont_demo.exe の実行でエラー。jpfont_demo.c 中のフォント名 MS-Mincyo が原因. 全てMS-Minchoに置換すればok.
-- なので libharu をコンパイルする場合は予め 
-- script/makefile.msvc の引数で、CFLAGS,LDFLAGS等の各種設定を変えてビルド。
+- なので libharu をビルドする場合は予め 修正しておくこと。
+- バッチ内では、script/makefile.msvc の引数で CFLAGS,LDFLAGS等の各種設定を変えてビルド。
 
 
 #### glfw
 - OpenGL 関係
 - bld_glfw.bat
 - ディレクトリは glfw-3.?.? 　- 試したバージョンは glfw-3.1.1
-- CMake の引数で所定の変数を設定してビルド.
-- 最終的にmisc_lib/へコピーされるが、ビルド中のライブラリ生成ディレクトリは元とは多少違う.
+- バッチ内では、CMake の引数で所定の変数を設定してビルド.
 -- glfw-?.?.?/lib/ の下に vc??_x??[_static][_debug]  のようなディレクトリを作りその下に.libを配置.
 
 
@@ -234,24 +229,23 @@ x86 と x64 の切り替えはコンパイル環境の切り替えを伴うた�
 - 音声圧縮関係 (oggで使われる)
 - bld_libvorbis.bat
 - ディレクトリは libvorbis-?.?.? 　- 試したバージョンは libvorbis-1.3.5
-- 用意された vc sln 環境を使うが、vs2012(vc11),vs2013(vc12)用は vs2010(vc10)環境から生成している.
-- *_static.sln はdllランタイム前提だったので、_static.vcxproj 等をバッチ内で書き換えてstaticランタイム版をビルド.
-- (ビルド環境内では dllランタイム版は _rtdll をつけて生成し、misc_libへのコピー時に_staticに付け直している).
-- tiny_replstr 使用
 - libogg で使う
+- バッチ内では、用意された vc sln 環境を使うが、vs2012(vc11),vs2013(vc12)用は vs2010(vc10)環境から生成している.
+-- *_static.sln はdllランタイム前提だったので、_static.vcxproj 等をバッチ内で書き換えてstaticランタイム版をビルド.
+-- (ビルド環境内では dllランタイム版は _rtdll をつけて生成し、misc_libへのコピー時に_staticに付け直している).
+-- tiny_replstr 使用
 
 
 #### libogg
 - ogg関係
 - bld_libogg.bat
 - ディレクトリは libvogg-?.?.? 　- 試したバージョンは libogg-1.3.2
-- msbuildで libogg_static.sln, libogg_dynamic.sln に所定の引数与えてビルド. 
-- dllランタイム用が無いのでバッチ内でlibogg_static.slnからdllランタイム用slnを生成してビルド.
-- 最終的にmisc_lib/へコピーされるが、ビルド中のライブラリ生成ディレクトリは元とは多少違う.
--- libvorbis-?.?.?/lib/ の下に vc??_x??[_static][_debug]  のようなディレクトリを作りその下に.libを配置.
-- (ビルド環境内では dllランタイム版は _rtdll をつけて生成し、misc_libへのコピー時に_staticに付け直している).
-- tiny_replstr 使用
 - libvorbis 必須. ※ _static版のランタイム指定が liboggとlibvorbisで違うような... dll(_dynamic)ライブラリ版しか使ってないの？
+- msbuildで libogg_static.sln, libogg_dynamic.sln に所定の引数与えてビルド. 
+-- バッチ内では、dllランタイム用が無いのでバッチ内でlibogg_static.slnからdllランタイム用slnを生成してビルド.
+-- 最終的にmisc_lib/へコピーされるが、ビルド中のライブラリ生成ディレクトリは元とは多少違う.
+-- (ビルド環境内では dllランタイム版は _rtdll をつけて生成し、misc_libへのコピー時に_staticに付け直している).
+-- tiny_replstr 使用
 
 
 ### misc*系に置かないモノ
@@ -280,10 +274,10 @@ x86 と x64 の切り替えはコンパイル環境の切り替えを伴うた�
 - bld_fltk.bat
 - ディレクトリは fltk-?.?.? 　- 試したバージョンは fltk-1.3.3
 - でっかいので、fltkの環境のまま使用。
-- dllランタイム版は、msbuild fltk.sln で Configuration, Platform を指定してビルド.
-- static ランタイム版やx64版は用意されていないので、.slnや.vcxprojを無理やり書き換えたものを生成してビルド.
 - zlibやpngライブラリを使っているが、ソースは予め配布ライブラリ内に含まれている.
 - デバッグ用ライブラリについては、元のまま 最後に d がついたモノを使うことになる.
 - .lib は lib/ の下に、misc_lib 同様のサブディレクトリを掘ってそこに入れている.
-- tiny_replstr 使用
+- バッチ内では、dllランタイム版は、msbuild fltk.sln で Configuration, Platform を指定してビルド.
+-- static ランタイム版やx64版は用意されていないので、.slnや.vcxprojを無理やり書き換えたものを生成してビルド.
+-- tiny_replstr 使用
 
