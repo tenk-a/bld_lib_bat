@@ -73,6 +73,13 @@ if "%StrRtSta%%StrRtDll%"=="" set StrRtSta=_static
 if "%LibDir%"=="" set LibDir=lib
 if not exist %LibDir% mkdir %LibDir%
 
+if not exist jconfig.h copy jconfig.vc jconfig.h
+if not exist win32.mak (
+  echo # dummy win32.mak >win32.mak
+  echo cc=cl >>win32.mak
+  echo link=link >>win32.mak
+)
+
 if "%HasRtSta%%HasRel%"=="Sr" call :Bld1 rtsta rel %StrPrefix%%Arch%%StrRtSta%%StrRel%
 if "%HasRtSta%%HasDbg%"=="Sd" call :Bld1 rtsta dbg %StrPrefix%%Arch%%StrRtSta%%StrDbg%
 if "%HasRtDll%%HasRel%"=="Lr" call :Bld1 rtdll rel %StrPrefix%%Arch%%StrRtDll%%StrRel%

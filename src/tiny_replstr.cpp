@@ -20,7 +20,7 @@ public:
         fprintf(stderr,
             "usage> tiny_replstr [opts] [old-str] [new-str] file\n"
             "       tiny_replstr [opts] ++ [old1] [new1] [old2] [new2] ...  -- file\n"
-            "  opts:
+            "  opts:\n"
             "    -x   Overwite the same file.\n");
         return 1;
     }

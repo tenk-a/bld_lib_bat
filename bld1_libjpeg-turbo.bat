@@ -79,6 +79,8 @@ if "%StrRel%%StrDbg%"==""     set StrDbg=_debug
 if "%LibDir%"=="" set LibDir=lib
 if not exist %LibDir% mkdir %LibDir%
 
+if not exist jconfig.h copy jconfig.vc jconfig.h
+
 if "%HasRtSta%%HasRel%"=="Sr" call :Bld1 rtsta release %StrPrefix%%Arch%%StrRtSta%%StrRel%
 if "%HasRtSta%%HasDbg%"=="Sd" call :Bld1 rtsta debug   %StrPrefix%%Arch%%StrRtSta%%StrDbg%
 if "%HasRtDll%%HasRel%"=="Lr" call :Bld1 rtdll release %StrPrefix%%Arch%%StrRtDll%%StrRel%

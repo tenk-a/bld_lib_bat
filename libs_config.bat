@@ -14,7 +14,8 @@ rem for glfw, libjpeg-turbo etc
 set CcCMakeDir=%ProgramFiles(x86)%\CMake\bin
 
 rem for libjpeg-turbo
-set CcNasmDir=c:\tools\nasm
+set CcNasmDir=%USERPROFILE%\AppData\Local\nasm
+c:\tools\nasm
 
 
 rem ==========================================================================
@@ -27,8 +28,8 @@ if "%CcName%"=="" (
 )
 
 set CcLibDir=.\lib
-rem set CcLibPrefix=vc_
-set CcLibPrefix=%CcName%_
+set CcLibPrefix=
+rem set CcLibPrefix=%CcName%_
 set CcLibStrDebug=_debug
 set CcLibStrRelease=
 set CcLibStrDll=_dll

@@ -122,7 +122,15 @@ if exist %JpegIncDir%\jpeglib.h (
   set "JPEG_ARGS=JPEG_SUPPORT=1 JPEGDIR=%JpegIncDir% JPEG_INCLUDE=-I%JpegIncDir% JPEG_LIB=%JpegLibDir%\%Target%\libjpeg.lib"
 )
 
+cd port
+del libport.lib
+nmake -f Makefile.vc "OPTFLAGS=%OPTFLAGS%"
+if errorlevel 1 goto :EOF
+del *.obj *.exp *.dll.manifest *.ilk
+cd ..
+
 cd libtiff
+del libtiff.lib
 nmake -f Makefile.vc "OPTFLAGS=%OPTFLAGS%" %ZLIB_ARGS% %JPEG_ARGS%
 if errorlevel 1 goto :EOF
 del *.obj *.exp *.dll.manifest *.ilk

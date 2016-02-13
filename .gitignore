@@ -1,0 +1,11 @@
+*.bak
+*.obj
+tmp
+*.tmp
+*.sav
+sav
+*.ilk
+*.pdb
+libs_config.bat
+*.exe
+err.txt
