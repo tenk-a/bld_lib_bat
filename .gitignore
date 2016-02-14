@@ -1,6 +1,7 @@
-/
+/*
 !/bld_lib_bat
 !/bld_lib_sample
+!.gitignore
 *.bak
 *.obj
 tmp
