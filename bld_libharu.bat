@@ -20,6 +20,7 @@ if "%CcLibHaruDir%"=="" (
 
 if not exist %CcMiscIncDir%\libharu mkdir %CcMiscIncDir%\libharu
 for /f %%i in ('dir /b /on %CcLibHaruDir%\include\*.h') do call :gen_header %%~nxi
+for /f %%i in ('dir /b /on %CcLibHaruDir%\win32\include\*.h') do call :gen_header2 %%~nxi
 
 set Arg=libcopy:%CD%\%CcMiscLibDir%
 if "%CcNoRtStatic%"=="1" set Arg=%Arg% rtdll
@@ -39,6 +40,15 @@ goto :END
 echo /// %1 wrapper >%CcMiscIncDir%\libharu\%1
 echo #pragma once >>%CcMiscIncDir%\libharu\%1
 echo #include "../../%CcLibHaruDir%/include/%1" >>%CcMiscIncDir%\libharu\%1
+echo #ifdef _MSC_VER >>%CcMiscIncDir%\libharu\%1
+echo   #pragma comment(lib, "libhpdf.lib") >>%CcMiscIncDir%\libharu\%1
+echo #endif >>%CcMiscIncDir%\libharu\%1
+exit /b
+
+:gen_header2
+echo /// %1 wrapper >%CcMiscIncDir%\libharu\%1
+echo #pragma once >>%CcMiscIncDir%\libharu\%1
+echo #include "../../%CcLibHaruDir%/win32/include/%1" >>%CcMiscIncDir%\libharu\%1
 echo #ifdef _MSC_VER >>%CcMiscIncDir%\libharu\%1
 echo   #pragma comment(lib, "libhpdf.lib") >>%CcMiscIncDir%\libharu\%1
 echo #endif >>%CcMiscIncDir%\libharu\%1

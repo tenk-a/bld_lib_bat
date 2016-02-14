@@ -276,7 +276,8 @@ x86 と x64 の切り替えはコンパイル環境の切り替えを伴うた�
 - でっかいし環境整ってるので、boostの環境のまま使用。
 - libs_vc??/直下に zlib*, bzip2* のフォルダを予め用意してあれば、それらを使ってライブラリ構築する.
 - ※ boost環境内でzlib,libbz2を含んだライブラリが作られるので、予めzlibやlibbz2を構築する必要はない.
-- ※jpegやpngについては現状未対応
+- gilで使う jpeg、png、tiffについては、使う側で、jpeglib.h,png.h,tiff.h がそのままincludeできlibがリンクされるようにする必要がある。
+(gil自体は ヘッダオンリーのライブラリのようで、boost構築時にjpeg,png,tiffについて何かする必要はなさそう
 - .lib は boost-?????/stage/vc??_x??[_debug][_static]/ に生成される
 
 
