@@ -1,4 +1,4 @@
-rem @echo off
+@echo off
 rem Compile libjpeg-turbo for vc
 rem usage: bld1_libjpeg-turbo [x86/x64] [debug/release] [clean]
 rem ex)
@@ -95,11 +95,22 @@ set RtType=%1
 set BldType=%2
 set Target=%3
 
-CMake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=%BldType%
+call :Clean
+
+set ADD_CMAKE_OPTS=
+if %RtType%==rtdll (
+    set ADD_CMAKE_OPTS=-DWITH_CRT_DLL=true
+) else (
+    set ADD_CMAKE_OPTS=-DWITH_CRT_DLL=false
+)
+CMake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=%BldType% %ADD_CMAKE_OPTS%
 if errorlevel 1 goto :EOF
 
-if %RtType%==rtdll (
-  call :ReplaceMTtoMD
+rem if %RtType%==rtdll (
+rem   call :ReplaceMTtoMD
+rem )
+if %RtType%==rtsta (
+    call :ReplaceMDtoMT
 )
 
 nmake
@@ -135,7 +146,6 @@ exit /b
 
 
 :Clean
-
 if exist Makefile (
   nmake clean
   del Makefile
@@ -182,11 +192,10 @@ exit /b
 
 
 :ReplaceMTtoMD
-for /R %%i in (flags.make CMakeLists.txt) do (
+for /R %%i in (CMakeCache.txt) do (
   if exist %%i call :Rep1MTtoMD %%i
 )
 exit /b
-
 :Rep1MTtoMD
 set TgtReplFile=%1
 set BakReplFile=%1.bak
@@ -198,7 +207,27 @@ for /f "delims=" %%A in (%BakReplFile%) do (
     call :Rep1SubMTtoMD
 )
 exit /b
-
 :Rep1SubMTtoMD
 echo %line:/MT=/MD%>>%TgtReplFile%
+exit /b
+
+
+:ReplaceMDtoMT
+for /R %%i in (CMakeCache.txt) do (
+  if exist %%i call :Rep1MDtoMT %%i
+)
+exit /b
+:Rep1MDtoMT
+set TgtReplFile=%1
+set BakReplFile=%1.bak
+if exist %BakReplFile% del %BakReplFile%
+move %TgtReplFile% %BakReplFile%
+type nul >%TgtReplFile%
+for /f "delims=" %%A in (%BakReplFile%) do (
+    set line=%%A
+    call :Rep1SubMDtoMT
+)
+exit /b
+:Rep1SubMDtoMT
+echo %line:/MD=/MT%>>%TgtReplFile%
 exit /b
