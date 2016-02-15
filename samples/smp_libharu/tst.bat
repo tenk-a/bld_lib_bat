@@ -1,1 +1,4 @@
-smp_jpg2pdf -otst.pdf img\01.jpg img\02.jpg img\03.jpg img\04.jpg img\05.jpg img\07.jpg img\08.jpg
+set srcDir=..\data\img
+set dstDir=..\tst_output
+if not exist %dstDir% mkdir %dstDir%
+smp_jpg2pdf -o%dstDir%\smp_libharu_result.pdf %srcDir%\01.jpg %srcDir%\02.jpg %srcDir%\03.jpg %srcDir%\04.jpg

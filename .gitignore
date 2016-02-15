@@ -1,8 +1,8 @@
-/bak
+bak
 *.bak
-/tmp
+tmp
 *.tmp
-/sav
+sav
 *.sav
 libs_config.bat
 *.exe
@@ -10,5 +10,4 @@ libs_config.bat
 *.pdb
 *.ilk
 err.txt
-*.jpg
-*.png
+/samples/tst_output/*

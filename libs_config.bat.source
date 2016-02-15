@@ -15,7 +15,6 @@ set CcCMakeDir=%ProgramFiles(x86)%\CMake\bin
 
 rem for libjpeg-turbo
 set CcNasmDir=%USERPROFILE%\AppData\Local\nasm
-c:\tools\nasm
 
 
 rem ==========================================================================

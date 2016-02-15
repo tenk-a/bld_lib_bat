@@ -22,11 +22,10 @@ if "%CcLibJpegDir%"=="" (
   for /f %%i in ('dir /b /on /ad jpeg*') do set CcLibJpegDir=%%i
 )
 
-if not exist %CcLibTiffDir%\tiff mkdir %CcLibTiffDir%\tiff
+if not exist %CcMiscIncDir%\tiff mkdir %CcMiscIncDir%\tiff
 call :gen_header tiffio.h     %CcLibTiffDir% >%CcMiscIncDir%\tiff\tiffio.h
-call :gen_header tiffiop.h    %CcLibTiffDir% >%CcMiscIncDir%\tiff\tiffiop.h
-call :gen_header tif_config.h %CcLibTiffDir% >%CcMiscIncDir%\tiff\tif_config.h
 call :gen_header tiffio.hxx   %CcLibTiffDir% >%CcMiscIncDir%\tiff\tiffio.hxx
+rem call :gen_header tif_config.h %CcLibTiffDir% >%CcMiscIncDir%\tiff\tif_config.h
 
 set Arg=libcopy:%CD%\%CcMiscLibDir% zlibinc:%CD%\%CcMiscIncDir% zliblib:%CD%\%CcMiscLibDir% jpeginc:%CD%\%CcLibJpegDir% jpeglib:%CD%\%CcMiscLibDir%
 if "%CcNoRtStatic%"=="1" set Arg=%Arg% rtdll
