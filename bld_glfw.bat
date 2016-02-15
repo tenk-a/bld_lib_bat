@@ -18,9 +18,8 @@ if "%CcGlfwDir%"=="" (
   goto END
 )
 
-if not exist %CcMiscIncDir%\glfw mkdir %CcMiscIncDir%\glfw
-call :gen_header glfw3.h       %CcGlfwDir% >%CcMiscIncDir%\glfw\glfw3.h
-call :gen_header glfw3native.h %CcGlfwDir% >%CcMiscIncDir%\glfw\glfw3native.h
+call :gen_header glfw3.h       ../../%CcGlfwDir%/include/glfw glfw3.lib %CcMiscIncDir%\glfw
+call :gen_header glfw3native.h ../../%CcGlfwDir%/include/glfw glfw3.lib %CcMiscIncDir%\glfw
 
 set Arg=
 set Arg=%Arg% libcopy:%CD%\%CcMiscLibDir%
@@ -43,13 +42,16 @@ if "%CcHasX64%"=="1" (
 cd ..
 goto END
 
-
 :gen_header
+if not exist %4 mkdir %4
+call :gen_header_print %1 %2 %3 >%4\%1
+exit /b
+:gen_header_print
 echo /// %1 wrapper
 echo #pragma once
-echo #include "../../%2/include/glfw/%1"
+echo #include "%2/%1"
 echo #ifdef _MSC_VER
-echo  #pragma comment(lib, "glfw3.lib")
+echo  #pragma comment(lib, "%3")
 echo #endif
 exit /b
 
