@@ -153,15 +153,9 @@ if "%LibCopyDir%"=="" goto ENDIF_LibCopyDir
 if not exist %LibCopyDir% mkdir %LibCopyDir%
 if not exist %LibCopyDir%\%Target% mkdir %LibCopyDir%\%Target%
 
-if exist %JpegIncDir%\turbojpeg.h (
-  if exist %DstDir%\libtiff_i.lib copy %DstDir%\libtiff_i.lib %LibCopyDir%\%Target%\libtiff_i-jpegturbo.lib
-  if exist %DstDir%\libtiff.lib   copy %DstDir%\libtiff.lib   %LibCopyDir%\%Target%\libtiff-jpegturbo.lib
-  if exist %DstDir%\libtiff.dll   copy %DstDir%\libtiff.dll   %LibCopyDir%\%Target%\libtiff-jpegturbo.dll
-  if exist %DstDir%\libtiff.pdb   copy %DstDir%\libtiff.pdb   %LibCopyDir%\%Target%\libtiff-jpegturbo.pdb
-) else (
-  if exist %DstDir%\*.lib copy %DstDir%\*.lib %LibCopyDir%\%Target%
-  if exist %DstDir%\*.dll copy %DstDir%\*.dll %LibCopyDir%\%Target%
-  if exist %DstDir%\*.pdb copy %DstDir%\*.pdb %LibCopyDir%\%Target%
-)
+if exist %DstDir%\*.lib copy %DstDir%\*.lib %LibCopyDir%\%Target%
+if exist %DstDir%\*.dll copy %DstDir%\*.dll %LibCopyDir%\%Target%
+if exist %DstDir%\*.pdb copy %DstDir%\*.pdb %LibCopyDir%\%Target%
+
 :ENDIF_LibCopyDir
 exit /b

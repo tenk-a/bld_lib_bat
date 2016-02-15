@@ -37,23 +37,6 @@ if "%CcHasX64%"=="1" (
 )
 cd ..
 
-rem for jpeg-turbo
-if not exist %CD%\%CcMiscIncDir%\jpeg-turbo\turbojpeg.h goto END
-
-set LibJpegDir=
-for /f %%i in ('dir /b /on /ad libjpeg-turbo*') do set LibJpegDir=%%i
-set Arg=libcopy:%CD%\%CcMiscLibDir% zlibinc:%CD%\%CcMiscIncDir% zliblib:%CD%\%CcMiscLibDir% jpeginc:%CD%\%LibJpegDir% jpeglib:%CD%\%CcMiscLibDir% LibDir:lib-jpegturbo
-if "%CcNoRtStatic%"=="1" set Arg=%Arg% rtdll
-
-cd %CcLibTiffDir%
-call ..\bld_lib_bat\setcc.bat %CcName% x86
-call ..\bld_lib_bat\bld1_tiff.bat x86 %Arg%
-if "%CcHasX64%"=="1" (
-  call ..\bld_lib_bat\setcc.bat %CcName% x64
-  call ..\bld_lib_bat\bld1_tiff.bat x64 %Arg%
-)
-cd ..
-
 goto :END
 
 
@@ -67,19 +50,10 @@ echo /// %1 wrapper
 echo #pragma once
 echo #include "%2/libtiff/%1"
 echo #ifdef _MSC_VER
-echo  #include "jpeglib.h"
-echo  #ifdef LIBJPEG_TURBO_VERSION
-echo   #ifdef DLLDEFINE
-echo    #pragma comment(lib, "libtiff-jpegturbo.lib")
-echo   #else
-echo    #pragma comment(lib, "libtiff_i-jpegturbo.lib")
-echo   #endif
+echo  #ifdef DLLDEFINE
+echo   #pragma comment(lib, "libtiff.lib")
 echo  #else
-echo   #ifdef DLLDEFINE
-echo    #pragma comment(lib, "libtiff.lib")
-echo   #else
-echo    #pragma comment(lib, "libtiff_i.lib")
-echo   #endif
+echo   #pragma comment(lib, "libtiff_i.lib")
 echo  #endif
 echo #endif
 exit /b
