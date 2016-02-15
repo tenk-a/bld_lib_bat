@@ -2,6 +2,12 @@
 rem This batch-file license: boost software license version 1.0
 setlocal
 call libs_config.bat
+
+if not exist tiny_replstr.exe (
+  call setcc.bat %CcName% x86
+  call gen_replstr.bat
+)
+
 cd ..
 
 if not exist %CcMiscIncDir% mkdir %CcMiscIncDir%
