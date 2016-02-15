@@ -21,6 +21,7 @@ set ZlibIncDir=
 set ZlibLibDir=
 set JpegIncDir=
 set JpegLibDir=
+set JpegTurbo=0
 
 set HasRel=
 set HasDbg=
@@ -49,10 +50,10 @@ set HasRtDll=
   if /I "%ARG:~0,7%"=="LibRel:"     set StrRel=%ARG:~7%
   if /I "%ARG:~0,7%"=="LibDbg:"     set StrDbg=%ARG:~7%
 
-  if /I "%ARG:~0,8%"=="zlibinc:" set ZlibIncDir=%ARG:~8%
-  if /I "%ARG:~0,8%"=="zliblib:" set ZlibLibDir=%ARG:~8%
-  if /I "%ARG:~0,8%"=="jpeginc:" set JpegIncDir=%ARG:~8%
-  if /I "%ARG:~0,8%"=="jpeglib:" set JpegLibDir=%ARG:~8%
+  if /I "%ARG:~0,8%"=="zlibinc:"    set ZlibIncDir=%ARG:~8%
+  if /I "%ARG:~0,8%"=="zliblib:"    set ZlibLibDir=%ARG:~8%
+  if /I "%ARG:~0,8%"=="jpeginc:"    set JpegIncDir=%ARG:~8%
+  if /I "%ARG:~0,8%"=="jpeglib:"    set JpegLibDir=%ARG:~8%
 
   shift
 goto ARG_LOOP
@@ -121,16 +122,21 @@ set JPEG_ARGS=
 if exist %JpegIncDir%\jpeglib.h (
   set "JPEG_ARGS=JPEG_SUPPORT=1 JPEGDIR=%JpegIncDir% JPEG_INCLUDE=-I%JpegIncDir% JPEG_LIB=%JpegLibDir%\%Target%\libjpeg.lib"
 )
+if exist %JpegIncDir%\turbojpeg.h (
+  set "JPEG_ARGS=JPEG_SUPPORT=1 JPEGDIR=%JpegIncDir% JPEG_INCLUDE=-I%JpegIncDir% JPEG_LIB=%JpegLibDir%\%Target%\jpeg-static.lib"
+)
 
 cd port
-del libport.lib
+if exist libport.lib del libport.lib
+del *.obj *.exp *.dll.manifest *.ilk
 nmake -f Makefile.vc "OPTFLAGS=%OPTFLAGS%"
 if errorlevel 1 goto :EOF
 del *.obj *.exp *.dll.manifest *.ilk
 cd ..
 
 cd libtiff
-del libtiff.lib
+if exist libtiff.lib del libtiff.lib
+del *.obj *.exp *.dll.manifest *.ilk
 nmake -f Makefile.vc "OPTFLAGS=%OPTFLAGS%" %ZLIB_ARGS% %JPEG_ARGS%
 if errorlevel 1 goto :EOF
 del *.obj *.exp *.dll.manifest *.ilk
@@ -146,9 +152,16 @@ if exist libtiff\*.pdb move libtiff\*.pdb %DstDir%\
 if "%LibCopyDir%"=="" goto ENDIF_LibCopyDir
 if not exist %LibCopyDir% mkdir %LibCopyDir%
 if not exist %LibCopyDir%\%Target% mkdir %LibCopyDir%\%Target%
-if exist %DstDir%\*.lib copy %DstDir%\*.lib %LibCopyDir%\%Target%
-if exist %DstDir%\*.dll copy %DstDir%\*.dll %LibCopyDir%\%Target%
-if exist %DstDir%\*.pdb copy %DstDir%\*.pdb %LibCopyDir%\%Target%
-:ENDIF_LibCopyDir
 
+if exist %JpegIncDir%\turbojpeg.h (
+  if exist %DstDir%\libtiff_i.lib copy %DstDir%\libtiff_i.lib %LibCopyDir%\%Target%\libtiff_i-jpegturbo.lib
+  if exist %DstDir%\libtiff.lib   copy %DstDir%\libtiff.lib   %LibCopyDir%\%Target%\libtiff-jpegturbo.lib
+  if exist %DstDir%\libtiff.dll   copy %DstDir%\libtiff.dll   %LibCopyDir%\%Target%\libtiff-jpegturbo.dll
+  if exist %DstDir%\libtiff.pdb   copy %DstDir%\libtiff.pdb   %LibCopyDir%\%Target%\libtiff-jpegturbo.pdb
+) else (
+  if exist %DstDir%\*.lib copy %DstDir%\*.lib %LibCopyDir%\%Target%
+  if exist %DstDir%\*.dll copy %DstDir%\*.dll %LibCopyDir%\%Target%
+  if exist %DstDir%\*.pdb copy %DstDir%\*.pdb %LibCopyDir%\%Target%
+)
+:ENDIF_LibCopyDir
 exit /b

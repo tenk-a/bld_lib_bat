@@ -52,7 +52,11 @@ echo /// jpeglib.h wrapper (turbo version)
 echo #pragma once
 echo #include "../../%1/jpeglib.h"
 echo #ifdef _MSC_VER
+echo  #ifdef DLLDEFINE
+echo   #pragma comment(lib, "jpeg.lib")
+echo  #else
 echo   #pragma comment(lib, "jpeg-static.lib")
+echo  #endif
 echo #endif
 exit /b
 
