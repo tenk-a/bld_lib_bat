@@ -18,7 +18,8 @@ if "%CcBzip2Dir%"=="" (
   goto END
 )
 
-call bld_lib_bat\gen_header.bat bzlib.h %CcBzip2Dir% libbz2.lib %CcMiscIncDir%\bzip2
+rem call :gen_header bzlib.h ../../%CcBzip2Dir% libbz2.lib %CcMiscIncDir%
+call :gen_header bzlib.h ../%CcBzip2Dir% libbz2.lib %CcMiscIncDir%
 
 set Arg=
 set Arg=%Arg% libcopy:%CD%\%CcMiscLibDir%
@@ -39,6 +40,20 @@ if "%CcHasX64%"=="1" (
   call ..\bld_lib_bat\bld1_bzip2.bat x64 %Arg%
 )
 cd ..
+goto END
+
+:gen_header
+if not exist %4 mkdir %4
+call :gen_header_print %1 %2 %3 >%4\%1
+exit /b
+:gen_header_print
+echo /// %1 wrapper
+echo #pragma once
+echo #include "%2/%1"
+echo #ifdef _MSC_VER
+echo  #pragma comment(lib, "%3")
+echo #endif
+exit /b
 
 :END
 cd bld_lib_bat

@@ -106,7 +106,7 @@ if "%ZlibIncDir%"=="" (
   for /D %%i in (..\*.*) do set ZlibIncDir=%%i
   set ZlibLibDir=%ZlibIncDir%\lib\%Target%
 ) else (
-  set ZlibIncDir=..\%ZlibIncDir%\zlib
+  set ZlibIncDir=..\%ZlibIncDir%
   set ZlibLibDir=..\%CcMiscLibDir%\%Target%
 )
 

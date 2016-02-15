@@ -62,7 +62,7 @@ if "%ZlibDir%"=="" (
 set ZlibIncDir=%ZlibDir%
 set ZlibLibDir=%ZlibDir%\lib
 if "%ZlibDir%"=="misc" (
-  set ZlibIncDir=..\misc_inc\zlib
+  set ZlibIncDir=..\misc_inc
   set ZlibLibDir=..\misc_lib
 )
 

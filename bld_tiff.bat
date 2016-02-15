@@ -22,10 +22,11 @@ if "%CcLibJpegDir%"=="" (
   for /f %%i in ('dir /b /on /ad jpeg*') do set CcLibJpegDir=%%i
 )
 
-if not exist %CcMiscIncDir%\tiff mkdir %CcMiscIncDir%\tiff
-call :gen_header tiffio.h     %CcLibTiffDir% >%CcMiscIncDir%\tiff\tiffio.h
-call :gen_header tiffio.hxx   %CcLibTiffDir% >%CcMiscIncDir%\tiff\tiffio.hxx
-rem call :gen_header tif_config.h %CcLibTiffDir% >%CcMiscIncDir%\tiff\tif_config.h
+rem if not exist %CcMiscIncDir%\tiff mkdir %CcMiscIncDir%\tiff
+rem call :gen_header tiffio.h     %CcLibTiffDir% >%CcMiscIncDir%\tiff\tiffio.h
+rem call :gen_header tiffio.hxx   %CcLibTiffDir% >%CcMiscIncDir%\tiff\tiffio.hxx
+call :gen_header tiffio.h     %CcLibTiffDir% >%CcMiscIncDir%\tiffio.h
+call :gen_header tiffio.hxx   %CcLibTiffDir% >%CcMiscIncDir%\tiffio.hxx
 
 set Arg=libcopy:%CD%\%CcMiscLibDir% zlibinc:%CD%\%CcMiscIncDir% zliblib:%CD%\%CcMiscLibDir% jpeginc:%CD%\%CcLibJpegDir% jpeglib:%CD%\%CcMiscLibDir%
 if "%CcNoRtStatic%"=="1" set Arg=%Arg% rtdll
@@ -43,7 +44,7 @@ goto :END
 :gen_header
 echo /// %1 wrapper
 echo #pragma once
-echo #include "../../%2/libtiff/%1"
+echo #include "../%2/libtiff/%1"
 echo #ifdef _MSC_VER
 echo   #pragma comment(lib, "libtiff.lib")
 echo #endif

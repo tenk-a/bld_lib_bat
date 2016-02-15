@@ -18,8 +18,8 @@ if "%CcLibPngDir%"=="" (
   goto END
 )
 
-if not exist %CcMiscIncDir%\png mkdir %CcMiscIncDir%\png
-call :gen_header png.h %CcLibPngDir%  >%CcMiscIncDir%\png\png.h
+rem call :gen_header png.h ../../%CcLibPngDir% %CcMiscIncDir%\png
+call :gen_header png.h ../%CcLibPngDir% %CcMiscIncDir%
 
 set Arg=libcopy:%CD%\%CcMiscLibDir%
 if "%CcNoRtStatic%"=="1" set Arg=%Arg% rtdll
@@ -34,15 +34,19 @@ if "%CcHasX64%"=="1" (
 cd ..
 
 endlocal
-goto :EOF
+goto :END
 
 :gen_header
-echo /// %1 wrapper
+if not exist %3 mkdir %3
+call :gen_header_print %1 %2 >%3\%1
+exit /b
+:gen_header_print
+echo /// %1 (official version) wrapper
 echo #pragma once
-echo #include "../../%2/%1"
+echo #include "%2/%1"
 echo #ifdef _MSC_VER
-echo #pragma comment(lib, "libpng.lib")
-echo #pragma comment(lib, "zlib.lib")
+echo  #pragma comment(lib, "libpng.lib")
+echo  #pragma comment(lib, "zlib.lib")
 echo #endif
 exit /b
 

@@ -1,4 +1,4 @@
-rem @echo off
+@echo off
 rem This batch-file license: boost software license version 1.0
 setlocal
 call libs_config.bat
@@ -18,9 +18,8 @@ if "%CcLibHaruDir%"=="" (
   goto END
 )
 
-if not exist %CcMiscIncDir%\libharu mkdir %CcMiscIncDir%\libharu
-for /f %%i in ('dir /b /on %CcLibHaruDir%\include\*.h') do call :gen_header %%~nxi
-for /f %%i in ('dir /b /on %CcLibHaruDir%\win32\include\*.h') do call :gen_header2 %%~nxi
+call :gen_header hpdf.h        ../%CcLibHaruDir%/include       libhpdf.lib %CcMiscIncDir%
+call :gen_header hpdf_config.h ../%CcLibHaruDir%/win32/include libhpdf.lib %CcMiscIncDir%
 
 set Arg=libcopy:%CD%\%CcMiscLibDir%
 if "%CcNoRtStatic%"=="1" set Arg=%Arg% rtdll
@@ -35,25 +34,18 @@ if "%CcHasX64%"=="1" (
 cd ..
 goto :END
 
-
 :gen_header
-echo /// %1 wrapper >%CcMiscIncDir%\libharu\%1
-echo #pragma once >>%CcMiscIncDir%\libharu\%1
-echo #include "../../%CcLibHaruDir%/include/%1" >>%CcMiscIncDir%\libharu\%1
-echo #ifdef _MSC_VER >>%CcMiscIncDir%\libharu\%1
-echo   #pragma comment(lib, "libhpdf.lib") >>%CcMiscIncDir%\libharu\%1
-echo #endif >>%CcMiscIncDir%\libharu\%1
+if not exist %4 mkdir %4
+call :gen_header_print %1 %2 %3 >%4\%1
 exit /b
-
-:gen_header2
-echo /// %1 wrapper >%CcMiscIncDir%\libharu\%1
-echo #pragma once >>%CcMiscIncDir%\libharu\%1
-echo #include "../../%CcLibHaruDir%/win32/include/%1" >>%CcMiscIncDir%\libharu\%1
-echo #ifdef _MSC_VER >>%CcMiscIncDir%\libharu\%1
-echo   #pragma comment(lib, "libhpdf.lib") >>%CcMiscIncDir%\libharu\%1
-echo #endif >>%CcMiscIncDir%\libharu\%1
+:gen_header_print
+echo /// %1 wrapper
+echo #pragma once
+echo #include "%2/%1"
+echo #ifdef _MSC_VER
+echo  #pragma comment(lib, "%3")
+echo #endif
 exit /b
-
 
 :END
 cd bld_lib_bat

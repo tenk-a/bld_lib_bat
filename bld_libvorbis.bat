@@ -18,10 +18,10 @@ if "%CcLibVorbisDir%"=="" (
   goto END
 )
 
-if not exist %CcMiscIncDir%\vorbis mkdir %CcMiscIncDir%\vorbis
-call :gen_header vorbisenc.h   %CcLibVorbisDir% >%CcMiscIncDir%\vorbis\vorbisenc.h
-call :gen_header codec.h       %CcLibVorbisDir% >%CcMiscIncDir%\vorbis\codec.h
-call :gen_header vorbisfile.h  %CcLibVorbisDir% >%CcMiscIncDir%\vorbis\vorbisfile.h
+if not exist %CcMiscIncDir%\ogg mkdir %CcMiscIncDir%\ogg
+call :gen_header vorbisenc.h   %CcLibVorbisDir% >%CcMiscIncDir%\ogg\vorbisenc.h
+call :gen_header codec.h       %CcLibVorbisDir% >%CcMiscIncDir%\ogg\codec.h
+call :gen_header vorbisfile.h  %CcLibVorbisDir% >%CcMiscIncDir%\ogg\vorbisfile.h
 
 set Arg=libcopy:%CD%\%CcMiscLibDir%
 if "%CcNoRtStatic%"=="1" set Arg=%Arg% rtdll
