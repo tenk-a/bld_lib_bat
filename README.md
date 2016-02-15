@@ -208,7 +208,7 @@ x86 と x64 の切り替えはコンパイル環境の切り替えを伴うた�
 #### libjpeg-turbo
 - jpeg画像ファイル関係. libjpegの派生
 - bld_libjpeg-turbo.bat
-- ディレクトリは libjpeg-turbo-* 　- 試したバージョンは libjpeg-turbo-code-1537-trunk
+- ディレクトリは libjpeg-turbo-* 　- 試したバージョンは 最初:libjpeg-turbo-code-1537-trunk 最新:2016-02-13付近のgitリポジトリ
 - turbo版はlibjpegの派生で、libjpeg,libjpeg-turboの混在リンクは不可.
 - cmake, nasm 必須
 - DLLランタイム版のビルドは用意されていないので、無理やりバッチ内で、flags.make や CMakeLists.txt を書き換えた別ファイルを生成してビルド.
@@ -218,7 +218,7 @@ x86 と x64 の切り替えはコンパイル環境の切り替えを伴うた�
 - tiff画像ファイル関係
 - bld_tiff.bat
 - ディレクトリは tiff-?.?.? 　- 試したバージョンは tiff-4.0.3
-- zlib, libjeg 利用. なくてもビルドできるが圧縮未対応になるので、予め zlib, libjpeg をビルド済のこと.
+- zlib, libjeg ほぼ必須. なくてもビルドできるが圧縮未対応になるので、予め zlib, libjpeg をビルド済のこと.
 - バッチ内では、Makefile.vc の引数で各種指定してビルド.
 
 
@@ -226,7 +226,8 @@ x86 と x64 の切り替えはコンパイル環境の切り替えを伴うた�
 - pdf関係
 - bld_libharu.bat
 - ディレクトリは libharu-* 　- 試したバージョンは libharu-RELEASE_2_3_0
-- zlib, lpng 必須. 予め ビルド済みのこと.
+- zlib, lpng ほぼ必須. 予め ビルド済みのこと. (無でビルドする方法はある模様)
+- 無精して dll ライブラリ版は未生成.(ファイル名の都合もあり)
 - demo をコンパイルすると jpfont_demo.exe の実行でエラー。jpfont_demo.c 中のフォント名 MS-Mincyo が原因. 全てMS-Minchoに置換すればok.
 - なので libharu をビルドする場合は予め 修正しておくこと。
 - png_demo は生成されたpdfを開くとエラー発生("画像データに不足があります"で実際途中から表示無く). (lpngのバージョン違い?)
@@ -236,7 +237,7 @@ x86 と x64 の切り替えはコンパイル環境の切り替えを伴うた�
 #### glfw
 - OpenGL 関係
 - bld_glfw.bat
-- ディレクトリは glfw-3.?.? 　- 試したバージョンは glfw-3.1.1  3.1.2
+- ディレクトリは glfw-3.?.? 　- 試したバージョンは 最初:glfw-3.1.1  最新:3.1.2
 - バッチ内では、CMake の引数で所定の変数を設定してビルド.
 -- glfw-?.?.?/lib/ の下に vc??_x??[_static][_debug]  のようなディレクトリを作りその下に.libを配置.
 
@@ -272,7 +273,7 @@ x86 と x64 の切り替えはコンパイル環境の切り替えを伴うた�
 #### boost
 - 巨大汎用ライブラリ
 - bld_boost.bat
-- ディレクトリは boost_?_??_? 　- 試したバージョンは boost_1_58_0
+- ディレクトリは boost_?_??_? 　- 試したバージョンは 最初:boost_1_57_0 最新:boost_1_60_0
 - でっかいし環境整ってるので、boostの環境のまま使用。
 - libs_vc??/直下に zlib*, bzip2* のフォルダを予め用意してあれば、それらを使ってライブラリ構築する.
 - ※ boost環境内でzlib,libbz2を含んだライブラリが作られるので、予めzlibやlibbz2を構築する必要はない.
@@ -287,6 +288,7 @@ x86 と x64 の切り替えはコンパイル環境の切り替えを伴うた�
 - ディレクトリは wxWidgets-3.?.? 　- 試したバージョンは wxWidgets-3.0.2
 - でっかいし環境整ってるので、wxWidgetsの環境のまま使用。
 - makefile.vc に所定の引数渡してビルド.
+- sampleをコンパイルするのに vc10～vc12用のsln,vcxprojがないので、vc9用から生成する UpgradeWxWidgetsSampleVcproj.bat を用意して、それを用いてビルドしている.
 
 
 #### fltk
@@ -303,6 +305,6 @@ x86 と x64 の切り替えはコンパイル環境の切り替えを伴うた�
     x64_static/  
   に作られる。_static付がstaticランタイム版で デバッグ版に関してはディレクトリ別でなくファイル名の最後に 'd' がつく。
 - バッチ内では、dllランタイム版は、msbuild fltk.sln で Configuration, Platform を指定してビルド.
-- static ランタイム版やx64版は用意されていないので、.slnや.vcxprojを無理やり書き換えたものを生成してビルド.
+- static ランタイム版やx64版は用意されていないので、UpgradeFltkIdeVcproj.bat を呼び出して .slnや.vcxprojを無理やり書き換えたものを生成してビルド.
 - tiny_replstr 使用
 
