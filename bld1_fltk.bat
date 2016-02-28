@@ -18,13 +18,13 @@ set VcSlnDir=
 :ARG_LOOP
   if "%1"=="" goto ARG_LOOP_EXIT
 
-  if /I "%1"=="vc71"    set Compiler=vc71
-  if /I "%1"=="vc8"     set Compiler=vc8
-  if /I "%1"=="vc9"     set Compiler=vc9
-  if /I "%1"=="vc10"    set Compiler=vc10
-  if /I "%1"=="vc11"    set Compiler=vc11
-  if /I "%1"=="vc12"    set Compiler=vc12
-  rem if /I "%1"=="vc13"    set Compiler=vc13
+  if /I "%1"=="vc71"     set Compiler=vc71
+  if /I "%1"=="vc80"     set Compiler=vc80
+  if /I "%1"=="vc90"     set Compiler=vc90
+  if /I "%1"=="vc100"    set Compiler=vc100
+  if /I "%1"=="vc110"    set Compiler=vc110
+  if /I "%1"=="vc120"    set Compiler=vc120
+  rem if /I "%1"=="vc13" set Compiler=vc130
 
   if /I "%1"=="x86"      set Arch=x86
   if /I "%1"=="x64"      set Arch=x64
@@ -46,19 +46,19 @@ goto ARG_LOOP
 
 rem if /I not "%PATH:Microsoft Visual Studio 13.0=%"=="%PATH%" set Compiler=vc13
 if /I not "%PATH:Microsoft Visual Studio 12.0=%"=="%PATH%" (
-    set Compiler=vc12
+    set Compiler=vc120
     set VcSlnDir=VisualC2013
 )
 if /I not "%PATH:Microsoft Visual Studio 11.0=%"=="%PATH%" (
-    set Compiler=vc11
+    set Compiler=vc110
     set VcSlnDir=VisualC2012
 )
 if /I not "%PATH:Microsoft Visual Studio 10.0=%"=="%PATH%" (
-    set Compiler=vc10
+    set Compiler=vc100
     set VcSlnDir=VisualC2010
 )
 if /I not "%PATH:Microsoft Visual Studio 9.0=%"=="%PATH%" (
-    set Compiler=vc9
+    set Compiler=vc90
     set VcSlnDir=VisualC2008
 )
 if "%Compiler%"=="" (
@@ -80,8 +80,8 @@ set Platform=%Arch%
 if "%Platform%"=="x86" set Platform=Win32
 
 if not exist "ide\%VcSlnDir%" (
-  if "%Compiler%"=="vc12" call ..\bld_lib_bat\UpgradeFltkIdeVcproj.bat %VcSlnDir%
-  if "%Compiler%"=="vc11" call ..\bld_lib_bat\UpgradeFltkIdeVcproj.bat %VcSlnDir%
+  if "%Compiler%"=="vc120" call ..\bld_lib_bat\UpgradeFltkIdeVcproj.bat %VcSlnDir%
+  if "%Compiler%"=="vc110" call ..\bld_lib_bat\UpgradeFltkIdeVcproj.bat %VcSlnDir%
   if not exist "ide\%VcSlnDir%" (
      echo not found ide\%VcSlnDir% directory
      goto :EOF

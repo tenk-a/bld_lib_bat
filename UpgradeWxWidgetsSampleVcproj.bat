@@ -4,13 +4,13 @@ setlocal
 
 set VcName=
 if "%CcName%"=="" (
-  if /I not "%PATH:Microsoft Visual Studio 13.0=%"=="%PATH%" set VcName=vc13
-  if /I not "%PATH:Microsoft Visual Studio 12.0=%"=="%PATH%" set VcName=vc12
-  if /I not "%PATH:Microsoft Visual Studio 11.0=%"=="%PATH%" set VcName=vc11
-  if /I not "%PATH:Microsoft Visual Studio 10.0=%"=="%PATH%" set VcName=vc10
+  if /I not "%PATH:Microsoft Visual Studio 13.0=%"=="%PATH%" set VcName=vc130
+  if /I not "%PATH:Microsoft Visual Studio 12.0=%"=="%PATH%" set VcName=vc120
+  if /I not "%PATH:Microsoft Visual Studio 11.0=%"=="%PATH%" set VcName=vc110
+  if /I not "%PATH:Microsoft Visual Studio 10.0=%"=="%PATH%" set VcName=vc100
 )
 if "%VcName%"=="" (
-  echo ERROR: not found vc10-12 path.
+  echo ERROR: not found vc100-120 path.
   goto :EOF
 )
 

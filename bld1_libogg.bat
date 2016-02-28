@@ -21,13 +21,13 @@ set Compiler=
 :ARG_LOOP
   if "%1"=="" goto ARG_LOOP_EXIT
 
-  if /I "%1"=="vc71"    set Compiler=vc71
-  if /I "%1"=="vc8"     set Compiler=vc8
-  if /I "%1"=="vc9"     set Compiler=vc9
-  if /I "%1"=="vc10"    set Compiler=vc10
-  if /I "%1"=="vc11"    set Compiler=vc11
-  if /I "%1"=="vc12"    set Compiler=vc12
-  rem if /I "%1"=="vc13"    set Compiler=vc13
+  if /I "%1"=="vc71"      set Compiler=vc71
+  if /I "%1"=="vc80"      set Compiler=vc80
+  if /I "%1"=="vc90"      set Compiler=vc90
+  if /I "%1"=="vc100"     set Compiler=vc100
+  if /I "%1"=="vc110"     set Compiler=vc110
+  if /I "%1"=="vc120"     set Compiler=vc120
+  rem if /I "%1"=="vc130" set Compiler=vc130
 
   if /I "%1"=="x86"      set Arch=x86
   if /I "%1"=="x64"      set Arch=x64
@@ -54,11 +54,11 @@ goto ARG_LOOP
 
 if "%Compiler%"=="" (
   rem if /I not "%PATH:Microsoft Visual Studio 13.0=%"=="%PATH%" set Compiler=vc13
-  if /I not "%PATH:Microsoft Visual Studio 12.0=%"=="%PATH%" set Compiler=vc12
-  if /I not "%PATH:Microsoft Visual Studio 11.0=%"=="%PATH%" set Compiler=vc11
-  if /I not "%PATH:Microsoft Visual Studio 10.0=%"=="%PATH%" set Compiler=vc10
-  if /I not "%PATH:Microsoft Visual Studio 9.0=%"=="%PATH%"  set Compiler=vc9
-  if /I not "%PATH:Microsoft Visual Studio 8=%"=="%PATH%"    set Compiler=vc8
+  if /I not "%PATH:Microsoft Visual Studio 12.0=%"=="%PATH%" set Compiler=vc120
+  if /I not "%PATH:Microsoft Visual Studio 11.0=%"=="%PATH%" set Compiler=vc110
+  if /I not "%PATH:Microsoft Visual Studio 10.0=%"=="%PATH%" set Compiler=vc100
+  if /I not "%PATH:Microsoft Visual Studio 9.0=%"=="%PATH%"  set Compiler=vc90
+  if /I not "%PATH:Microsoft Visual Studio 8=%"=="%PATH%"    set Compiler=vc80
   if /I not "%PATH:Microsoft Visual Studio .NET 2003=%"=="%PATH%" set Compiler=vc71
 )
 if "%Compiler%"=="" (
@@ -80,12 +80,12 @@ if "%Platform%"=="x86" set Platform=Win32
 
 set SlnDir=
 rem if "%Compiler%"=="vs13" set SlnDir=VS2014
-if "%Compiler%"=="vc12" set SlnDir=VS2013
-if "%Compiler%"=="vc11" set SlnDir=VS2012
-if "%Compiler%"=="vc10" set SlnDir=VS2010
-if "%Compiler%"=="vc9"  set SlnDir=VS2008
-if "%Compiler%"=="vc8"  set SlnDir=VS2005
-if "%Compiler%"=="vc71" set SlnDir=VS2003
+if "%Compiler%"=="vc120" set SlnDir=VS2013
+if "%Compiler%"=="vc110" set SlnDir=VS2012
+if "%Compiler%"=="vc100" set SlnDir=VS2010
+if "%Compiler%"=="vc90"  set SlnDir=VS2008
+if "%Compiler%"=="vc80"  set SlnDir=VS2005
+if "%Compiler%"=="vc71"  set SlnDir=VS2003
 
 if not exist win32\%SlnDir% (
   if "%SlnDir%"=="VS2013" call :SlnCopyUpd VS2010 VS2013

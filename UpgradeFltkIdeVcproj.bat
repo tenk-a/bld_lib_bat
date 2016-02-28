@@ -13,7 +13,7 @@ if /I not "%PATH:Microsoft Visual Studio 11.0=%"=="%PATH%" (
     set VcDirName=VisualC2012
 )
 if "%VcDirName%"=="" (
-  echo ERROR: not found vc11-12 path.
+  echo ERROR: not found vc110-120 path.
   goto :EOF
 )
 

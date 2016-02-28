@@ -18,6 +18,19 @@ if "%CcArch%"=="" set CcArch=x86
 set CcNameArch=%CcName%
 if not "%CcArch%"=="x86" set CcNameArch=%CcName%%CcArch%
 
+if "%CcNameArch%"=="vc130"    goto L_VC13
+if "%CcNameArch%"=="vc130x64" goto L_VC13x64
+if "%CcNameArch%"=="vc120"    goto L_VC12
+if "%CcNameArch%"=="vc120x64" goto L_VC12x64
+if "%CcNameArch%"=="vc110"    goto L_VC11
+if "%CcNameArch%"=="vc110x64" goto L_VC11x64
+if "%CcNameArch%"=="vc100"    goto L_VC10
+if "%CcNameArch%"=="vc100x64" goto L_VC10x64
+if "%CcNameArch%"=="vc90"     goto L_VC9
+if "%CcNameArch%"=="vc90x64"  goto L_VC9x64
+if "%CcNameArch%"=="vc80"     goto L_VC8
+if "%CcNameArch%"=="vc80x64"  goto L_VC8x64
+if "%CcNameArch%"=="vc71"    goto L_VC71
 if "%CcNameArch%"=="vc13"    goto L_VC13
 if "%CcNameArch%"=="vc13x64" goto L_VC13x64
 if "%CcNameArch%"=="vc12"    goto L_VC12
@@ -30,11 +43,10 @@ if "%CcNameArch%"=="vc9"     goto L_VC9
 if "%CcNameArch%"=="vc9x64"  goto L_VC9x64
 if "%CcNameArch%"=="vc8"     goto L_VC8
 if "%CcNameArch%"=="vc8x64"  goto L_VC8x64
-if "%CcNameArch%"=="vc71"    goto L_VC71
 
 echo setcc [COMPILER] [x86/x64]
 echo   COMPILER:
-echo       vc12,vc11,vc10,vc9,vc8,vc71
+echo       vc120,vc110,vc100,vc90,vc80,vc71
 goto L_END
 
 :L_VC13
