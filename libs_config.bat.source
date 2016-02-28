@@ -3,7 +3,7 @@ rem This batch-file license: boost software license version 1.0
 rem ==========================================================================
 rem user setting
 
-rem vc80,vc90,vc100,vc110,vc120,vc130
+rem vc80,vc90,vc100,vc110,vc120,vc140
 set CcName=
 
 rem (VC++ Express Edition: CcHasX64=0 CcNoRtStatic=1)

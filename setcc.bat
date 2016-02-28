@@ -18,6 +18,8 @@ if "%CcArch%"=="" set CcArch=x86
 set CcNameArch=%CcName%
 if not "%CcArch%"=="x86" set CcNameArch=%CcName%%CcArch%
 
+if "%CcNameArch%"=="vc140"    goto L_VC14
+if "%CcNameArch%"=="vc140x64" goto L_VC14x64
 if "%CcNameArch%"=="vc130"    goto L_VC13
 if "%CcNameArch%"=="vc130x64" goto L_VC13x64
 if "%CcNameArch%"=="vc120"    goto L_VC12
@@ -48,6 +50,16 @@ echo setcc [COMPILER] [x86/x64]
 echo   COMPILER:
 echo       vc120,vc110,vc100,vc90,vc80,vc71
 goto L_END
+
+:L_VC14
+    set "PATH=%setcc_base_path%"
+    call "%VS140COMNTOOLS%vsvars32.bat"
+    goto L_END
+
+:L_VC14x64
+    set "PATH=%setcc_base_path%"
+    call "%VS140COMNTOOLS%..\..\vc\bin\amd64\vcvars64.bat"
+    goto L_VC_COMMON_X64
 
 :L_VC13
     set "PATH=%setcc_base_path%"
