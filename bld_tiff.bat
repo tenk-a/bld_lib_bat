@@ -29,8 +29,8 @@ set Arg=libcopy:%CD%\%CcMiscLibDir% zlibinc:%CD%\%CcMiscIncDir% zliblib:%CD%\%Cc
 if "%CcNoRtStatic%"=="1" set Arg=%Arg% rtdll
 
 cd %CcLibTiffDir%
-call ..\bld_lib_bat\setcc.bat %CcName% x86
-call ..\bld_lib_bat\bld1_tiff.bat x86 %Arg%
+call ..\bld_lib_bat\setcc.bat %CcName% %CcLibArchX86%
+call ..\bld_lib_bat\bld1_tiff.bat %CcLibArchX86% %Arg%
 if "%CcHasX64%"=="1" (
   call ..\bld_lib_bat\setcc.bat %CcName% x64
   call ..\bld_lib_bat\bld1_tiff.bat x64 %Arg%

@@ -23,10 +23,14 @@ set HasRtSta=
 set HasRtDll=
 set CleanMode=
 
+set LibArchX86=%CcLibArchX86%
+if "%LibArchX86%"=="" set LibArchX86=Win32
+
 :ARG_LOOP
   if "%1"=="" goto ARG_LOOP_EXIT
 
-  if /I "%1"=="x86"      set Arch=x86
+  if /I "%1"=="x86"      set Arch=%LibArchX86%
+  if /I "%1"=="win32"    set Arch=%LibArchX86%
   if /I "%1"=="x64"      set Arch=x64
 
   if /I "%1"=="static"   set HasRtSta=S
@@ -59,7 +63,7 @@ if "%Arch%"=="" (
   if /I not "%PATH:Microsoft Visual Studio 9.0\VC\BIN\amd64=%"=="%PATH%"  set Arch=x64
   if /I not "%PATH:Microsoft Visual Studio 8\VC\BIN\amd64=%"=="%PATH%"    set Arch=x64
 )
-if "%Arch%"=="" set Arch=x86
+if "%Arch%"=="" set Arch=%LibArchX86%
 
 call :Clean
 if "%CleanMode%"=="1" goto :EOF

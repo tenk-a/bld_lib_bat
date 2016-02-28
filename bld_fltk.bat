@@ -4,7 +4,7 @@ setlocal
 call libs_config.bat
 
 if not exist tiny_replstr.exe (
-  call setcc.bat %CcName% x86
+  call setcc.bat %CcName% %CcLibArchX86%
   call gen_replstr.bat
 )
 
@@ -34,8 +34,8 @@ set Arg=%Arg% LibRtDll:%CcLibStrRtDll%
 if "%CcNoRtStatic%"=="1" set Arg=%Arg% rtdll
 
 cd %CcFltkDir%
-call ..\bld_lib_bat\setcc.bat %CcName% x86
-call ..\bld_lib_bat\bld1_fltk.bat x86 %Arg%
+call ..\bld_lib_bat\setcc.bat %CcName% %CcLibArchX86%
+call ..\bld_lib_bat\bld1_fltk.bat %CcLibArchX86% %Arg%
 if "%CcHasX64%"=="1" (
   call ..\bld_lib_bat\setcc.bat %CcName% x64
   call ..\bld_lib_bat\bld1_fltk.bat x64 %Arg%

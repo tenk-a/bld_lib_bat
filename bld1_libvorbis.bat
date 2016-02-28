@@ -21,6 +21,9 @@ set SrcOggVerVc8=1.1.4
 set SrcOggVerVc9=1.1.4
 set SrcOggVerVc10=1.2.0
 
+set LibArchX86=%CcLibArchX86%
+if "%LibArchX86%"=="" set LibArchX86=Win32
+
 :ARG_LOOP
   if "%1"=="" goto ARG_LOOP_EXIT
 
@@ -30,9 +33,11 @@ set SrcOggVerVc10=1.2.0
   if /I "%1"=="vc100"    set Compiler=vc100
   if /I "%1"=="vc110"    set Compiler=vc110
   if /I "%1"=="vc120"    set Compiler=vc120
-  rem if /I "%1"=="vc13" set Compiler=vc130
+  if /I "%1"=="vc13"     set Compiler=vc130
+  if /I "%1"=="vc14"     set Compiler=vc140
 
-  if /I "%1"=="x86"      set Arch=x86
+  if /I "%1"=="x86"      set Arch=%LibArchX86%
+  if /I "%1"=="win32"    set Arch=%LibArchX86%
   if /I "%1"=="x64"      set Arch=x64
 
   if /I "%1"=="static"   set HasRtSta=S
@@ -59,6 +64,8 @@ goto ARG_LOOP
 
 if "%Compiler%"=="" (
   rem if /I not "%PATH:Microsoft Visual Studio 13.0=%"=="%PATH%" set Compiler=vc13
+  if /I not "%PATH:Microsoft Visual Studio 14.0=%"=="%PATH%" set Compiler=vc140
+  if /I not "%PATH:Microsoft Visual Studio 13.0=%"=="%PATH%" set Compiler=vc130
   if /I not "%PATH:Microsoft Visual Studio 12.0=%"=="%PATH%" set Compiler=vc120
   if /I not "%PATH:Microsoft Visual Studio 11.0=%"=="%PATH%" set Compiler=vc110
   if /I not "%PATH:Microsoft Visual Studio 10.0=%"=="%PATH%" set Compiler=vc100
@@ -73,18 +80,22 @@ if "%Compiler%"=="" (
 
 if "%Arch%"=="" (
   rem if /I not "%PATH:Microsoft Visual Studio 13.0\VC\BIN\amd64=%"=="%PATH%" set Arch=x64
+  if /I not "%PATH:Microsoft Visual Studio 14.0\VC\BIN\amd64=%"=="%PATH%" set Arch=x64
+  if /I not "%PATH:Microsoft Visual Studio 13.0\VC\BIN\amd64=%"=="%PATH%" set Arch=x64
   if /I not "%PATH:Microsoft Visual Studio 12.0\VC\BIN\amd64=%"=="%PATH%" set Arch=x64
   if /I not "%PATH:Microsoft Visual Studio 11.0\VC\BIN\amd64=%"=="%PATH%" set Arch=x64
   if /I not "%PATH:Microsoft Visual Studio 10.0\VC\BIN\amd64=%"=="%PATH%" set Arch=x64
   if /I not "%PATH:Microsoft Visual Studio 9.0\VC\BIN\amd64=%"=="%PATH%"  set Arch=x64
   if /I not "%PATH:Microsoft Visual Studio 8\VC\BIN\amd64=%"=="%PATH%"    set Arch=x64
 )
-if "%Arch%"=="" set Arch=x86
+if "%Arch%"=="" set Arch=%LibArchX86%
 set Platform=%Arch%
 if "%Platform%"=="x86" set Platform=Win32
 
 set SlnDir=
 rem if "%Compiler%"=="vs13" set SlnDir=VS2014
+if "%Compiler%"=="vc140" set SlnDir=VS2015
+if "%Compiler%"=="vc130" set SlnDir=VS2014
 if "%Compiler%"=="vc120" set SlnDir=VS2013
 if "%Compiler%"=="vc110" set SlnDir=VS2012
 if "%Compiler%"=="vc100" set SlnDir=VS2010
@@ -93,6 +104,8 @@ if "%Compiler%"=="vc80"  set SlnDir=VS2005
 if "%Compiler%"=="vc71"  set SlnDir=VS2003
 
 if not exist win32\%SlnDir% (
+  if "%SlnDir%"=="VS2015" call :SlnCopyUpd VS2010 VS2015
+  if "%SlnDir%"=="VS2014" call :SlnCopyUpd VS2010 VS2014
   if "%SlnDir%"=="VS2013" call :SlnCopyUpd VS2010 VS2013
   if "%SlnDir%"=="VS2012" call :SlnCopyUpd VS2010 VS2012
   if not exist win32\%SlnDir% (
@@ -136,6 +149,8 @@ set Target=%3
 pushd win32\%SlnDir%
 
 if not "%OggVar%"=="" (
+  if "%Compiler%"=="vc140" ..\..\..\bld_lib_bat\tiny_replstr -x ++ %SrcOggVerVc10% %OggVar% VS2010 VS2015 -- libogg.props
+  if "%Compiler%"=="vc130" ..\..\..\bld_lib_bat\tiny_replstr -x ++ %SrcOggVerVc10% %OggVar% VS2010 VS2014 -- libogg.props
   if "%Compiler%"=="vc120" ..\..\..\bld_lib_bat\tiny_replstr -x ++ %SrcOggVerVc10% %OggVar% VS2010 VS2013 -- libogg.props
   if "%Compiler%"=="vc110" ..\..\..\bld_lib_bat\tiny_replstr -x ++ %SrcOggVerVc10% %OggVar% VS2010 VS2012 -- libogg.props
   if "%Compiler%"=="vc100" ..\..\..\bld_lib_bat\tiny_replstr -x ++ %SrcOggVerVc10% %OggVar% -- libogg.props

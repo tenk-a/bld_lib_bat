@@ -33,8 +33,8 @@ set Arg=%Arg% LibDbg:%CcLibStrDebug%
 if "%CcNoRtStatic%"=="1" set Arg=%Arg% rtdll
 
 cd %CcGlfwDir%
-call ..\bld_lib_bat\setcc.bat %CcName% x86
-call ..\bld_lib_bat\bld1_glfw.bat x86 %Arg%
+call ..\bld_lib_bat\setcc.bat %CcName% %CcLibArchX86%
+call ..\bld_lib_bat\bld1_glfw.bat %CcLibArchX86% %Arg%
 if "%CcHasX64%"=="1" (
   call ..\bld_lib_bat\setcc.bat %CcName% x64
   call ..\bld_lib_bat\bld1_glfw.bat x64 %Arg%

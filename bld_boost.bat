@@ -24,8 +24,8 @@ if "%CcBzip2Dir%"=="" (
 
 cd %CcBoostDir%
 set Arg=zlib:%CcZlibDir% bzip2:%CcBzip2Dir% LibPrefix:%CcLibPrefix%
-call ..\bld_lib_bat\setcc.bat      %CcName% x86
-call ..\bld_lib_bat\bld1_boost.bat %CcName% x86 %Arg%
+call ..\bld_lib_bat\setcc.bat      %CcName% %CcLibArchX86%
+call ..\bld_lib_bat\bld1_boost.bat %CcName% %CcLibArchX86% %Arg%
 if "%CcHasX64%"=="1" (
   call ..\bld_lib_bat\setcc.bat      %CcName% x64
   call ..\bld_lib_bat\bld1_boost.bat %CcName% x64 %Arg%

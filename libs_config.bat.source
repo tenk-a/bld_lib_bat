@@ -3,7 +3,7 @@ rem This batch-file license: boost software license version 1.0
 rem ==========================================================================
 rem user setting
 
-rem vc80,vc90,vc100,vc110,vc120,vc140
+rem vc80,vc90,vc100,vc110,vc120,vc140  // 2005,2008,2010,2012,2013,2015
 set CcName=
 
 rem (VC++ Express Edition: CcHasX64=0 CcNoRtStatic=1)
@@ -29,6 +29,7 @@ if "%CcName%"=="" (
 set CcLibDir=.\lib
 rem set CcLibPrefix=
 set CcLibPrefix=%CcName%_
+set CcLibArchX86=Win32
 set CcLibStrDebug=_debug
 set CcLibStrRelease=_release
 set CcLibStrDll=_dll

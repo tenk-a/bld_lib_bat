@@ -25,8 +25,8 @@ set Arg=libcopy:%CD%\%CcMiscLibDir%
 if "%CcNoRtStatic%"=="1" set Arg=%Arg% rtdll
 
 cd %CcLibHaruDir%
-call ..\bld_lib_bat\setcc.bat %CcName% x86
-call ..\bld_lib_bat\bld1_libharu.bat   x86 %Arg% ZlibDir:misc PngDir:misc
+call ..\bld_lib_bat\setcc.bat %CcName% %CcLibArchX86%
+call ..\bld_lib_bat\bld1_libharu.bat   %CcLibArchX86% %Arg% ZlibDir:misc PngDir:misc
 if "%CcHasX64%"=="1" (
   call ..\bld_lib_bat\setcc.bat %CcName% x64
   call ..\bld_lib_bat\bld1_libharu.bat x64 %Arg% ZlibDir:misc PngDir:misc

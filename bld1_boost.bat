@@ -19,6 +19,9 @@ set StageDir=
 set StrPrefix=
 set Compiler=
 
+set LibArchX86=%CcLibArchX86%
+if "%LibArchX86%"=="" set LibArchX86=Win32
+
 :ARG_LOOP
   if "%1"=="" goto ARG_LOOP_EXIT
 
@@ -30,7 +33,8 @@ set Compiler=
   if /I "%1"=="vc120"   set Compiler=vc120
   if /I "%1"=="vc130"   set Compiler=vc130
 
-  if /I "%1"=="x86"     set Arch=x86
+  if /I "%1"=="x86"     set Arch=%LibArchX86%
+  if /I "%1"=="win32"   set Arch=%LibArchX86%
   if /I "%1"=="x64"     set Arch=x64
 
   set ARG=%1
@@ -73,8 +77,8 @@ if "%Compiler%"=="vc140" set ToolSet=msvc-14.0
 
 if "%ToolSet%"=="" goto USAGE
 
-if "%Arch%"==""    set Arch=x86
-if "%Arch%"=="x86" set AddrModel=32
+if "%Arch%"==""    set Arch=%LibArchX86%
+if "%Arch%"=="%LibArchX86%" set AddrModel=32
 if "%Arch%"=="x64" set AddrModel=64
 
 set /a ThreadNum=%NUMBER_OF_PROCESSORS%+1

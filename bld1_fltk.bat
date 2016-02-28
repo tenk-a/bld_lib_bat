@@ -15,6 +15,9 @@ set HasRtDll=
 set Compiler=
 set VcSlnDir=
 
+set LibArchX86=%CcLibArchX86%
+if "%LibArchX86%"=="" set LibArchX86=Win32
+
 :ARG_LOOP
   if "%1"=="" goto ARG_LOOP_EXIT
 
@@ -26,7 +29,8 @@ set VcSlnDir=
   if /I "%1"=="vc120"    set Compiler=vc120
   rem if /I "%1"=="vc13" set Compiler=vc130
 
-  if /I "%1"=="x86"      set Arch=x86
+  if /I "%1"=="x86"      set Arch=%LibArchX86%
+  if /I "%1"=="win32"    set Arch=%LibArchX86%
   if /I "%1"=="x64"      set Arch=x64
 
   if /I "%1"=="static"   set HasRtSta=S
@@ -75,7 +79,7 @@ if /I not "%PATH:Microsoft Visual Studio 10.0\VC\BIN\amd64=%"=="%PATH%" set Arch
 if /I not "%PATH:Microsoft Visual Studio 9.0\VC\BIN\amd64=%"=="%PATH%"  set Arch=x64
 rem if /I not "%PATH:Microsoft Visual Studio 8\VC\BIN\amd64=%"=="%PATH%"    set Arch=x64
 
-if "%Arch%"=="" set Arch=x86
+if "%Arch%"=="" set Arch=%LibArchX86%
 set Platform=%Arch%
 if "%Platform%"=="x86" set Platform=Win32
 

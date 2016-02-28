@@ -25,8 +25,8 @@ call :gen_header_jpeglib   %CcLibJpegTurboDir% >%CcMiscIncDir%\jpeg-turbo\jpegli
 set Arg=libcopy:%CD%\%CcMiscLibDir%
 
 cd %CcLibJpegTurboDir%
-call ..\bld_lib_bat\setcc.bat %CcName% x86
-call ..\bld_lib_bat\bld1_libjpeg-turbo.bat x86 %Arg%
+call ..\bld_lib_bat\setcc.bat %CcName% %CcLibArchX86%
+call ..\bld_lib_bat\bld1_libjpeg-turbo.bat %CcLibArchX86% %Arg%
 if "%CcHasX64%"=="1" (
   call ..\bld_lib_bat\setcc.bat %CcName% x64
   call ..\bld_lib_bat\bld1_libjpeg-turbo.bat x64 %Arg%

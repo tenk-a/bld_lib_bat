@@ -46,6 +46,10 @@ static|dllランタイム, 等の都合でフォルダ分けし直している.
 数が増えると利用時の指定が面倒なので、ファイル数の少ないライブラリに
 関しては　misc_inc/, misc_lib/ というディレクトリにもまとめてもいる。
 
+- ターゲットライブラリはdll化せずstaticリンクしての利用を想定。
+ターゲットライブラリ自身のdll版は、ビルドに用意されていれば一応ビルドしている。
+(が用意されていないターゲットも多いので...)
+
 - 一応バッチのライセンスは boost software license version 1.0 という
 ことにしとく(当然 各ライブラリのライセンスはそれぞれ)
 
@@ -53,7 +57,8 @@ static|dllランタイム, 等の都合でフォルダ分けし直している.
 ## インストール
 
 - まず 各種ライブラリをまとめて置くフォルダを用意する.  
-コンパイラとしてvc12(vs2013)を使うとして、仮にここでは d:/libs_vc/ としておく.
+仮にここでは、コンパイラとしてvc12(vs2013)を使い、まとめ置きディレクトリを
+d:/libs_vc/ とする。
 
 - そのフォルダ(d:/libs_vc/) の直下に この  
   bld_lib_bat/  
@@ -113,10 +118,10 @@ boostやwxWidgetsのように仕分け対応積みのモノもあるが、debug|
 仕分け対応していないライブラリについては、このバッチ群独自にディレクトリ分けしている。
 
 libs_vc??/misc_lib/ に入るものについては、
-- vc120_x86_release
-- vc120_x86_debug
-- vc120_x86_static
-- vc120_x86_static_debug
+- vc120_Win32_release
+- vc120_Win32_debug
+- vc120_Win32_static
+- vc120_Win32_static_debug
 - vc120_x64_release
 - vc120_x64_debug
 - vc120_x64_static
@@ -126,25 +131,25 @@ libs_vc??/misc_lib/ に入るものについては、
 ディレクトリ分けされてない各ライブラリのビルドについても似たような感じでディレクトリ分けしている。
 （このへんはライブラリごとに事情が違うので、ビルド後のディレクトリを確認のこと)
   
-先頭にはまず使用するVCのバージョン名がつく。Visual Studio のマクロ変数$(PlatformToolsetVersion)
-の値が使えるように vc9やvc12でなくvc90やvc120のように記述するようにしている。
+先頭にはまず使用するVCのバージョン名がつく。vc11付近からのVisual Studio のマクロ変数
+$(PlatformToolsetVersion) の値が使えるように vc9やvc12でなくvc90やvc120のように記述するようにしている。
 次に _staticがあればstaticランタイム版(なければdllランタイム:msvcrt???.dllを使う)、
 最後に _release | _debug ビルドを表している。  
   
-Visual Studio の 追加のライブラリの欄に  
-  (ディレクトリ…)/libs_vc/misc_lib/vc$(PlatformToolsetVersion)_$(PlatformTarget)_$(Configuration)  
-  や (ディレクトリ…)/libs_vc/misc_lib/vc$(PlatformToolsetVersion)_$(PlatformTarget)_static_$(Configuration)  
+vc11(vc10?)以降ならば Visual Studio の 追加のライブラリの欄に  
+  (ディレクトリ…)/libs_vc/misc_lib/vc$(PlatformToolsetVersion)_$(PlatformName)_$(Configuration)  
+  や (ディレクトリ…)/libs_vc/misc_lib/vc$(PlatformToolsetVersion)_$(PlatformName)_static_$(Configuration)  
 の感じに追加するのを想定. 
-(static版も、ソリューション構成に static_release, static_debug を追加している場合は最初の指定でok)
-  
+static版も、ソリューション構成に static_release, static_debug を追加している場合は最初の指定でok.
+
+vc9(vc10?)以前の場合、$(Configuration)でなく$(ConfigurationName)を使う必要ありで、また、$(PlatformToolsetVersion)
+がないので直接vc90のように記述するか、vsのプロパティシートでユーザー定義マクロとして
+PlatformToolsetVersion を設定することになる。
+
 生成される各ライブラリのファイル名は、なるべく元のビルドのままにしたかったが、
 debugビルドやランタイムの区別のため、元とは違うポストフィックス(_debugや_static)を
 つけている場合もある。 実際に生成されたファイル名を確認のこと.
-  
-基本的に、ターゲットライブラリはstaticリンクしての利用を想定。
-ターゲットライブラリ自身のdll版は、ビルドに用意されていれば一応ビルドしている。
-(が用意されていないターゲットも多いので...)
-  
+
 dllライブラリ版は用意されている場合は、staticライブラリ版を別名で生成していて _static や -static が
 後ろについていることも多そう。なので、そうでないものもそれに倣った。
   
@@ -154,7 +159,7 @@ staticはターゲットライブラリがstaticリンクであることを表�
 ※ 生成ディレクトリ名を調整(変更)したい場合は libs_config.bat を弄る.
 たとえば vcバージョン名を付けたくなければ CcNamePrefix を  
     set CcLibPrefix=  
-のように空に設定.
+のように空に設定. 
 
 
 ## makefileやvcxproj等に対する文字列置換

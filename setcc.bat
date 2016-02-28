@@ -13,10 +13,11 @@ if not "%CcCMakeDir%"=="" set "setcc_base_path=%CcCMakeDir%;%setcc_base_path%"
 set CcName=%1
 set CcArch=%2
 
-if "%CcArch%"=="" set CcArch=x86
+if "%CcArch%"==""    set CcArch=Win32
+if "%CcArch%"=="x86" set CcArch=Win32
 
 set CcNameArch=%CcName%
-if not "%CcArch%"=="x86" set CcNameArch=%CcName%%CcArch%
+if /I not "%CcArch%"=="Win32" set CcNameArch=%CcName%%CcArch%
 
 if "%CcNameArch%"=="vc140"    goto L_VC14
 if "%CcNameArch%"=="vc140x64" goto L_VC14x64
@@ -33,6 +34,8 @@ if "%CcNameArch%"=="vc90x64"  goto L_VC9x64
 if "%CcNameArch%"=="vc80"     goto L_VC8
 if "%CcNameArch%"=="vc80x64"  goto L_VC8x64
 if "%CcNameArch%"=="vc71"    goto L_VC71
+if "%CcNameArch%"=="vc14"    goto L_VC14
+if "%CcNameArch%"=="vc14x64" goto L_VC14x64
 if "%CcNameArch%"=="vc13"    goto L_VC13
 if "%CcNameArch%"=="vc13x64" goto L_VC13x64
 if "%CcNameArch%"=="vc12"    goto L_VC12
@@ -49,6 +52,7 @@ if "%CcNameArch%"=="vc8x64"  goto L_VC8x64
 echo setcc [COMPILER] [x86/x64]
 echo   COMPILER:
 echo       vc120,vc110,vc100,vc90,vc80,vc71
+echo       vc120x64,vc110x64,vc100x64,vc90x64,vc80x64
 goto L_END
 
 :L_VC14
