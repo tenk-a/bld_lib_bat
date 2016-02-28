@@ -1,4 +1,4 @@
-rem @echo off
+@echo off
 rem Compile fltk for vc
 rem This batch-file license: boost software license version 1.0
 setlocal
@@ -27,7 +27,8 @@ if "%LibArchX86%"=="" set LibArchX86=Win32
   if /I "%1"=="vc100"    set Compiler=vc100
   if /I "%1"=="vc110"    set Compiler=vc110
   if /I "%1"=="vc120"    set Compiler=vc120
-  rem if /I "%1"=="vc13" set Compiler=vc130
+  if /I "%1"=="vc130"    set Compiler=vc130
+  if /I "%1"=="vc140"    set Compiler=vc140
 
   if /I "%1"=="x86"      set Arch=%LibArchX86%
   if /I "%1"=="win32"    set Arch=%LibArchX86%
@@ -49,6 +50,14 @@ goto ARG_LOOP
 :ARG_LOOP_EXIT
 
 rem if /I not "%PATH:Microsoft Visual Studio 13.0=%"=="%PATH%" set Compiler=vc13
+if /I not "%PATH:Microsoft Visual Studio 14.0=%"=="%PATH%" (
+    set Compiler=vc140
+    set VcSlnDir=VisualC2015
+)
+if /I not "%PATH:Microsoft Visual Studio 13.0=%"=="%PATH%" (
+    set Compiler=vc130
+    set VcSlnDir=VisualC2014
+)
 if /I not "%PATH:Microsoft Visual Studio 12.0=%"=="%PATH%" (
     set Compiler=vc120
     set VcSlnDir=VisualC2013
@@ -65,6 +74,10 @@ if /I not "%PATH:Microsoft Visual Studio 9.0=%"=="%PATH%" (
     set Compiler=vc90
     set VcSlnDir=VisualC2008
 )
+if /I not "%PATH:Microsoft Visual Studio 8=%"=="%PATH%" (
+    set Compiler=vc80
+    set VcSlnDir=VisualC2005
+)
 if "%Compiler%"=="" (
   echo unkown compiler
   goto END
@@ -73,6 +86,8 @@ if "%Compiler%"=="" (
 call :Clean
 
 rem if /I not "%PATH:Microsoft Visual Studio 13.0\VC\BIN\amd64=%"=="%PATH%" set Arch=x64
+if /I not "%PATH:Microsoft Visual Studio 14.0\VC\BIN\amd64=%"=="%PATH%" set Arch=x64
+if /I not "%PATH:Microsoft Visual Studio 13.0\VC\BIN\amd64=%"=="%PATH%" set Arch=x64
 if /I not "%PATH:Microsoft Visual Studio 12.0\VC\BIN\amd64=%"=="%PATH%" set Arch=x64
 if /I not "%PATH:Microsoft Visual Studio 11.0\VC\BIN\amd64=%"=="%PATH%" set Arch=x64
 if /I not "%PATH:Microsoft Visual Studio 10.0\VC\BIN\amd64=%"=="%PATH%" set Arch=x64
@@ -84,6 +99,8 @@ set Platform=%Arch%
 if "%Platform%"=="x86" set Platform=Win32
 
 if not exist "ide\%VcSlnDir%" (
+  if "%Compiler%"=="vc140" call ..\bld_lib_bat\UpgradeFltkIdeVcproj.bat %VcSlnDir%
+  if "%Compiler%"=="vc130" call ..\bld_lib_bat\UpgradeFltkIdeVcproj.bat %VcSlnDir%
   if "%Compiler%"=="vc120" call ..\bld_lib_bat\UpgradeFltkIdeVcproj.bat %VcSlnDir%
   if "%Compiler%"=="vc110" call ..\bld_lib_bat\UpgradeFltkIdeVcproj.bat %VcSlnDir%
   if not exist "ide\%VcSlnDir%" (
