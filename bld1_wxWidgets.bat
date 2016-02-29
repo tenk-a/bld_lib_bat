@@ -40,6 +40,7 @@ goto ARG_LOOP
 :ARG_LOOP_EXIT
 
 if "%Arch%"=="" (
+  if /I not "%PATH:Microsoft Visual Studio 14.0\VC\BIN\amd64=%"=="%PATH%" set Arch=x64
   if /I not "%PATH:Microsoft Visual Studio 13.0\VC\BIN\amd64=%"=="%PATH%" set Arch=x64
   if /I not "%PATH:Microsoft Visual Studio 12.0\VC\BIN\amd64=%"=="%PATH%" set Arch=x64
   if /I not "%PATH:Microsoft Visual Studio 11.0\VC\BIN\amd64=%"=="%PATH%" set Arch=x64
@@ -55,9 +56,9 @@ if "%HasRtSta%%HasRtDll%%HasDll%"=="" (
   set HasDll=D
 )
 
-if "%HasRtDll%"=="L" call :Bld1 "RUNTIME_LIBS=dynamic" lib_rtdll
-if "%HasRtSta%"=="S" call :Bld1 "RUNTIME_LIBS=static"  lib
-if "%HasDll%"=="D"   call :Bld1 "SHARED=1"             dll
+if "%HasRtSta%"=="S" call :Bld1 "RUNTIME_LIBS=static"  static_lib lib
+if "%HasRtDll%"=="L" call :Bld1 "RUNTIME_LIBS=dynamic" lib        lib
+if "%HasDll%"=="D"   call :Bld1 "SHARED=1"             dll        dll
 
 endlocal
 goto :EOF
@@ -65,27 +66,28 @@ goto :EOF
 :Bld1
 set RtOpt=%~1
 set Postfix=%2
+set TargetOldPostfix=%3
 
 set TargetOld=vc_
-if not "%Arch%"=="x86" set TargetOld=%TargetOld%%Arch%_
-if "%Postfix%"=="lib_rtdll" (
-  set TargetOld=%TargetOld%lib
-) else (
-  set TargetOld=%TargetOld%%Postfix%
-)
+if not "%Arch%"=="%LibArchX86%" set TargetOld=%TargetOld%%Arch%_
+set TargetOld=%TargetOld%%TargetOldPostfix%
 
-set Target=%StrPrefix%
-if not "%Arch%"=="x86" set Target=%Target%%Arch%_
-set Target=%Target%%Postfix%
+rem set Target=%StrPrefix%
+rem if not "%Arch%"=="%LibArchX86%" set Target=%Target%%Arch%_
+rem set Target=%Target%%Postfix%
+set Target=%StrPrefix%%Arch%_%Postfix%
 
 set CpuOpt=
 if %Arch%==x64 set "CpuOpt=TARGET_CPU=X64"
 
+set CFLAGSSET=
+rem if /I "%CcName%"=="vc140" set "CFLAGSSET=CFLAGS=-Dsnprintf=snprintf"
+
 cd .\build\msw
-nmake -f makefile.vc %CpuOpt% %RtOpt% BUILD=release clean
-nmake -f makefile.vc %CpuOpt% %RtOpt% BUILD=release
-nmake -f makefile.vc %CpuOpt% %RtOpt% BUILD=debug   clean
-nmake -f makefile.vc %CpuOpt% %RtOpt% BUILD=debug
+nmake -f makefile.vc %CpuOpt% %RtOpt% %CFLAGSSET% BUILD=release clean
+nmake -f makefile.vc %CpuOpt% %RtOpt% %CFLAGSSET% BUILD=release
+nmake -f makefile.vc %CpuOpt% %RtOpt% %CFLAGSSET% BUILD=debug   clean
+nmake -f makefile.vc %CpuOpt% %RtOpt% %CFLAGSSET% BUILD=debug
 cd ..\..
 
 if not %TargetOld%==%Target% (
