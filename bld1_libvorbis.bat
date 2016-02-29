@@ -1,4 +1,4 @@
-rem @echo off
+@echo off
 rem Compile libogg for vc
 rem This batch-file license: boost software license version 1.0
 setlocal
