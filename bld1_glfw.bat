@@ -22,6 +22,7 @@ set HasDbg=
 set HasRtSta=
 set HasRtDll=
 set CleanMode=
+set MakeTargetName=
 
 set LibArchX86=%CcLibArchX86%
 if "%LibArchX86%"=="" set LibArchX86=Win32
@@ -65,6 +66,11 @@ if "%Arch%"=="" (
 )
 if "%Arch%"=="" set Arch=%LibArchX86%
 
+if "%CcName%"=="vc80" set MakeTargetName=glfw
+if "%CcName%"=="vc90" set MakeTargetName=glfw
+if "%CcName%"=="vc100" set MakeTargetName=glfw
+if "%CcName%"=="vc110" set MakeTargetName=glfw
+
 call :Clean
 if "%CleanMode%"=="1" goto :EOF
 
@@ -107,8 +113,7 @@ set Arg=%Arg% -DCMAKE_BUILD_TYPE=%BldType%
 
 CMake -G "NMake Makefiles" %Arg%
 if errorlevel 1 goto :EOF
-nmake
-if errorlevel 1 goto :EOF
+nmake %MakeTargetName%
 
 set DstDir=%LibDir%\%Target%
 
