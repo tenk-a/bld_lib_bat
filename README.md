@@ -397,10 +397,10 @@ bld_系バッチで共通で使われるバッチとして、libs_config.bat(変
     vc??(_x64)_static_lib/  　　　　staticランタイム版  
     vc??(_x64)_dll/         　　　　dllライブラリ版  
   のようなディレクトリに配置。  
-  ただ実際に使うときは wxWidgets 内部での include の都合もあり、vc??_rtdll_lib か vc??_static_lib かどちらかを
-  vc??_lib (x64版なら vc_x64_lib) に rename する必要がある。（dll版の場合はそのままだろう）  
-  と vc??_lib と書いたが これは コンパイラオプションで wxMSVC_VERSION_AUTO マクロを定義した場合の話で、
-  指定していない場合はバージョンが付かず vc_lib (vc_x64_lib) となるので、使い方に合わせてrenameする必要がある。
+  が実際に使うときは wxWidgets 内部での include の都合もあり、vc??_rtdll_lib か vc??_static_lib かどちらかを
+  vc_lib (x64版なら vc_x64_lib) に rename する必要がある。（dll版の場合は vc_dll）  
+  (ただコンパイラオプションで wxMSVC_VERSION_AUTO マクロを定義した場合は、vc120_lib のようにvcバージョンが
+  ついたディレクトリが対象になるので、都合に合わせてrenameすることになる)
 - debug版ライブラリは、release版のファイル名の最後に 'd' を付加した名前になっている
 - v3.1.0では直っているようだが、vc14(vs2015)で wxWidgets v3.0.2 のソースを
   コンパイルすると tif_config.h の #define sprintf _sprintf が、
@@ -413,7 +413,6 @@ bld_系バッチで共通で使われるバッチとして、libs_config.bat(変
     #endif  
   のように書き換える必要がある。
 - バッチ内では makefile.vc に所定の引数渡してビルド
-- sampleをコンパイルするのに vc10～vc14用のsln,vcxprojがないので、vc9用から生成するバッチを用いてビルドしている
 - vc9,12,14 はビルド通った。 他vcについては未確認
 
 
