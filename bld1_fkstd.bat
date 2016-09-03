@@ -1,6 +1,6 @@
 @echo off
 rem Compile fkstd for vc
-rem usage: bld1_fkstd [x86/x64] [debug/release] [static/rtdll] [libdir:DEST_DIR]
+rem usage: bld1_fkstd [win32/x64] [debug/release] [static/rtdll] [libdir:DEST_DIR]
 rem ex)
 rem cd fks
 rem ..\bld_lib_bat\bld1_fkstd.bat x64 static libdir:d:\mylib

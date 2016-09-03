@@ -1,6 +1,6 @@
 rem @echo off
 rem Compile wxWidgets for vc
-rem bld1_wxWidgets [x86/x64] [static/rtdll/dll] [libdir:DEST_DIR]
+rem bld1_wxWidgets [win32/x64] [static/rtdll/dll] [libdir:DEST_DIR]
 rem ex)
 rem cd wxWidgets-3.0.2
 rem ..\bld_lib_bat\bld1_wxWidgets.bat x64

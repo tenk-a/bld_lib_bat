@@ -1,6 +1,6 @@
 rem @echo off
 rem Compile libjpeg for vc
-rem usage: bld1_libjpeg [x86/x64] [debug/release] [static/rtdll] [libdir:DEST_DIR]
+rem usage: bld1_libjpeg [win32/x64] [debug/release] [static/rtdll] [libdir:DEST_DIR]
 rem ex)
 rem cd libjpeg-1.2.8
 rem ..\bld_lib_bat\bld1_libjpeg.bat x64 static libdir:d:\mylib

@@ -1,6 +1,6 @@
 @echo off
 rem Compile libbz2 for vc
-rem bld1_bzip2 [x86/x64] [debug/release] [static/rtdll] [libdir:DEST_DIR]
+rem bld1_bzip2 [win32/x64] [debug/release] [static/rtdll] [libdir:DEST_DIR]
 rem ex)
 rem cd bzip2-1.0.6
 rem ..\bld_lib_bat\bld1_bzip2.bat x64
@@ -53,6 +53,7 @@ goto ARG_LOOP
 :ARG_LOOP_EXIT
 
 if "%Arch%"=="" (
+  if /I not "%PATH:Microsoft Visual Studio 14.0\VC\BIN\amd64=%"=="%PATH%" set Arch=x64
   if /I not "%PATH:Microsoft Visual Studio 13.0\VC\BIN\amd64=%"=="%PATH%" set Arch=x64
   if /I not "%PATH:Microsoft Visual Studio 12.0\VC\BIN\amd64=%"=="%PATH%" set Arch=x64
   if /I not "%PATH:Microsoft Visual Studio 11.0\VC\BIN\amd64=%"=="%PATH%" set Arch=x64

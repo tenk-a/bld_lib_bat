@@ -1,6 +1,6 @@
 rem @echo off
 rem Compile libpng for vc
-rem usage: bld1_lpng [x86/x64] [debug/release] [static/rtdll] [libdir:DEST_DIR]
+rem usage: bld1_lpng [win32/x64] [debug/release] [static/rtdll] [libdir:DEST_DIR]
 rem ex)
 rem cd lpng1616
 rem ..\bld_lib_bat\bld1_lpng.bat x64 static
@@ -53,6 +53,7 @@ goto ARG_LOOP
 :ARG_LOOP_EXIT
 
 if "%Arch%"=="" (
+  if /I not "%PATH:Microsoft Visual Studio 14.0\VC\BIN\amd64=%"=="%PATH%" set Arch=x64
   if /I not "%PATH:Microsoft Visual Studio 13.0\VC\BIN\amd64=%"=="%PATH%" set Arch=x64
   if /I not "%PATH:Microsoft Visual Studio 12.0\VC\BIN\amd64=%"=="%PATH%" set Arch=x64
   if /I not "%PATH:Microsoft Visual Studio 11.0\VC\BIN\amd64=%"=="%PATH%" set Arch=x64

@@ -1,6 +1,6 @@
-rem @echo off
+@echo off
 rem Compile libharu for vc
-rem usage: bld1_libharu [x86/x64] [debug/release] [static/rtdll] [libdir:DEST_DIR] [libcopy:DEST_DIR]
+rem usage: bld1_libharu [win32/x64] [debug/release] [static/rtdll] [libdir:DEST_DIR] [libcopy:DEST_DIR]
 rem ex)
 rem cd libharu-RELEASE_2_3_0
 rem ..\bld_lib_bat\bld1_libharu.bat
@@ -80,7 +80,7 @@ if "%PngDir%"=="misc" (
 )
 
 if "%Arch%"=="" (
-  if /I not "%PATH:Microsoft Visual Studio 13.0\VC\BIN\amd64=%"=="%PATH%" set Arch=x64
+  if /I not "%PATH:Microsoft Visual Studio 14.0\VC\BIN\amd64=%"=="%PATH%" set Arch=x64
   if /I not "%PATH:Microsoft Visual Studio 12.0\VC\BIN\amd64=%"=="%PATH%" set Arch=x64
   if /I not "%PATH:Microsoft Visual Studio 11.0\VC\BIN\amd64=%"=="%PATH%" set Arch=x64
   if /I not "%PATH:Microsoft Visual Studio 10.0\VC\BIN\amd64=%"=="%PATH%" set Arch=x64

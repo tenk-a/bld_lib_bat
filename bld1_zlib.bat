@@ -1,6 +1,6 @@
 @echo off
 rem Compile zlib for vc
-rem usage: bld1_zlib [x86/x64] [debug/release] [static/rtdll] [libdir:DEST_DIR]
+rem usage: bld1_zlib [win32/x64] [debug/release] [static/rtdll] [libdir:DEST_DIR]
 rem ex)
 rem cd zlib-1.2.8
 rem ..\bld_lib_bat\bld1_zlib.bat x64 static
@@ -54,6 +54,7 @@ goto ARG_LOOP
 :ARG_LOOP_EXIT
 
 if "%Arch%"=="" (
+  if /I not "%PATH:Microsoft Visual Studio 14.0\VC\BIN\amd64=%"=="%PATH%" set Arch=x64
   if /I not "%PATH:Microsoft Visual Studio 13.0\VC\BIN\amd64=%"=="%PATH%" set Arch=x64
   if /I not "%PATH:Microsoft Visual Studio 12.0\VC\BIN\amd64=%"=="%PATH%" set Arch=x64
   if /I not "%PATH:Microsoft Visual Studio 11.0\VC\BIN\amd64=%"=="%PATH%" set Arch=x64

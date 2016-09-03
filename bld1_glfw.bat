@@ -1,6 +1,6 @@
 @echo off
 rem Compile glfw for vc
-rem usage: bld1_glfw [x86/x64] [debug/release] [clean]
+rem usage: bld1_glfw [win32/x64] [debug/release] [clean]
 rem ex)
 rem cd glfw-?.?.?
 rem ..\bld_lib_bat\bld1_glfw.bat x64
@@ -57,6 +57,7 @@ goto ARG_LOOP
 :ARG_LOOP_EXIT
 
 if "%Arch%"=="" (
+  if /I not "%PATH:Microsoft Visual Studio 14.0\VC\BIN\amd64=%"=="%PATH%" set Arch=x64
   if /I not "%PATH:Microsoft Visual Studio 13.0\VC\BIN\amd64=%"=="%PATH%" set Arch=x64
   if /I not "%PATH:Microsoft Visual Studio 12.0\VC\BIN\amd64=%"=="%PATH%" set Arch=x64
   if /I not "%PATH:Microsoft Visual Studio 11.0\VC\BIN\amd64=%"=="%PATH%" set Arch=x64
