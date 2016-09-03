@@ -76,7 +76,7 @@ d:/libs_vc/ とする。
         set CcName=vc120 (vc80～vc120のいずれか)       　　使用するvcコンパイラ  
         set CcHasX64=0 or 1                            　　x86のみなら 0, x64版もビルドするなら 1  
         set CcNoRtStatic=0 or 1                        　　staticランタイム版を生成しない場合 1を設定  
-        set CcCMakeDir=%ProgramFiles(x86)%\CMake\bin   　　cmake.exeのあるディレクトリ  
+        set CcCMakeDir=%ProgramFiles%\CMake\bin        　　cmake.exeのあるディレクトリ  
         set CcNasmDir=%USERPROFILE%\AppData\Local\nasm 　　nasm.exe のあるディレクトリ  
         set CcPerlDir=c:\Perl64\site\bin;c:\Perl64\bin 　　perl.exe のあるディレクトリ  
   を自身の環境に合わせて書き換える。
@@ -328,14 +328,16 @@ bld_系バッチで共通で使われるバッチとして、libs_config.bat(変
 - vc12,vc14 はビルド通ったが、vc8-11は全くダメだったり一部ダメだったりと不具合有(原因未調査)
 
 
-#### openssl
+#### openssl (libssl, libcrypto)
 - ssl関係
 - bld_openssl.bat (+ bld1_openssl.bat, tiny_replstr.exe +共通bat)
 - ディレクトリは openssl-?.?.? 　試したバージョンは openssl-1.1.0
 - perl必須. libs_config.bat に perlのpathを設定のこと。
 - ライブラリの生成のみ。実行ファイルは無視。(生成するけどすぐ削除)
 - dll ライブラリ版は未生成。※直にbld1_openssl.batでdll指定すればdll版生成可能。
+- misc_inc/ へは、バイパスヘッダでなく include/openssl/ フォルダのヘッダをそのままコピー。
 - debug版の生成無し。debug版ディレクトリには release版をコピー。
+- vc8-14 のビルド通るはず
 
 
 ### 大きめのライブラリ(misc_*/に置かない)
