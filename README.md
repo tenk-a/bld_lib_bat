@@ -118,7 +118,8 @@ d:/libs_vc/ とする。
 ## misc_inc
 
 misc_inc/ には、ライブラリ別にディレクトリを用意、その中にヘッダを入れている。
-置かれるヘッダは 本来のヘッダをincludeするラッパーとなる。(実態のコピーはしない)
+なるべくヘッダは 本来のヘッダをincludeするラッパーとなるにし、極力、実態のコピーはしない。
+(openssl等、量が多めならコピーする場合もある)
 
 これを使えというわけでなく利用の一手段として。
 (misc_incのみあるいはmisc_libのみ使い他は元ライブラリ側使うというのも手)
@@ -336,6 +337,7 @@ bld_系バッチで共通で使われるバッチとして、libs_config.bat(変
 - ライブラリの生成のみ。実行ファイルは無視。(生成するけどすぐ削除)
 - dll ライブラリ版は未生成。※直にbld1_openssl.batでdll指定すればdll版生成可能。
 - misc_inc/ へは、バイパスヘッダでなく include/openssl/ フォルダのヘッダをそのままコピー。
+- perlで生成されたmakefileが/Mt版のみのため /Md用はテキスト置換して用意.
 - debug版の生成無し。debug版ディレクトリには release版をコピー。
 - vc8-14 のビルド通るはず
 
@@ -359,7 +361,7 @@ bld_系バッチで共通で使われるバッチとして、libs_config.bat(変
 #### OpenCV
 - 画像処理ライブラリ
 - bld_opencv.bat (+bld1_opencv.bat +共通bat)
-- ディレクトリは opencv-?.?.? 　- 試したバージョンは opencv-3.1.0
+- ディレクトリは opencv-?.?.? 　- 試したバージョンは opencv-3.1.0.zip (Sourcecode のみのzip)
 - .lib は opencv-?.?.?/lib/vc??_(Win32|x64)[_static](_release|_debug)/ ディレクトリに生成
 - _static付がstaticランタイム版。無しがdllランタイム版。
 - dll(shared)版の生成は行っていない。(直に bld1_opencv.bat で dll 指定すれば可能)
