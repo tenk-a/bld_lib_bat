@@ -27,7 +27,7 @@ vc8～vc14が対象...だが vc9,vc12 が主で他はビルド試してないの
 
 比較的小さいライブラリ
 - 現状 zlib, libbz2, libpng, jpeglib, libjpeg-turbo, libtiff, libharu,
-glfw3, libogg, libvorbis  openssl  
+glfw3, libogg, libvorbis, openssl  
 これらは misc_inc/ , misc_lib/ ディレクトリにも、まとめる。
 
 
@@ -73,13 +73,16 @@ d:/libs_vc/ とする。
         bld_lib_bat/libs_config.bat  
   を作成。  
   エディタで開け、  
+  
         set CcName=vc120 (vc80～vc120のいずれか)       　　使用するvcコンパイラ  
         set CcHasX64=0 or 1                            　　x86のみなら 0, x64版もビルドするなら 1  
         set CcNoRtStatic=0 or 1                        　　staticランタイム版を生成しない場合 1を設定  
         set CcCMakeDir=%ProgramFiles%\CMake\bin        　　cmake.exeのあるディレクトリ  
         set CcNasmDir=%USERPROFILE%\AppData\Local\nasm 　　nasm.exe のあるディレクトリ  
         set CcPerlDir=c:\Perl64\site\bin;c:\Perl64\bin 　　perl.exe のあるディレクトリ  
+  
   を自身の環境に合わせて書き換える。
+  
   - vcバージョン名は VSのマクロ変数$(PlatformToolsetVersion) の値が使えるように
     vc9やvc12でなくvc90やvc120のように記述するようにしている。
   - vc++ express版の場合はCcHasX64=0、CcNoRtStatic=0にすることになる
@@ -110,15 +113,22 @@ d:/libs_vc/ とする。
       d:/libs_vc/misc_lib/vc120_Win32_debug  
       d:/libs_vc/misc_lib/vc120_Win32_static_release  
       d:/libs_vc/misc_lib/vc120_Win32_static_debug  
+      d:/libs_vc/misc_lib/vc120_x64_release  
+      d:/libs_vc/misc_lib/vc120_x64_debug  
+      d:/libs_vc/misc_lib/vc120_x64_static_release  
+      d:/libs_vc/misc_lib/vc120_x64_static_debug  
   等に zlib.lib が生成される。  
   ※ ターゲットディレクトリ名はzlib*のように指定して、名前ソートで最後に見つかった
      モノを使うが、わかりにくいので複数のバージョンを置くのは避けたほうがよいだろう。
+  
+  一度ビルドを始めると、x86,x64のdllランタイム版&static版をdebug&release共にビルド(計8種類)
+  をビルドをするので、かなり時間がかかることが多いので余裕のあるときに行うこと。
 
 
 ## misc_inc
 
 misc_inc/ には、ライブラリ別にディレクトリを用意、その中にヘッダを入れている。
-なるべくヘッダは 本来のヘッダをincludeするラッパーとなるにし、極力、実態のコピーはしない。
+なるべくヘッダは 本来のヘッダをincludeするラッパーとなるようにし、極力、実態のコピーはしない。
 (openssl等、量が多めならコピーする場合もある)
 
 これを使えというわけでなく利用の一手段として。
@@ -127,7 +137,7 @@ misc_inc/ には、ライブラリ別にディレクトリを用意、その中�
 
 ## 生成するライブラリについて、misc_lib/ について
 
-boostやwxWidgetsのように仕分け対応積みのモノもあるが、debug|release、static|dll 等の
+boostやwxWidgetsのように元から仕分け対応済のモノもあるが、debug|release、static|dll 等の
 設定違い別にディレクトリを変えたり名前を変えたりしていないライブラリも多々あるため、
 仕分け対応していないライブラリについては、このバッチ群独自にディレクトリ分けしている。
 
@@ -142,20 +152,22 @@ libs_vc??/misc_lib/ に入るものについては、
 - vc120_x64_static_debug
   
 のようになる。  
+
 ディレクトリ分けされてない各ライブラリのビルドについても似たような感じでディレクトリ分けしている。
 （このへんはライブラリごとに事情が違うので、ビルド後のディレクトリを確認のこと)
   
-先頭にはまず使用するVCのバージョン名がつく。vc10からのVisual Studio のマクロ変数
-$(PlatformToolsetVersion) の値が使えるように vc10 や vc12 でなくvc90やvc120のように
+先頭にはまず使用するVCのバージョン名がつく。vc10からのVisual Studio の
+マクロ変数 $(PlatformToolsetVersion) の値が使えるように vc10 や vc12 でなく vc90 や vc120 のように
 記述するようにしている。
-次に _staticがあればstaticランタイム版(なければdllランタイム:msvcrt???.dllを使う)、
+次に _static があれば static ランタイム版で(なければdllランタイム:msvcrt???.dllを使う)、
 最後に _release | _debug ビルドを表している。  
   
 vc10 以降ならば Visual Studio の追加のライブラリの欄に  
   (ディレクトリ…)/libs_vc/misc_lib/vc$(PlatformToolsetVersion)_$(PlatformName)_$(Configuration)  
-  や (ディレクトリ…)/libs_vc/misc_lib/vc$(PlatformToolsetVersion)_$(PlatformName)_static_$(Configuration)  
+  や  
+  (ディレクトリ…)/libs_vc/misc_lib/vc$(PlatformToolsetVersion)_$(PlatformName)_static_$(Configuration)  
 の感じに追加するのを想定。 
-static版も、ソリューション構成に static_release, static_debug を追加している場合は最初の指定でok。
+static版でも、ソリューション構成側で static_release, static_debug を用意している場合は最初の指定でよいだろう。
 
 vc9以前の場合は $(Configuration) でなく $(ConfigurationName) を使う必要あり。
 また、$(PlatformToolsetVersion) がないので直接vc90のように記述するか、
@@ -222,6 +234,7 @@ bld_系バッチで共通で使われるバッチとして、libs_config.bat(変
 - dllライブラリ版を使用する場合は、zlib.h のinclude前にZLIB_DLLを#defineしておく必要がある。
 - libpng, tiff, boost, wxWidgets 等 各種ライブラリビルド時にソースなり .lib なりが参照される。
 - vc8-14 のビルド通るはず
+
 
 #### bzip2(libbz2)
 - データ(ファイル)圧縮関係
@@ -369,23 +382,28 @@ bld_系バッチで共通で使われるバッチとして、libs_config.bat(変
 - ビルドは build/vc??_(Win32|x64)[_static](_release|_debug)/ ディレクトリを作ってそこで行っている。
   終了しても残っているので、不要なら削除のこと。
 - バッチ内では、CMake の引数で所定の変数を設定してビルド
-- vc10exp,vc12,14 でビルド通った。vc11はCMake中にエラー。
+- vc10exp,vc12,14 でビルド通った。vc11はCMake中にエラー。  
   vc9以下は公式未対応の模様。stdint.h必須だし。ただ代用stdint.h用意してOpenCL オフにすればvideoio関係
-  以外はコンパイル通るかも。あとvc8,vc9はIDE上ではビルド試せるけどmsbuild.exeはハングして駄目だった。
+  以外はコンパイル通るかも。あとvc8,vc9はIDE上ではビルドを試せたがmsbuild.exeはハングして駄目だった。
 
 
 #### wxWidgets v3
 - GUIフレームワーク
 - bld_wxWidgets.bat (+ bld1_wxWidgets.bat + UpgradeWxWidgetsSampleVcproj.bat +共通bat)
-- ディレクトリは wxWidgets-3.?.? 　- 試したバージョンは wxWidgets-3.0.2
+- ディレクトリは wxWidgets-3.?.? 　- 試したバージョンは 最初:wxWidgets-3.0.2  最新:wxWidgets-3.1.0
 - でっかいし環境整ってるので、wxWidgetsの環境のまま使用
 - ただし生成されたライブラリは lib/ ディレクトリ直下にwx標準とは違う  
-    vc??_(Win32|x64)_lib/         dllランタイム版  
-    vc??_(Win32|x64)_static_lib/  staticランタイム版  
-    vc??_(Win32|x64)_dll/         dllライブラリ版  
-  のようなディレクトリに配置  
-  (debug版ライブラリは、release版のファイル名の最後に 'd' を付加した名前になっている)
-- vc14(vs2015)で wxWidgets v3.0.2 のソースを コンパイルすると tif_config.h の #define sprintf _sprintf が、
+    vc??(_x64)_rtdll_lib/   　　　　dllランタイム版  
+    vc??(_x64)_static_lib/  　　　　staticランタイム版  
+    vc??(_x64)_dll/         　　　　dllライブラリ版  
+  のようなディレクトリに配置。  
+  ただ実際に使うときは wxWidgets 内部での include の都合もあり、vc??_rtdll_lib か vc??_static_lib かどちらかを
+  vc??_lib (x64版なら vc_x64_lib) に rename する必要がある。（dll版の場合はそのままだろう）  
+  と vc??_lib と書いたが これは コンパイラオプションで wxMSVC_VERSION_AUTO マクロを定義した場合の話で、
+  指定していない場合はバージョンが付かず vc_lib (vc_x64_lib) となるので、使い方に合わせてrenameする必要がある。
+- debug版ライブラリは、release版のファイル名の最後に 'd' を付加した名前になっている
+- v3.1.0では直っているようだが、vc14(vs2015)で wxWidgets v3.0.2 のソースを
+  コンパイルすると tif_config.h の #define sprintf _sprintf が、
   vc14の stdio.h でのマクロ対策#errorのせいでエラーになる  
   なのでvc14でコンパイルする場合は src/tiff/libtiff/tif_config.h の 367 行目付近の  
     #define snprintf _snprintf  
@@ -396,7 +414,7 @@ bld_系バッチで共通で使われるバッチとして、libs_config.bat(変
   のように書き換える必要がある。
 - バッチ内では makefile.vc に所定の引数渡してビルド
 - sampleをコンパイルするのに vc10～vc14用のsln,vcxprojがないので、vc9用から生成するバッチを用いてビルドしている
-- vc9,12,14 はビルド通った(vc14は上記ソース修正有)。 他vcについては未確認
+- vc9,12,14 はビルド通った。 他vcについては未確認
 
 
 #### fltk

@@ -49,6 +49,9 @@ if "%Arch%"=="" (
   if /I not "%PATH:Microsoft Visual Studio 8\VC\BIN\amd64=%"=="%PATH%"    set Arch=x64
 )
 if "%Arch%"=="" set Arch=%LibArchX86%
+set ArchName=%Arch%_
+if "%Arch%"=="%LibArchX86%" set ArchName=
+
 
 if "%HasRtSta%%HasRtDll%%HasDll%"=="" (
   set HasRtSta=S
@@ -57,7 +60,7 @@ if "%HasRtSta%%HasRtDll%%HasDll%"=="" (
 )
 
 if "%HasRtSta%"=="S" call :Bld1 "RUNTIME_LIBS=static"  static_lib lib
-if "%HasRtDll%"=="L" call :Bld1 "RUNTIME_LIBS=dynamic" lib        lib
+if "%HasRtDll%"=="L" call :Bld1 "RUNTIME_LIBS=dynamic" rtdll_lib  lib
 if "%HasDll%"=="D"   call :Bld1 "SHARED=1"             dll        dll
 
 endlocal
@@ -69,16 +72,13 @@ set Postfix=%2
 set TargetOldPostfix=%3
 
 set TargetOld=vc_
-if not "%Arch%"=="%LibArchX86%" set TargetOld=%TargetOld%%Arch%_
+if "%Arch%"=="x64" set TargetOld=%TargetOld%%Arch%_
 set TargetOld=%TargetOld%%TargetOldPostfix%
 
-rem set Target=%StrPrefix%
-rem if not "%Arch%"=="%LibArchX86%" set Target=%Target%%Arch%_
-rem set Target=%Target%%Postfix%
-set Target=%StrPrefix%%Arch%_%Postfix%
+set Target=%StrPrefix%%ArchName%%Postfix%
 
 set CpuOpt=
-if %Arch%==x64 set "CpuOpt=TARGET_CPU=X64"
+if "%Arch%"=="x64" set "CpuOpt=TARGET_CPU=X64"
 
 set CFLAGSSET=
 rem if /I "%CcName%"=="vc140" set "CFLAGSSET=CFLAGS=-Dsnprintf=snprintf"
