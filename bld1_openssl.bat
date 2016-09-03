@@ -73,9 +73,11 @@ if "%HasRtSta%%HasDll%"=="" (
 )
 
 if "%LibDir%"=="" set LibDir=lib
-if not "%LibCopyDir%"=="" set LibDir=%LibCopyDir%
-
 if not exist %LibDir% mkdir %LibDir%
+
+if not "%LibCopyDir%"=="" (
+  if not exist %LibCopyDir% mkdir %LibCopyDir%
+)
 
 if not exist bin mkdir bin
 
@@ -118,7 +120,17 @@ if exist libssl.pdb copy libssl.pdb %DstDir%\
 if exist libcrypto.lib copy libcrypto.lib %DstDir%\
 if exist libcrypto.pdb copy libcrypto.pdb %DstDir%\
 
-set DstDir=%LibDir%\%Target%_debug
+if not exist %LibCopyDir% goto SKIP_END
+
+set DstDir=%LibCopyDir%\%Target%_release
+if not exist %DstDir% mkdir %DstDir%
+
+if exist libssl.lib copy libssl.lib %DstDir%\
+if exist libssl.pdb copy libssl.pdb %DstDir%\
+if exist libcrypto.lib copy libcrypto.lib %DstDir%\
+if exist libcrypto.pdb copy libcrypto.pdb %DstDir%\
+
+set DstDir=%LibCopyDir%\%Target%_debug
 if not exist %DstDir% mkdir %DstDir%
 
 if exist libssl.lib copy libssl.lib %DstDir%\
@@ -130,6 +142,23 @@ goto SKIP_END
 :SKIP_TO_DLL
 
 set DstDir=%LibDir%\%Target%
+if not exist %DstDir% mkdir %DstDir%
+
+if exist libssl*.lib copy libssl*.lib %DstDir%\
+if exist libssl*.dll copy libssl*.dll %DstDir%\
+if exist libssl*.pdb copy libssl*.pdb %DstDir%\
+if exist libcrypto*.lib copy libcrypto*.lib %DstDir%\
+if exist libcrypto*.dll copy libcrypto*.dll %DstDir%\
+if exist libcrypto*.pdb copy libcrypto*.pdb %DstDir%\
+
+if not exist %DstDir%\engines mkdir %DstDir%\engines
+if exist engines\*.lib move engines\*.lib %DstDir%\engines\
+if exist engines\*.dll move engines\*.dll %DstDir%\engines\
+if exist engines\*.pdb move engines\*.pdb %DstDir%\engines\
+
+if not exist %LibCopyDir% goto SKIP_END
+
+set DstDir=%LibCopyDir%\%Target%
 if not exist %DstDir% mkdir %DstDir%
 
 if exist libssl*.lib copy libssl*.lib %DstDir%\
