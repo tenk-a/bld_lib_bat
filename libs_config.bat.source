@@ -1,4 +1,4 @@
-rem @echo off
+@echo off
 rem This batch-file license: boost software license version 1.0
 rem ==========================================================================
 rem user setting
@@ -10,12 +10,14 @@ rem (VC++ Express Edition: CcHasX64=0 CcNoRtStatic=1)
 set CcHasX64=1
 set CcNoRtStatic=
 
-rem for glfw, libjpeg-turbo etc
-set CcCMakeDir=%ProgramFiles(x86)%\CMake\bin
+rem for glfw, libjpeg-turbo, openssl etc
+set CcCMakeDir=%ProgramFiles%\CMake\bin
 
-rem for libjpeg-turbo
+rem for libjpeg-turbo, OpenSSL
 set CcNasmDir=%USERPROFILE%\AppData\Local\nasm
 
+rem for openssl
+set CcPerlDir=c:\Perl64\site\bin;c:\Perl64\bin
 
 rem ==========================================================================
 rem

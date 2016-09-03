@@ -14,19 +14,20 @@ boost のように ランタイムのstatic/dll, ライブラリ自身のstatic/
 仕訳を多少楽にするためにバッチ化。
 
 vc8～vc14が対象...だが vc9,vc12 が主で他はビルド試してないのもある。
-(そもそもライブラリ・ビルドして力尽きて満足しちまってるような……)
+(そもそもライブラリ・ビルドして力尽きて満足しちまってるような……)  
 ※最近のオープンソースは vc12,14あたりがターゲットで古いには
   未サポートになってきている気配.
 
 
 ## コンパイルするライブラリ
 
-大きいライブラリ
+大きめのライブラリ
 - 現状 boost, OpenCV, wxWidgets, fltk  
 これらは、それらの標準のincludeやlibのパスを使う。
 
 比較的小さいライブラリ
-- 現状 zlib, libbz2, libpng, jpeglib, libjpeg-turbo, libtiff, libharu, glfw3, libogg, libvorbis  openssl
+- 現状 zlib, libbz2, libpng, jpeglib, libjpeg-turbo, libtiff, libharu,
+glfw3, libogg, libvorbis  openssl  
 これらは misc_inc/ , misc_lib/ ディレクトリにも、まとめる。
 
 
@@ -72,12 +73,12 @@ d:/libs_vc/ とする。
         bld_lib_bat/libs_config.bat  
   を作成。  
   エディタで開け、  
-        set CcName=vc120 (vc80～vc120のいずれか)       　　使用するvcコンパイラ
+        set CcName=vc120 (vc80～vc120のいずれか)       　　使用するvcコンパイラ  
         set CcHasX64=0 or 1                            　　x86のみなら 0, x64版もビルドするなら 1  
-        set CcNoRtStatic=0 or 1                        　　staticランタイム版を生成しない場合 1を設定
-        set CcCMakeDir=%ProgramFiles(x86)%\CMake\bin   　　cmake.exeのあるディレクトリ
-        set CcNasmDir=%USERPROFILE%\AppData\Local\nasm 　　nasm.exe のあるディレクトリ
-        set CcPerlDir=c:\Perl64\site\bin;c:\Perl64\bin 　　perl.exe のあるディレクトリ
+        set CcNoRtStatic=0 or 1                        　　staticランタイム版を生成しない場合 1を設定  
+        set CcCMakeDir=%ProgramFiles(x86)%\CMake\bin   　　cmake.exeのあるディレクトリ  
+        set CcNasmDir=%USERPROFILE%\AppData\Local\nasm 　　nasm.exe のあるディレクトリ  
+        set CcPerlDir=c:\Perl64\site\bin;c:\Perl64\bin 　　perl.exe のあるディレクトリ  
   を自身の環境に合わせて書き換える。
   - vcバージョン名は VSのマクロ変数$(PlatformToolsetVersion) の値が使えるように
     vc9やvc12でなくvc90やvc120のように記述するようにしている。
@@ -97,18 +98,18 @@ d:/libs_vc/ とする。
 - ビルドしたいライブラリを入手(ダンロード)して d:/libs_vc/ の直下に解凍。  
   フォルダ名はバージョン番号等含んだデフォルトのままのこと。  
   たとえば zlib だと zlib128.zip を入手＆解凍、  
-    d:/libs_vc/zlib-1.2.8  
+      d:/libs_vc/zlib-1.2.8  
   が出来る。  
   d:/libs_vc/bld_lib_bat/ をカレント・ディレクトリにして  
-    bld_zlib.bat  
+      bld_zlib.bat  
   を実行。  
-    d:/libs_vc/misc_inc/  
+      d:/libs_vc/misc_inc/  
   にヘッダ zlib.h が生成され
   (作られた zlib.h は zlib-1.2.8 にある本物のzlib.h をincludeするだけのラッパー)  
-    d:/libs_vc/misc_lib/vc120_Win32_release  
-    d:/libs_vc/misc_lib/vc120_Win32_debug  
-    d:/libs_vc/misc_lib/vc120_Win32_static_release  
-    d:/libs_vc/misc_lib/vc120_Win32_static_debug  
+      d:/libs_vc/misc_lib/vc120_Win32_release  
+      d:/libs_vc/misc_lib/vc120_Win32_debug  
+      d:/libs_vc/misc_lib/vc120_Win32_static_release  
+      d:/libs_vc/misc_lib/vc120_Win32_static_debug  
   等に zlib.lib が生成される。  
   ※ ターゲットディレクトリ名はzlib*のように指定して、名前ソートで最後に見つかった
      モノを使うが、わかりにくいので複数のバージョンを置くのは避けたほうがよいだろう。
@@ -363,6 +364,7 @@ bld_系バッチで共通で使われるバッチとして、libs_config.bat(変
 - デバッグ版のライブラリはファイル名の最後に 'd' がつく。
 - ビルドは build/vc??_(Win32|x64)[_static](_release|_debug)/ ディレクトリを作ってそこで行っている。
   終了しても残っているので、不要なら削除のこと。
+- バッチ内では、CMake の引数で所定の変数を設定してビルド
 - vc10exp,vc12,14 でビルド通った。vc11はCMake中にエラー。
   vc9以下は公式未対応の模様。stdint.h必須だし。ただ代用stdint.h用意してOpenCL オフにすればvideoio関係
   以外はコンパイル通るかも。あとvc8,vc9はIDE上ではビルド試せるけどmsbuild.exeはハングして駄目だった。
