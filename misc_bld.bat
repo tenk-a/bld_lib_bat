@@ -9,3 +9,4 @@ if exist bld_libharu.bat        call bld_libharu.bat
 if exist bld_glfw.bat           call bld_glfw.bat
 if exist bld_libvorbis.bat      call bld_libvorbis.bat
 if exist bld_libogg.bat         call bld_libogg.bat
+if exist bld_openssl.bat        call bld_openssl.bat

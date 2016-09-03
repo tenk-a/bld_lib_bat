@@ -13,17 +13,20 @@ boost のように ランタイムのstatic/dll, ライブラリ自身のstatic/
 フォルダに１つ(1形式)生成するだけのものも多いので、そういうビルド＆フォルダ
 仕訳を多少楽にするためにバッチ化。
 
-vc8～vc14が対象...だが vc9,vc12 が主で他はビルド試してないのもある.
+vc8～vc14が対象...だが vc9,vc12 が主で他はビルド試してないのもある。
 (そもそもライブラリ・ビルドして力尽きて満足しちまってるような……)
+※最近のオープンソースは vc12,14あたりがターゲットで古いには
+  未サポートになってきている気配.
+
 
 ## コンパイルするライブラリ
 
 大きいライブラリ
-- 現状 boost, wxWidgets, fltk  
+- 現状 boost, OpenCV, wxWidgets, fltk  
 これらは、それらの標準のincludeやlibのパスを使う。
 
 比較的小さいライブラリ
-- 現状 zlib, libbz2, libpng, jpeglib, libjpeg-turbo, libtiff, libharu, glfw3, libogg, libvorbis  
+- 現状 zlib, libbz2, libpng, jpeglib, libjpeg-turbo, libtiff, libharu, glfw3, libogg, libvorbis  openssl
 これらは misc_inc/ , misc_lib/ ディレクトリにも、まとめる。
 
 
@@ -74,17 +77,20 @@ d:/libs_vc/ とする。
         set CcNoRtStatic=0 or 1                        　　staticランタイム版を生成しない場合 1を設定
         set CcCMakeDir=%ProgramFiles(x86)%\CMake\bin   　　cmake.exeのあるディレクトリ
         set CcNasmDir=%USERPROFILE%\AppData\Local\nasm 　　nasm.exe のあるディレクトリ
-
-  を自身の環境に合わせて書き換える。  
+        set CcPerlDir=c:\Perl64\site\bin;c:\Perl64\bin 　　perl.exe のあるディレクトリ
+  を自身の環境に合わせて書き換える。
   - vcバージョン名は VSのマクロ変数$(PlatformToolsetVersion) の値が使えるように
     vc9やvc12でなくvc90やvc120のように記述するようにしている。
   - vc++ express版の場合はCcHasX64=0、CcNoRtStatic=0にすることになる
     (がexpress自身でのライブラリビルドは未確認。
      今はvs2013のフリー版やvs2015のコミュニティー版を使えるし...)  
-  - libjpeg-turbo や glfw 等は cmakeを使うので予めインストールし、ここにそのディレクトリを記述。
+  - libjpeg-turbo や glfw, opencv 等は cmakeを使うので予めインストールし、ここにそのディレクトリを記述。
     win64環境で cmakeのインストーラで入れたならこのままでいいはず。
-  - libjpeg-turbo 等 nasm を使う場合は nasmのディレクトリを設定。
+  - libjpeg-turbo や openssl 等 nasm を使う場合は nasmのディレクトリを設定。
     nasmをインストーラで入れたならこのままでいいはず。
+  - openssl 等 perl を使う場合は perl のディレクトリを設定。
+    例はWin64用ActivePerl のdefaultの場合。 
+  - CcCMakeDir,CcNasmDir,CcPerlDirを使わない場合でフォルダが存在しない場合は空にしておくのが無難。
   - その他 同一ファイル内にある Cc???? はバッチ共通で使うデフォルト値。
 
 
@@ -99,10 +105,10 @@ d:/libs_vc/ とする。
     d:/libs_vc/misc_inc/  
   にヘッダ zlib.h が生成され
   (作られた zlib.h は zlib-1.2.8 にある本物のzlib.h をincludeするだけのラッパー)  
-    d:/libs_vc/misc_lib/vc120_x86_release  
-    d:/libs_vc/misc_lib/vc120_x86_debug  
-    d:/libs_vc/misc_lib/vc120_x86_static_release  
-    d:/libs_vc/misc_lib/vc120_x86_static_debug  
+    d:/libs_vc/misc_lib/vc120_Win32_release  
+    d:/libs_vc/misc_lib/vc120_Win32_debug  
+    d:/libs_vc/misc_lib/vc120_Win32_static_release  
+    d:/libs_vc/misc_lib/vc120_Win32_static_debug  
   等に zlib.lib が生成される。  
   ※ ターゲットディレクトリ名はzlib*のように指定して、名前ソートで最後に見つかった
      モノを使うが、わかりにくいので複数のバージョンを置くのは避けたほうがよいだろう。
@@ -126,11 +132,11 @@ boostやwxWidgetsのように仕分け対応積みのモノもあるが、debug|
 libs_vc??/misc_lib/ に入るものについては、
 - vc120_Win32_release
 - vc120_Win32_debug
-- vc120_Win32_static
+- vc120_Win32_static_release
 - vc120_Win32_static_debug
 - vc120_x64_release
 - vc120_x64_debug
-- vc120_x64_static
+- vc120_x64_static_release
 - vc120_x64_static_debug
   
 のようになる。  
@@ -183,7 +189,7 @@ bld_????.bat は実際には bld1_????.bat を呼び出している。
 
 bld1_????.bat は各ライブラリのフォルダに掘り込んで、基本的にそれのみで実際にビルドを行えるようにしてある。
 (一部tiny_replstr.exeや追加バッチが必要なものあり)
-x86 と x64 の切り替えはコンパイル環境の切り替えを伴うため、そのへんは bld_????.bat 側で行っている。
+x86(Win32) と x64 の切り替えはコンパイル環境の切り替えを伴うため、そのへんは bld_????.bat 側で行っている。
 
 
 ## 各ライブラリについて
@@ -270,12 +276,12 @@ bld_系バッチで共通で使われるバッチとして、libs_config.bat(変
 - pdf関係
 - bld_libharu.bat (+ bld1_libharu.bat +共通bat)
 - ディレクトリは libharu* 　- 試したバージョンは libharu-RELEASE_2_3_0
-- zlib, lpng ほぼ必須. 予め ビルド済みのこと. (無でビルドする方法はある模様)
+- zlib, lpng ほぼ必須。 予め ビルド済みのこと。 (無でビルドする方法はある模様)
 - ライブラリビルド時は zlib, libpng として mic_inc&misc_lib のものを使用
-- 無精して dll ライブラリ版は未生成.(ファイル名の都合もあり)
-- demo をコンパイルすると jpfont_demo.exe の実行でエラー。jpfont_demo.c 中のフォント名 MS-Mincyo が原因. 全てMS-Minchoに置換すればok
+- 無精して dll ライブラリ版は未生成。(ファイル名の都合もあり)
+- demo をコンパイルすると jpfont_demo.exe の実行でエラー。jpfont_demo.c 中のフォント名 MS-Mincyo が原因。 全てMS-Minchoに置換すればok
 - なので libharu をビルドする場合は予め 修正しておくこと
-- png_demo は生成されたpdfを開くとエラー発生("画像データに不足があります"で実際途中から表示無く). (lpngのバージョン違い?)
+- png_demo は生成されたpdfを開くとエラー発生("画像データに不足があります"で実際途中から表示無く)。 (lpngのバージョン違い?)
 - バッチ内では、script/makefile.msvc の引数で CFLAGS,LDFLAGS等の各種設定を変えてビルド
 - 上記ソース修正した状態で vc8-14 のビルド通るはず
 
@@ -316,9 +322,19 @@ bld_系バッチで共通で使われるバッチとして、libs_config.bat(変
   staticランタイム版をビルド、逆にdllランタイム版の名前を _rtdll 付きに変えている
 - dllランタイム版 _rtdll は misc_lib/ へのコピー時に 他のライブラリと
   ネイミングを合わせるため _rtdll無にし、無のほうを _static に付け直している
-- vc11以前では何がしかビルド失敗(vc9以前はmsbuildがハング。
+- vc11以前では何がしかビルド失敗(vc9以前はmsbuildがハング)。
   新し目のmsbuildを流用するとハングはしないがエラー有)
 - vc12,vc14 はビルド通ったが、vc8-11は全くダメだったり一部ダメだったりと不具合有(原因未調査)
+
+
+#### openssl
+- ssl関係
+- bld_openssl.bat (+ bld1_openssl.bat, tiny_replstr.exe +共通bat)
+- ディレクトリは openssl-?.?.? 　試したバージョンは openssl-1.1.0
+- perl必須. libs_config.bat に perlのpathを設定のこと。
+- ライブラリの生成のみ。実行ファイルは無視。(生成するけどすぐ削除)
+- dll ライブラリ版は未生成。※直にbld1_openssl.batでdll指定すればdll版生成可能。
+- debug版の生成無し。debug版ディレクトリには release版をコピー。
 
 
 ### 大きめのライブラリ(misc_*/に置かない)
@@ -333,8 +349,23 @@ bld_系バッチで共通で使われるバッチとして、libs_config.bat(変
 - gilで使う jpeg、png、tiffについては、使う側で、jpeglib.h,png.h,tiff.h が
   そのままincludeできlibがリンクされるようにする必要がある
 (gil自体は ヘッダオンリーのライブラリのようで、boost構築時にjpeg,png,tiffについて何かする必要はない)
-- .lib は boost-?????/stage/vc??_x??[_static](_release|_debug)/ ディレクトリに生成される
+- .lib は boost-?????/stage/vc??_(Win32|x64)[_static](_release|_debug)/ ディレクトリに生成される
 - vc8,9,12,14 のビルド通した(他は未確認)
+
+
+#### OpenCV
+- 画像処理ライブラリ
+- bld_opencv.bat (+bld1_opencv.bat +共通bat)
+- ディレクトリは opencv-?.?.? 　- 試したバージョンは opencv-3.1.0
+- .lib は opencv-?.?.?/lib/vc??_(Win32|x64)[_static](_release|_debug)/ ディレクトリに生成
+- _static付がstaticランタイム版。無しがdllランタイム版。
+- dll(shared)版の生成は行っていない。(直に bld1_opencv.bat で dll 指定すれば可能)
+- デバッグ版のライブラリはファイル名の最後に 'd' がつく。
+- ビルドは build/vc??_(Win32|x64)[_static](_release|_debug)/ ディレクトリを作ってそこで行っている。
+  終了しても残っているので、不要なら削除のこと。
+- vc10exp,vc12,14 でビルド通った。vc11はCMake中にエラー。
+  vc9以下は公式未対応の模様。stdint.h必須だし。ただ代用stdint.h用意してOpenCL オフにすればvideoio関係
+  以外はコンパイル通るかも。あとvc8,vc9はIDE上ではビルド試せるけどmsbuild.exeはハングして駄目だった。
 
 
 #### wxWidgets v3
@@ -356,10 +387,11 @@ bld_系バッチで共通で使われるバッチとして、libs_config.bat(変
     #if !defined(_MSC_VER) || _MSC_VER < 1900  
     #define snprintf _snprintf  
     #endif  
-  のように書き換える必要がある.
+  のように書き換える必要がある。
 - バッチ内では makefile.vc に所定の引数渡してビルド
 - sampleをコンパイルするのに vc10～vc14用のsln,vcxprojがないので、vc9用から生成するバッチを用いてビルドしている
-- vc9,12,14 はビルド通った(vc14は上記ソース修正有). 他vcについては未確認
+- vc9,12,14 はビルド通った(vc14は上記ソース修正有)。 他vcについては未確認
+
 
 #### fltk
 - GUIフレームワーク
@@ -370,10 +402,11 @@ bld_系バッチで共通で使われるバッチとして、libs_config.bat(変
 - デバッグ用ライブラリについては、元のまま 最後に d がついたモノを使うことになる
 - .lib は lib/ の下の  
     vc??_Win32/  
-    vc??_x86_static/  
-    vc??_Win32/  
+    vc??_Win32_static/  
+    vc??_x64/  
     vc??_x64_static/  
-  に作られる。_static付がstaticランタイム版で デバッグ版に関してはディレクトリ別でなくファイル名の最後に 'd' がつく。
+  に作られる。
+- _static付がstaticランタイム版で デバッグ版に関してはディレクトリ別でなくファイル名の最後に 'd' がつく。
 - バッチ内では、dllランタイム版は、msbuild fltk.sln で Configuration, Platform を指定してビルド
 - static ランタイム版やx64版は用意されていないので .slnや.vcxprojを無理やり書き換えたものを生成してビルド
-- vc10exp,vc12,vc14はビルド通った. vc8,9,11は失敗(原因未調査)
+- vc10exp,vc12,vc14はビルド通った。vc8,9,11は失敗(原因未調査)

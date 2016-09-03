@@ -9,6 +9,7 @@ if "%setcc_save_path%"=="" set "setcc_save_path=%path%"
 set "setcc_base_path=%setcc_save_path%"
 if not "%CcNasmDir%"==""  set "setcc_base_path=%CcNasmDir%;%setcc_base_path%"
 if not "%CcCMakeDir%"=="" set "setcc_base_path=%CcCMakeDir%;%setcc_base_path%"
+if not "%CcPerlDir%"==""  set "setcc_base_path=%CcPerlDir%;%setcc_base_path%"
 
 set CcName=%1
 set CcArch=%2
