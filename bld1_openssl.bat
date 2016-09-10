@@ -112,7 +112,7 @@ nmake
 
 if "%TgtType%"=="dll" goto SKIP_TO_DLL
 
-set DstDir=%LibDir%\%Target%_release
+set DstDir=%LibDir%\%Target%
 if not exist %DstDir% mkdir %DstDir%
 
 if exist libssl.lib copy libssl.lib %DstDir%\
