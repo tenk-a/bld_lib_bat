@@ -92,6 +92,8 @@ set RtType=%1
 set BldType=%2
 set Target=%3
 
+del *.obj *.res *.manifest *.exp *.exe *.pdb
+
 if "%RtType%"=="rtdll" (
   set RtOpts=-MD
 ) else (
@@ -108,7 +110,7 @@ set DstDir=%LibDir%\%Target%
 
 set ZlibIncDir=%CcMiscIncDir%
 if "%ZlibIncDir%"=="" (
-  for /D %%i in (..\*.*) do set ZlibIncDir=%%i
+  for /D %%i in (..\zlib*.*) do set ZlibIncDir=%%i
   set ZlibLibDir=%ZlibIncDir%\lib\%Target%
 ) else (
   set ZlibIncDir=..\%ZlibIncDir%
@@ -136,10 +138,12 @@ if /I exist *.lib move *.lib %DstDir%\
 
 del *.obj *.res *.manifest *.exp *.exe *.pdb
 
-if not "%LibCopyDir%"=="" (
-  if not exist %LibCopyDir% mkdir %LibCopyDir%
-  if not exist %LibCopyDir%\%Target% mkdir %LibCopyDir%\%Target%
-  if exist %DstDir%\*.lib copy %DstDir%\*.lib %LibCopyDir%\%Target%
-)
+echo "%LibCopyDir%"
+
+if "%LibCopyDir%"=="" goto BLD1_SKIP_1
+if not exist %LibCopyDir% mkdir %LibCopyDir%
+if not exist %LibCopyDir%\%Target% mkdir %LibCopyDir%\%Target%
+if exist %DstDir%\*.lib copy %DstDir%\*.lib %LibCopyDir%\%Target%
+:BLD1_SKIP_1
 
 exit /b

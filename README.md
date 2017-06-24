@@ -248,11 +248,13 @@ bld_系バッチで共通で使われるバッチとして、libs_config.bat(変
 #### lpng(libpng)
 - png画像ファイル関係
 - bld_lpng.bat (+ bld1_lpng.bat +共通bat)
-- ディレクトリは lpng* 　- 試したバージョンは 最初:lpng1616 最新:lpng1621
+- ディレクトリは lpng* 　- 試したバージョンは 最初:lpng1616 最新:lpng1629(ただし微修正必要. 後述)
 - zlib 必須
 - scripts/makefile.vcwin32 の引数でCFLAGS,CPPFLAGSを設定してビルド
 - libharuビルド時に参照される
 - vc8-14 のビルド通るはず
+- 1.6.29 にて pngrutil.c で inflateValidate() という関数が使われているが存在しない。
+とりあえず 425行付近の ret = inflateValidate(&png_ptr->zstream, 0); をコメントアウトして対処のこと。
 
 
 #### jpeg(libjpeg)
@@ -268,10 +270,20 @@ bld_系バッチで共通で使われるバッチとして、libs_config.bat(変
 #### libjpeg-turbo
 - jpeg画像ファイル関係. libjpegの派生
 - bld_libjpeg-turbo.bat (+ bld1_libjpeg-turbo.bat +共通bat)
-- ディレクトリは libjpeg-turbo* 　- 試したバージョンは 2016-02-13付近のgitリポジトリ  
+- ディレクトリは libjpeg-turbo* 　- 試したバージョンは 2016-02-13付近のgitリポジトリ  (最新は 2017-06-23付近)
 (以前試した libjpeg-turbo-code-1537-trunk とはビルドスクリプト変わってたので 今のに合わせて修正済)
 - turbo版はlibjpegの派生で、libjpeg,libjpeg-turboの混在リンクは不可
 - misc_inc を使う場合は、 -Imisc_inc/jpeg-turbo -Imisc_inc のように先にturbo版を指定しておくことで対応(あるいはinculde <jpeg-turbo/jpeglib.h>するか)
+- cmake, nasm 必須
+- DLLランタイム版のビルドは用意されていないので、無理やりバッチ内で、flags.make や CMakeLists.txt を書き換えた別ファイルを生成してビルド
+- vc8-14 のビルド通るはず
+
+#### mozjpeg
+- jpeg画像ファイル関係. libjpeg-turbo の派生
+- bld_mozjpeg.bat (+ bld1_mozjpeg.bat +共通bat)
+- ディレクトリは mozjpeg* 　- 初めて試したバージョンは 2017-03-19付近のgitリポジトリ (最新は 2017-06-23付近)
+- libjpeg,libjpeg-turbo,mozjpegの混在リンクは不可
+- misc_inc を使う場合は、 -Imisc_inc/mozjpeg -Imisc_inc のように先にmozjpeg版を指定しておくことで対応(あるいはinculde <mozjpeg/jpeglib.h>するか)
 - cmake, nasm 必須
 - DLLランタイム版のビルドは用意されていないので、無理やりバッチ内で、flags.make や CMakeLists.txt を書き換えた別ファイルを生成してビルド
 - vc8-14 のビルド通るはず
