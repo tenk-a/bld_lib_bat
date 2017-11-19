@@ -16,6 +16,8 @@ set HasRtSta=
 set HasRtDll=
 set HasDll=
 
+set CppOpt="USE_OPENGL=1"
+
 set LibArchX86=%CcLibArchX86%
 if "%LibArchX86%"=="" set LibArchX86=Win32
 
@@ -30,6 +32,7 @@ if "%LibArchX86%"=="" set LibArchX86=Win32
   if /I "%1"=="rtsta"    set HasRtSta=S
   if /I "%1"=="rtdll"    set HasRtDll=L
   if /I "%1"=="dll"      set HasDll=D
+
 
   set ARG=%1
   if /I "%ARG:~0,7%"=="LibDir:"     set LibDir=%ARG:~7%
@@ -84,10 +87,10 @@ set CFLAGSSET=
 rem if /I "%CcName%"=="vc140" set "CFLAGSSET=CFLAGS=-Dsnprintf=snprintf"
 
 cd .\build\msw
-nmake -f makefile.vc %CpuOpt% %RtOpt% %CFLAGSSET% BUILD=release clean
-nmake -f makefile.vc %CpuOpt% %RtOpt% %CFLAGSSET% BUILD=release
-nmake -f makefile.vc %CpuOpt% %RtOpt% %CFLAGSSET% BUILD=debug   clean
-nmake -f makefile.vc %CpuOpt% %RtOpt% %CFLAGSSET% BUILD=debug
+nmake -f makefile.vc %CpuOpt% %RtOpt% %CppOpt% %CFLAGSSET% BUILD=release clean
+nmake -f makefile.vc %CpuOpt% %RtOpt% %CppOpt% %CFLAGSSET% BUILD=release
+rem nmake -f makefile.vc %CpuOpt% %RtOpt% %CppOpt% %CFLAGSSET% BUILD=debug   clean
+rem nmake -f makefile.vc %CpuOpt% %RtOpt% %CppOpt% %CFLAGSSET% BUILD=debug
 cd ..\..
 
 if not %TargetOld%==%Target% (

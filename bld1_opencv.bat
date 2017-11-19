@@ -40,6 +40,7 @@ if "%LibArchX86%"=="" set LibArchX86=Win32
   if /I "%1"=="vc120"     set Compiler=vc120
   if /I "%1"=="vc130"     set Compiler=vc130
   if /I "%1"=="vc140"     set Compiler=vc140
+  if /I "%1"=="vc141"     set Compiler=vc141
 
   if /I "%1"=="x86"      set Arch=%LibArchX86%
   if /I "%1"=="win32"    set Arch=%LibArchX86%
@@ -68,6 +69,7 @@ goto ARG_LOOP
 
 if "%Compiler%"=="" (
   rem if /I not "%PATH:Microsoft Visual Studio 13.0=%"=="%PATH%" set Compiler=vc13
+  if /I not "%PATH:Microsoft Visual Studio\2017=%"=="%PATH%" set Compiler=vc141
   if /I not "%PATH:Microsoft Visual Studio 14.0=%"=="%PATH%" set Compiler=vc140
   if /I not "%PATH:Microsoft Visual Studio 12.0=%"=="%PATH%" set Compiler=vc120
   if /I not "%PATH:Microsoft Visual Studio 11.0=%"=="%PATH%" set Compiler=vc110
@@ -101,7 +103,7 @@ set ADD_CMAKE_OPTS=%ADD_CMAKE_OPTS% -DWITH_OPENCL=0 -DWITH_OPENCL_SVM=0 -DWITH_O
 :SKIP_VC8VC9
 
 set Generator=
-rem if "%Compiler%"=="vs13" set SlnDir=VS2014
+if "%Compiler%"=="vc141" set "Generator=Visual Studio 15 2017"
 if "%Compiler%"=="vc140" set "Generator=Visual Studio 14 2015"
 if "%Compiler%"=="vc120" set "Generator=Visual Studio 12 2013"
 if "%Compiler%"=="vc110" set "Generator=Visual Studio 11 2012"

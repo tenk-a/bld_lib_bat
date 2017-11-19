@@ -37,8 +37,8 @@ cd %CcWxWidgetsDir%
 call ..\bld_lib_bat\setcc.bat %Compl% %CcLibArchX86%
 call ..\bld_lib_bat\bld1_wxWidgets.bat %CcLibArchX86% %Arg%
 if "%CcHasX64%"=="1" (
-  call ..\bld_lib_bat\setcc.bat %Compl% x64
-  call ..\bld_lib_bat\bld1_wxWidgets.bat x64 %Arg%
+call ..\bld_lib_bat\setcc.bat %Compl% x64
+call ..\bld_lib_bat\bld1_wxWidgets.bat x64 %Arg%
 )
 cd ..
 

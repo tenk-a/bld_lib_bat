@@ -49,6 +49,7 @@ goto ARG_LOOP
 :ARG_LOOP_EXIT
 
 if "%Compiler%"=="" (
+  if /I not "%PATH:Microsoft Visual Studio\2017=%"=="%PATH%" set Compiler=vc141
   if /I not "%PATH:Microsoft Visual Studio 14.0=%"=="%PATH%" set Compiler=vc140
   if /I not "%PATH:Microsoft Visual Studio 13.0=%"=="%PATH%" set Compiler=vc130
   if /I not "%PATH:Microsoft Visual Studio 12.0=%"=="%PATH%" set Compiler=vc120
@@ -76,6 +77,7 @@ if "%Compiler%"=="vc110" set ToolSet=msvc-11.0
 if "%Compiler%"=="vc120" set ToolSet=msvc-12.0
 if "%Compiler%"=="vc130" set ToolSet=msvc-13.0
 if "%Compiler%"=="vc140" set ToolSet=msvc-14.0
+if "%Compiler%"=="vc141" set ToolSet=msvc-14.1
 
 if "%ToolSet%"=="" goto USAGE
 

@@ -5,12 +5,14 @@ call libs_config.bat
 cd ..
 
 set Compl=
+if /I "%1"=="vc141" set Compl=vc141
 if /I "%1"=="vc140" set Compl=vc140
 if /I "%1"=="vc120" set Compl=vc120
 if /I "%1"=="vc110" set Compl=vc110
 if /I "%1"=="vc100" set Compl=vc100
 if /I "%1"=="vc90"  set Compl=vc90
 if /I "%1"=="vc80"  set Compl=vc80
+if /I "%1"=="vc71"  set Compl=vc71
 if not "%Compl%"=="" (
   set CcLibPrefix=%Compl%_
   shift

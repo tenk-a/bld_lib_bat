@@ -29,6 +29,7 @@ if "%LibArchX86%"=="" set LibArchX86=Win32
   if /I "%1"=="vc120"    set Compiler=vc120
   if /I "%1"=="vc130"    set Compiler=vc130
   if /I "%1"=="vc140"    set Compiler=vc140
+  if /I "%1"=="vc141"    set Compiler=vc141
 
   if /I "%1"=="x86"      set Arch=%LibArchX86%
   if /I "%1"=="win32"    set Arch=%LibArchX86%
@@ -50,6 +51,10 @@ goto ARG_LOOP
 :ARG_LOOP_EXIT
 
 rem if /I not "%PATH:Microsoft Visual Studio 13.0=%"=="%PATH%" set Compiler=vc13
+if /I not "%PATH:Microsoft Visual Studio\2017=%"=="%PATH%" (
+    set Compiler=vc141
+    set VcSlnDir=VisualC2017
+)
 if /I not "%PATH:Microsoft Visual Studio 14.0=%"=="%PATH%" (
     set Compiler=vc140
     set VcSlnDir=VisualC2015
@@ -98,6 +103,7 @@ set Platform=%Arch%
 if "%Platform%"=="x86" set Platform=Win32
 
 if not exist "ide\%VcSlnDir%" (
+  if "%Compiler%"=="vc141" call ..\bld_lib_bat\UpgradeFltkIdeVcproj.bat %VcSlnDir%
   if "%Compiler%"=="vc140" call ..\bld_lib_bat\UpgradeFltkIdeVcproj.bat %VcSlnDir%
   if "%Compiler%"=="vc130" call ..\bld_lib_bat\UpgradeFltkIdeVcproj.bat %VcSlnDir%
   if "%Compiler%"=="vc120" call ..\bld_lib_bat\UpgradeFltkIdeVcproj.bat %VcSlnDir%

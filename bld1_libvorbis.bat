@@ -35,6 +35,7 @@ if "%LibArchX86%"=="" set LibArchX86=Win32
   if /I "%1"=="vc120"    set Compiler=vc120
   if /I "%1"=="vc130"    set Compiler=vc130
   if /I "%1"=="vc140"    set Compiler=vc140
+  if /I "%1"=="vc141"    set Compiler=vc141
 
   if /I "%1"=="x86"      set Arch=%LibArchX86%
   if /I "%1"=="win32"    set Arch=%LibArchX86%
@@ -63,6 +64,7 @@ goto ARG_LOOP
 :ARG_LOOP_EXIT
 
 if "%Compiler%"=="" (
+  if /I not "%PATH:Microsoft Visual Studio\2017=%"=="%PATH%" set Compiler=vc141
   if /I not "%PATH:Microsoft Visual Studio 14.0=%"=="%PATH%" set Compiler=vc140
   if /I not "%PATH:Microsoft Visual Studio 13.0=%"=="%PATH%" set Compiler=vc130
   if /I not "%PATH:Microsoft Visual Studio 12.0=%"=="%PATH%" set Compiler=vc120
@@ -91,6 +93,7 @@ set Platform=%Arch%
 if "%Platform%"=="x86" set Platform=Win32
 
 set SlnDir=
+if "%Compiler%"=="vc141" set SlnDir=VS2017
 if "%Compiler%"=="vc140" set SlnDir=VS2015
 if "%Compiler%"=="vc130" set SlnDir=VS2014
 if "%Compiler%"=="vc120" set SlnDir=VS2013
@@ -101,6 +104,7 @@ if "%Compiler%"=="vc80"  set SlnDir=VS2005
 if "%Compiler%"=="vc71"  set SlnDir=VS2003
 
 if not exist win32\%SlnDir% (
+  if "%SlnDir%"=="VS2017" call :SlnCopyUpd VS2010 VS2017
   if "%SlnDir%"=="VS2015" call :SlnCopyUpd VS2010 VS2015
   if "%SlnDir%"=="VS2014" call :SlnCopyUpd VS2010 VS2014
   if "%SlnDir%"=="VS2013" call :SlnCopyUpd VS2010 VS2013
@@ -146,6 +150,7 @@ set Target=%3
 pushd win32\%SlnDir%
 
 if not "%OggVar%"=="" (
+  if "%Compiler%"=="vc141" ..\..\..\bld_lib_bat\tiny_replstr -x ++ %SrcOggVerVc10% %OggVar% VS2010 VS2017 -- libogg.props
   if "%Compiler%"=="vc140" ..\..\..\bld_lib_bat\tiny_replstr -x ++ %SrcOggVerVc10% %OggVar% VS2010 VS2015 -- libogg.props
   if "%Compiler%"=="vc130" ..\..\..\bld_lib_bat\tiny_replstr -x ++ %SrcOggVerVc10% %OggVar% VS2010 VS2014 -- libogg.props
   if "%Compiler%"=="vc120" ..\..\..\bld_lib_bat\tiny_replstr -x ++ %SrcOggVerVc10% %OggVar% VS2010 VS2013 -- libogg.props
