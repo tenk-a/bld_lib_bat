@@ -72,6 +72,11 @@ if /i "%CcNameArch%"=="msys2_32"   goto L_MSYS2_32
 if /i "%CcNameArch%"=="msys2_64"   goto L_MSYS2_64
 if /i "%CcNameArch%"=="msys32"     goto L_MSYS2_32
 if /i "%CcNameArch%"=="msys64"     goto L_MSYS2_64
+if /i "%CcNameArch%"=="clang64"    goto L_MSYS2_64
+if /i "%CcNameArch%"=="msys2clang32" goto L_MSYS2_32
+if /i "%CcNameArch%"=="msys2clang64" goto L_MSYS2_64
+if /i "%CcNameArch%"=="msys2mingw32" goto L_MSYS2_32
+if /i "%CcNameArch%"=="msys2mingw64" goto L_MSYS2_64
 if /i "%CcNameArch%"=="mingw32"    goto L_MINGW32
 if /i "%CcNameArch%"=="mingw64"    goto L_MINGW64
 if /i "%CcNameArch%"=="tdm32"      goto L_TDM32
@@ -312,8 +317,8 @@ rem ## c++ ######################################
 
 :L_BCC101
     set COMPILER=bcc32c
-    if /i "%BCC101_DIR%"=="" set "BCC101_DIR=c:\bcc101"
-    set "PATH=%BCC101_DIR%\bin;%setcc_base_path%"
+    if /i "%BCC32C_DIR%"=="" set "BCC32C_DIR=c:\bcc101"
+    set "PATH=%BCC32C_DIR%\bin;%setcc_base_path%"
     goto :L_END
 
 :L_BCC55
