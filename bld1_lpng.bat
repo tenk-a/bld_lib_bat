@@ -21,6 +21,7 @@ set HasRel=
 set HasDbg=
 set HasRtSta=
 set HasRtDll=
+set ZlibFile=
 
 set LibArchX86=%CcLibArchX86%
 if "%LibArchX86%"=="" set LibArchX86=Win32
@@ -47,6 +48,7 @@ if "%LibArchX86%"=="" set LibArchX86=Win32
   if /I "%ARG:~0,9%"=="LibRtDll:"   set StrRtDll=%ARG:~9%
   if /I "%ARG:~0,7%"=="LibRel:"     set StrRel=%ARG:~7%
   if /I "%ARG:~0,7%"=="LibDbg:"     set StrDbg=%ARG:~7%
+  if /I "%ARG:~0,9%"=="ZlibFile:"   set ZlibFile=%ARG:~9%
 
   shift
 goto ARG_LOOP
@@ -123,7 +125,7 @@ set CFLAGS=-nologo -D_CRT_SECURE_NO_DEPRECATE -D_CRT_SECURE_NO_WARNINGS -W3 %RtO
 nmake -f scripts/makefile.vcwin32 "CFLAGS=%CFLAGS%" "CPPFLAGS=%CPPFLAGS%"
 if errorlevel 1 goto :EOF
 
-set ZlibFile=%ZlibLibDir%\zlib.lib
+if "%ZlibFile%"=="" set ZlibFile=%ZlibLibDir%\zlib.lib
 if exist %ZlibFile% (
   cl %CPPFLAGS% %CFLAGS% pngtest.c libpng.lib %ZlibFile%
   .\pngtest.exe

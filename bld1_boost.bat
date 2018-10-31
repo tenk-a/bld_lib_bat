@@ -33,6 +33,7 @@ if "%LibArchX86%"=="" set LibArchX86=Win32
   if /I "%1"=="vc120"   set Compiler=vc120
   if /I "%1"=="vc130"   set Compiler=vc130
   if /I "%1"=="vc140"   set Compiler=vc140
+  if /I "%1"=="vc141"   set Compiler=vc141
 
   if /I "%1"=="x86"     set Arch=%LibArchX86%
   if /I "%1"=="win32"   set Arch=%LibArchX86%
@@ -108,7 +109,7 @@ b2 --toolset=%ToolSet% --stagedir="%StageDir%" %B2Opts%
 goto END
 
 :USAGE
-echo bld_lib.bat [vc??] [win32/x64] [zlib:ZLIB_SRC_DIR] [bzip2:BZIP2_SRC_DIR]
+echo bld1_boost.bat [vc??] [win32/x64] [zlib:ZLIB_SRC_DIR] [bzip2:BZIP2_SRC_DIR]
 
 :END
 endlocal

@@ -8,6 +8,7 @@ if not exist %CcMiscIncDir% mkdir %CcMiscIncDir%
 if not exist %CcMiscLibDir% mkdir %CcMiscLibDir%
 
 set Compl=
+if /I "%1"=="vc141" set Compl=vc141
 if /I "%1"=="vc140" set Compl=vc140
 if /I "%1"=="vc120" set Compl=vc120
 if /I "%1"=="vc110" set Compl=vc110
