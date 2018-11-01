@@ -1,24 +1,27 @@
-@echo off
+rem @echo off
 rem This batch-file license: boost software license version 1.0
 setlocal
 call libs_config.bat
 
-set TgtName=zlib
+set TgtName=libtiff
 set TgtDir=
-set SrcIncSubDir=
+set SrcIncSubDir=libtiff
 set SrcLibSubDir=%CcLibDir%
 set DstIncSubDir=
 set DstLibSubDir=
-set hdr1=zlib.h
-set hdr2=zconf.h
-set hdr3=
-set hdr4=
-set hdr5=
+set hdr1=tiff.h
+set hdr2=tiffconf.h
+set hdr3=tiffio.h
+set hdr4=tiffio.hxx
+set hdr5=tiffvers.h
 set hdr6=
 set hdr7=
 set hdr8=
 set hdr9=
 set Arg=%CcBld1Arg%
+
+set Arg=debug static
+set CcHasX64=
 
 pushd ..
 

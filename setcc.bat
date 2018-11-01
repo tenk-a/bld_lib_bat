@@ -1,4 +1,4 @@
-@echo off
+rem @echo off
 rem This batch-file license: boost software license version 1.0
 rem Please rewrite PATH according to your environment.
 
@@ -7,12 +7,18 @@ set LIB=
 
 if /i "%ProgramFiles(x86)%"=="" set "ProgramFiles(x86)=%ProgramFiles%"
 
-if "%setcc_save_path%"=="" set "setcc_save_path=%path%"
+if "%setcc_save_path%"==""    set "setcc_save_path=%path%"
+if "%setcc_save_lib%"==""     set "setcc_save_lib=%LIB%"
+if "%setcc_save_include%"=="" set "setcc_save_include=%INCLUDE%"
+
+set "LIB=%setcc_save_lib%"
+set "INCLUDE=%setcc_save_include%"
 
 set "setcc_base_path=%setcc_save_path%"
+if not "%CcPython3Path%"=="" set "setcc_base_path=%CcPython3Path%;%setcc_base_path%"
+if not "%CcPerlDir%"==""  set "setcc_base_path=%CcPerlDir%;%setcc_base_path%"
 if not "%CcNasmDir%"==""  set "setcc_base_path=%CcNasmDir%;%setcc_base_path%"
 if not "%CcCMakeDir%"=="" set "setcc_base_path=%CcCMakeDir%;%setcc_base_path%"
-if not "%CcPerlDir%"==""  set "setcc_base_path=%CcPerlDir%;%setcc_base_path%"
 
 set CcName=%1
 set CcArch=%2
@@ -130,40 +136,56 @@ if /i "%CcNameArch%"=="java"        goto L_JAVA
 
 rem ## vc ######################################
 
-:L_VC141
-    set COMPILER=vc141
-    set "PATH=%setcc_base_path%"
-    if /i "%VC141_DIR%"=="" set "VC141_DIR=%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community"
-    pushd .
-    call "%VC141_DIR%\Common7\Tools\VsMSBuildCmd.bat"
-    call "%VC141_DIR%\VC\Auxiliary\Build\vcvars32.bat"
-    popd
-    goto L_END
-
 :L_VC141x64
     set COMPILER=vc141x64
-    call :C_VC141x64
-    goto L_END
-
-:C_VC141x64
+    set VCVARS_BAT=vcvars64.bat
+    goto L_VC141_SKIP_1
+:L_VC141
+    set COMPILER=vc141
+    set VCVARS_BAT=vcvars32.bat
+:L_VC141_SKIP_1
     set "PATH=%setcc_base_path%"
-    if /i "%VC141_DIR%"=="" set "VC141_DIR=%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community"
-    pushd .
-    call "%VC141_DIR%\Common7\Tools\VsMSBuildCmd.bat"
-    call "%VC141_DIR%\VC\Auxiliary\Build\vcvars64.bat"
-    popd
-    exit /b
+    if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Enterprise\Common7\Tools\VsMSBuildCmd.bat"   goto VC141_Enterprise64
+    if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Professional\Common7\Tools\VsMSBuildCmd.bat" goto VC141_Professional64
+    if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\Common7\Tools\VsMSBuildCmd.bat"    goto VC141_Community64
+    if exist "%ProgramFiles%\Microsoft Visual Studio\2017\Enterprise\Common7\Tools\VsMSBuildCmd.bat"   goto VC141_Enterprise
+    if exist "%ProgramFiles%\Microsoft Visual Studio\2017\Professional\Common7\Tools\VsMSBuildCmd.bat" goto VC141_Professional
+    if exist "%ProgramFiles%\Microsoft Visual Studio\2017\Community\Common7\Tools\VsMSBuildCmd.bat"    goto VC141_Community
+    echo ERROR: Not found "Microsoft Visual Studio 2017"
+    goto L_END
+:VC141_Enterprise64
+    call "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Enterprise\VC\Auxiliary\Build\%VCVARS_BAT%"
+    goto L_END
+:VC141_Professional64
+    call "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Professional\VC\Auxiliary\Build\%VCVARS_BAT%"
+    goto L_END
+:VC141_Community64
+    call "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\%VCVARS_BAT%"
+    goto L_END
+:VC141_Enterprise
+    call "%ProgramFiles%\Microsoft Visual Studio\2017\Enterprise\VC\Auxiliary\Build\%VCVARS_BAT%"
+    goto L_END
+:VC141_Professional
+    call "%ProgramFiles%\Microsoft Visual Studio\2017\Professional\VC\Auxiliary\Build\%VCVARS_BAT%"
+    goto L_END
+:VC141_Community
+    call "%ProgramFiles%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\%VCVARS_BAT%"
+    goto L_END
 
 :L_VC14
     set COMPILER=vc140
     set "PATH=%setcc_base_path%"
     call "%VS140COMNTOOLS%vsvars32.bat"
+    set VS140WindowsSdk=%ProgramFiles(x86)%\Windows Kits\8.1
+    set "PATH=%VS140WindowsSdk%\bin\x86;%PATH%"
     goto L_END
 
 :L_VC14x64
     set COMPILER=vc140x64
     set "PATH=%setcc_base_path%"
     call "%VS140COMNTOOLS%..\..\vc\bin\amd64\vcvars64.bat"
+    set VS140WindowsSdk=%ProgramFiles(x86)%\Windows Kits\8.1
+    set "PATH=%VS140WindowsSdk%\bin\x64;%PATH%"
     goto L_END
 
 :L_VC12
@@ -470,5 +492,5 @@ rem ## other ######################################
 
 
 :L_END
-set setcc_base_path=
+rem set setcc_base_path=
 set CcNameArch=

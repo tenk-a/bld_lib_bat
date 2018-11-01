@@ -3,15 +3,15 @@ rem This batch-file license: boost software license version 1.0
 setlocal
 call libs_config.bat
 
-set TgtName=zlib
+set TgtName=libpng
 set TgtDir=
 set SrcIncSubDir=
 set SrcLibSubDir=%CcLibDir%
 set DstIncSubDir=
 set DstLibSubDir=
-set hdr1=zlib.h
-set hdr2=zconf.h
-set hdr3=
+set hdr1=png.h
+set hdr2=pngconf.h
+set hdr3=pnglibconf.h
 set hdr4=
 set hdr5=
 set hdr6=
@@ -67,7 +67,7 @@ set Arg=%Arg% LibPrefix:%LibPrefix% LibDir:%SrcLibSubDir%
 set Arg=%Arg% LibRel:%CcLibStrRelease% LibDbg:%CcLibStrDebug% LibRtSta:%CcLibStrStatic% LibRtDll:%CcLibStrRtDll%
 if "%CcNoRtStatic%"=="1" set Arg=%Arg% rtdll
 
-rem goto BUILD_SKIP
+goto BUILD_SKIP
 pushd %TgtDir%
 if "%CcHasX86%"=="1" (
   call ..\bld_lib_bat\setcc.bat %VcVer% Win32

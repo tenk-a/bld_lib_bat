@@ -8,24 +8,17 @@ rem
 rem This batch-file license: boost software license version 1.0
 setlocal
 
-set ToolSet=
+set VcVer=
 set Platform=
 set Arch=
-rem set Arch=%CcArch%
-set LibDir=%CcLibDir%
-set StrPrefix=%CcLibPrefix%
-set StrRel=%CcLibStrRelease%
-set StrDbg=%CcLibStrDebug%
-set StrRtSta=%CcLibStrStatic%
-set StrRtDll=%CcLibStrRtDll%
+set StrPrefix=
+set StrRel=_release
+set StrDbg=_debug
+set StrRtSta=_static
+set StrRtDll=
+set StrDll=_dll
+set LibDir=lib
 
-if "%LibDir%"==""   set LibDir=lib
-if "%StrRel%"==""   set StrRel=_release
-if "%StrDbg%"==""   set StrDbg=_debug
-if "%StrRtSta%"=="" set StrRtSta=_static
-if "%StrRtDll%"=="" set StrRtDll=
-
-set LibCopyDir=
 set HasRel=
 set HasDbg=
 set HasRtSta=
@@ -45,8 +38,17 @@ set HasRtDll=
   if /I "%1"=="release"  set HasRel=r
   if /I "%1"=="debug"    set HasDbg=d
 
+  if /I "%1"=="vc71"     set VcVer=vc71
+  if /I "%1"=="vc80"     set VcVer=vc80
+  if /I "%1"=="vc90"     set VcVer=vc90
+  if /I "%1"=="vc100"    set VcVer=vc100
+  if /I "%1"=="vc110"    set VcVer=vc110
+  if /I "%1"=="vc120"    set VcVer=vc120
+  if /I "%1"=="vc130"    set VcVer=vc130
+  if /I "%1"=="vc140"    set VcVer=vc140
+  if /I "%1"=="vc141"    set VcVer=vc141
+
   set ARG=%1
-  if /I "%ARG:~0,8%"=="LibCopy:"    set LibCopyDir=%ARG:~8%
   if /I "%ARG:~0,7%"=="LibDir:"     set LibDir=%ARG:~7%
   if /I "%ARG:~0,10%"=="LibPrefix:" set StrPrefix=%ARG:~10%
   if /I "%ARG:~0,9%"=="LibRtSta:"   set StrRtSta=%ARG:~9%
@@ -58,18 +60,23 @@ set HasRtDll=
 goto ARG_LOOP
 :ARG_LOOP_EXIT
 
-if "%ToolSet%"=="" (
-  if /I not "%PATH:Microsoft Visual Studio\2017=%"=="%PATH%"    set ToolSet=vc141
-  if /I not "%PATH:Microsoft Visual Studio 14.0\VC=%"=="%PATH%" set ToolSet=vc140
-  if /I not "%PATH:Microsoft Visual Studio 13.0\VC=%"=="%PATH%" set ToolSet=vc130
-  if /I not "%PATH:Microsoft Visual Studio 12.0\VC=%"=="%PATH%" set ToolSet=vc120
-  if /I not "%PATH:Microsoft Visual Studio 11.0\VC=%"=="%PATH%" set ToolSet=vc110
-  if /I not "%PATH:Microsoft Visual Studio 10.0\VC=%"=="%PATH%" set ToolSet=vc100
-  if /I not "%PATH:Microsoft Visual Studio 9.0\VC=%"=="%PATH%"  set ToolSet=vc90
-  if /I not "%PATH:Microsoft Visual Studio 8\VC=%"=="%PATH%"    set ToolSet=vc80
+if "%VcVer%"=="" (
+  if /I not "%PATH:Microsoft Visual Studio .NET 2003=%"=="%PATH%" set VcVer=vc71
+  if /I not "%PATH:Microsoft Visual Studio 8=%"=="%PATH%"    set VcVer=vc80
+  if /I not "%PATH:Microsoft Visual Studio 9.0=%"=="%PATH%"  set VcVer=vc90
+  if /I not "%PATH:Microsoft Visual Studio 10.0=%"=="%PATH%" set VcVer=vc100
+  if /I not "%PATH:Microsoft Visual Studio 11.0=%"=="%PATH%" set VcVer=vc110
+  if /I not "%PATH:Microsoft Visual Studio 12.0=%"=="%PATH%" set VcVer=vc120
+  if /I not "%PATH:Microsoft Visual Studio 13.0=%"=="%PATH%" set VcVer=vc130
+  if /I not "%PATH:Microsoft Visual Studio 14.0=%"=="%PATH%" set VcVer=vc140
+  if /I not "%PATH:Microsoft Visual Studio\2017=%"=="%PATH%" set VcVer=vc141
 )
-if "%ToolSet%"=="" set ToolSet=vc
-if "%StrPrefix%"=="" set StrPrefix=%ToolSet%_
+
+if "%StrPrefix%"=="" (
+  if not "%VcVer%"=="" (
+    if "%StrPrefix%"=="" set StrPrefix=%VcVer%_
+  )
+)
 
 if "%Arch%"=="" (
   if /I not "%PATH:Microsoft Visual Studio 14.0\VC\BIN\amd64=%"=="%PATH%" set Arch=x64
@@ -80,9 +87,8 @@ if "%Arch%"=="" (
   if /I not "%PATH:Microsoft Visual Studio 9.0\VC\BIN\amd64=%"=="%PATH%"  set Arch=x64
   if /I not "%PATH:Microsoft Visual Studio 8\VC\BIN\amd64=%"=="%PATH%"    set Arch=x64
 )
-if "%Arch%"=="" (
-  set Arch=x86
-)
+if "%Arch%"=="" set Arch=Win32
+
 if "%Arch%"=="x86" (
   set Platform=Win32
 ) else (
@@ -97,9 +103,6 @@ if "%HasRel%%HasDbg%"=="" (
   set HasRel=r
   rem set HasDbg=d
 )
-
-if "%StrRel%%StrDbg%"==""     set StrDbg=_debug
-if "%StrRtSta%%StrRtDll%"=="" set StrRtSta=_static
 
 rem if not exist %LibDir% mkdir %LibDir%
 
@@ -167,7 +170,7 @@ lib /OUT:%TgtLibDir%\fkstd.lib /SUBSYSTEM:windows /NOLOGO /MACHINE:%Arch% @%TmpO
 :SKIP_MAKE_LIB
 
 
-rem goto SKIP_TEST
+goto SKIP_TEST
 rem [TEST]
 set TstWkDir=%BldDir%\obj\tst_%Target%
 if not exist %TstWkDir% mkdir %TstWkDir%
@@ -182,13 +185,6 @@ del %TstObjsFile%
 for /R %TstWkDir% %%i in (*.obj) do echo %%i | sort >>%TstObjsFile%
 cl -Fe%TstExeDir%\test_fkstd_%Target%.exe @%TstObjsFile% %TgtLibDir%\fkstd.lib
 :SKIP_TEST
-
-if "%LibCopyDir%"=="" goto ENDIF_LibCopyDir
-if not exist %LibCopyDir% mkdir %LibCopyDir%
-if not exist %LibCopyDir%\%Target% mkdir %LibCopyDir%\%Target%
-if exist %TgtLibDir%\*.lib copy %TgtLibDir%\*.lib %LibCopyDir%\%Target%
-if exist %TgtLibDir%\*.pdb copy %TgtLibDir%\*.pdb %LibCopyDir%\%Target%
-:ENDIF_LibCopyDir
 
 rem popd
 

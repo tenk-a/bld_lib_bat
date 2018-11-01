@@ -1,41 +1,28 @@
-rem @echo off
+@echo off
 rem Compile libogg for vc
 rem This batch-file license: boost software license version 1.0
 setlocal
 
-set Arch=%CcArch%
-rem set LibDir=%CcLibDir%
-set LibCopyDir=
-set StrPrefix=%CcLibPrefix%
-set StrRel=%CcLibStrRelease%
-set StrDbg=%CcLibStrDebug%
-set StrRtSta=%CcLibStrRtStatic%
-set StrRtDll=%CcLibStrRtDll%
+set Arch=
+set LibDir=
+set StrPrefix=
+set StrRel=_release
+set StrDbg=_debug
+set StrRtSta=_static
+set StrRtDll=
+set StrDll=_dll
 
 set HasRel=
 set HasDbg=
 set HasRtSta=
 set HasRtDll=
-set Compiler=
-
-set LibArchX86=%CcLibArchX86%
-if "%LibArchX86%"=="" set LibArchX86=Win32
+set VcVer=
 
 :ARG_LOOP
   if "%1"=="" goto ARG_LOOP_EXIT
 
-  if /I "%1"=="vc71"      set Compiler=vc71
-  if /I "%1"=="vc80"      set Compiler=vc80
-  if /I "%1"=="vc90"      set Compiler=vc90
-  if /I "%1"=="vc100"     set Compiler=vc100
-  if /I "%1"=="vc110"     set Compiler=vc110
-  if /I "%1"=="vc120"     set Compiler=vc120
-  if /I "%1"=="vc130"     set Compiler=vc130
-  if /I "%1"=="vc140"     set Compiler=vc140
-  if /I "%1"=="vc141"     set Compiler=vc141
-
-  if /I "%1"=="x86"      set Arch=%LibArchX86%
-  if /I "%1"=="win32"    set Arch=%LibArchX86%
+  if /I "%1"=="x86"      set Arch=Win32
+  if /I "%1"=="win32"    set Arch=Win32
   if /I "%1"=="x64"      set Arch=x64
 
   if /I "%1"=="static"   set HasRtSta=S
@@ -45,9 +32,18 @@ if "%LibArchX86%"=="" set LibArchX86=Win32
   if /I "%1"=="release"  set HasRel=r
   if /I "%1"=="debug"    set HasDbg=d
 
+  if /I "%1"=="vc71"      set VcVer=vc71
+  if /I "%1"=="vc80"      set VcVer=vc80
+  if /I "%1"=="vc90"      set VcVer=vc90
+  if /I "%1"=="vc100"     set VcVer=vc100
+  if /I "%1"=="vc110"     set VcVer=vc110
+  if /I "%1"=="vc120"     set VcVer=vc120
+  if /I "%1"=="vc130"     set VcVer=vc130
+  if /I "%1"=="vc140"     set VcVer=vc140
+  if /I "%1"=="vc141"     set VcVer=vc141
+
   set ARG=%1
-  if /I "%ARG:~0,8%"=="LibCopy:"    set LibCopyDir=%ARG:~8%
-  rem if /I "%ARG:~0,7%"=="LibDir:"     set LibDir=%ARG:~7%
+  if /I "%ARG:~0,7%"=="LibDir:"     set LibDir=%ARG:~7%
   if /I "%ARG:~0,10%"=="LibPrefix:" set StrPrefix=%ARG:~10%
   if /I "%ARG:~0,9%"=="LibRtSta:"   set StrRtSta=%ARG:~9%
   if /I "%ARG:~0,9%"=="LibRtDll:"   set StrRtDll=%ARG:~9%
@@ -58,20 +54,22 @@ if "%LibArchX86%"=="" set LibArchX86=Win32
 goto ARG_LOOP
 :ARG_LOOP_EXIT
 
-if "%Compiler%"=="" (
-  if /I not "%PATH:Microsoft Visual Studio\2017=%"=="%PATH%" set Compiler=vc141
-  if /I not "%PATH:Microsoft Visual Studio 14.0=%"=="%PATH%" set Compiler=vc140
-  if /I not "%PATH:Microsoft Visual Studio 13.0=%"=="%PATH%" set Compiler=vc130
-  if /I not "%PATH:Microsoft Visual Studio 12.0=%"=="%PATH%" set Compiler=vc120
-  if /I not "%PATH:Microsoft Visual Studio 11.0=%"=="%PATH%" set Compiler=vc110
-  if /I not "%PATH:Microsoft Visual Studio 10.0=%"=="%PATH%" set Compiler=vc100
-  if /I not "%PATH:Microsoft Visual Studio 9.0=%"=="%PATH%"  set Compiler=vc90
-  if /I not "%PATH:Microsoft Visual Studio 8=%"=="%PATH%"    set Compiler=vc80
-  if /I not "%PATH:Microsoft Visual Studio .NET 2003=%"=="%PATH%" set Compiler=vc71
+if "%VcVer%"=="" (
+  if /I not "%PATH:Microsoft Visual Studio .NET 2003=%"=="%PATH%" set VcVer=vc71
+  if /I not "%PATH:Microsoft Visual Studio 8=%"=="%PATH%"    set VcVer=vc80
+  if /I not "%PATH:Microsoft Visual Studio 9.0=%"=="%PATH%"  set VcVer=vc90
+  if /I not "%PATH:Microsoft Visual Studio 10.0=%"=="%PATH%" set VcVer=vc100
+  if /I not "%PATH:Microsoft Visual Studio 11.0=%"=="%PATH%" set VcVer=vc110
+  if /I not "%PATH:Microsoft Visual Studio 12.0=%"=="%PATH%" set VcVer=vc120
+  if /I not "%PATH:Microsoft Visual Studio 13.0=%"=="%PATH%" set VcVer=vc130
+  if /I not "%PATH:Microsoft Visual Studio 14.0=%"=="%PATH%" set VcVer=vc140
+  if /I not "%PATH:Microsoft Visual Studio\2017=%"=="%PATH%" set VcVer=vc141
 )
-if "%Compiler%"=="" (
-  echo unkown compiler
-  goto END
+
+if "%StrPrefix%"=="" (
+  if not "%VcVer%"=="" (
+    if "%StrPrefix%"=="" set StrPrefix=%VcVer%_
+  )
 )
 
 if "%Arch%"=="" (
@@ -83,20 +81,20 @@ if "%Arch%"=="" (
   if /I not "%PATH:Microsoft Visual Studio 9.0\VC\BIN\amd64=%"=="%PATH%"  set Arch=x64
   if /I not "%PATH:Microsoft Visual Studio 8\VC\BIN\amd64=%"=="%PATH%"    set Arch=x64
 )
-if "%Arch%"=="" set Arch=%LibArchX86%
+if "%Arch%"=="" set Arch=Win32
 set Platform=%Arch%
 if "%Platform%"=="x86" set Platform=Win32
 
 set SlnDir=
-if "%Compiler%"=="vc141" set SlnDir=VS2017
-if "%Compiler%"=="vc140" set SlnDir=VS2015
-if "%Compiler%"=="vc130" set SlnDir=VS2014
-if "%Compiler%"=="vc120" set SlnDir=VS2013
-if "%Compiler%"=="vc110" set SlnDir=VS2012
-if "%Compiler%"=="vc100" set SlnDir=VS2010
-if "%Compiler%"=="vc90"  set SlnDir=VS2008
-if "%Compiler%"=="vc80"  set SlnDir=VS2005
-if "%Compiler%"=="vc71"  set SlnDir=VS2003
+if "%VcVer%"=="vc141" set SlnDir=VS2017
+if "%VcVer%"=="vc140" set SlnDir=VS2015
+if "%VcVer%"=="vc130" set SlnDir=VS2014
+if "%VcVer%"=="vc120" set SlnDir=VS2013
+if "%VcVer%"=="vc110" set SlnDir=VS2012
+if "%VcVer%"=="vc100" set SlnDir=VS2010
+if "%VcVer%"=="vc90"  set SlnDir=VS2008
+if "%VcVer%"=="vc80"  set SlnDir=VS2005
+if "%VcVer%"=="vc71"  set SlnDir=VS2003
 
 if not exist win32\%SlnDir% (
   if "%SlnDir%"=="VS2017" call :SlnCopyUpd VS2010 VS2017
@@ -148,21 +146,6 @@ if "%RtType%"=="static" (
   msbuild libogg_rtdll.sln   /t:Rebuild /p:Configuration=%BldType% /p:Platform=%Platform%
 )
 popd
-
-set SrcDir=win32\%SlnDir%\%Platform%\%BldType%
-if "%LibCopyDir%"=="" goto ENDIF_LibCopyDir
-if not exist %LibCopyDir% mkdir %LibCopyDir%
-if not exist %LibCopyDir%\%Target% mkdir %LibCopyDir%\%Target%
-if "%RtType%"=="static" (
-  if exist %SrcDir%\libogg_static.lib copy %SrcDir%\libogg_static.lib %LibCopyDir%\%Target%\libogg_static.lib
-) else (
-  if exist %SrcDir%\libogg_rtdll.lib copy %SrcDir%\libogg_rtdll.lib %LibCopyDir%\%Target%\libogg_static.lib
-rem  if exist %SrcDir%\libogg_rtdll.lib copy %SrcDir%\libogg_rtdll.lib %LibCopyDir%\%Target%\libogg_rtdll.lib
-  if exist %SrcDir%\libogg.lib copy %SrcDir%\libogg.lib %LibCopyDir%\%Target%\libogg.lib
-  if exist %SrcDir%\libogg.dll copy %SrcDir%\libogg.dll %LibCopyDir%\%Target%
-  if exist %SrcDir%\libogg.pdb copy %SrcDir%\libogg.pdb %LibCopyDir%\%Target%
-)
-:ENDIF_LibCopyDir
 
 exit /b
 

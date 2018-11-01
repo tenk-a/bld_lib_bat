@@ -7,43 +7,34 @@ setlocal
 set CMAKE_NO_CUDA_OPTS=-DWITH_CUDA=0 -DWITH_CUFFT=0 -DBUILD_CUDA_STUBS=0
 set ADD_CMAKE_OPTS=-DWITH_OPENGL=1
 set ADD_CMAKE_OPTS=%ADD_CMAKE_OPTS% -DWITH_OPENCL=0 -DWITH_OPENCL_SVM=0 -DWITH_OPENCLAMDFFT=0 -DWITH_OPENCLAMDBLAS=0
-rem set ADD_CMAKE_OPTS=%ADD_CMAKE_OPTS% -DBUILD_PERF_TESTS=0 -DBUILD_TESTS=0
-rem set ADD_CMAKE_OPTS=%ADD_CMAKE_OPTS% -DBUILD_EXAMPLES=1
+set ADD_CMAKE_OPTS=%ADD_CMAKE_OPTS% -DBUILD_PERF_TESTS=0 -DBUILD_TESTS=0 -DBUILD_DOCS=0 -DBUILD_EXAMPLES=0
+set ADD_CMAKE_OPTS=%ADD_CMAKE_OPTS% -DINSTALL_CREATE_DISTRIB=ON
 
-set Arch=%CcArch%
-set LibDir=%CcLibDir%
-rem set LibCopyDir=
-set StrPrefix=%CcLibPrefix%
-set StrRtSta=%CcLibStrRtStatic%
-set StrRtDll=%CcLibStrRtDll%
-set StrDll=%CcLibStrDll%
-set StrRel=%CcLibStrRelease%
-set StrDbg=%CcLibStrDebug%
+rem set ADD_CMAKE_OPTS=%ADD_CMAKE_OPTS% -DPYTHON_DEFAULT_AVAILABLE=OFF
 
+
+set Arch=
+set LibDir=
+set StrPrefix=
+set StrRel=_release
+set StrDbg=_debug
+set StrRtSta=_static
+set StrRtDll=
+set StrDll=_dll
+
+set HasRel=
+set HasDbg=
 set HasRtSta=
 set HasRtDll=
 set HasDll=
-set Compiler=
+set VcVer=
 set EnableCuda=
-
-set LibArchX86=%CcLibArchX86%
-if "%LibArchX86%"=="" set LibArchX86=Win32
 
 :ARG_LOOP
   if "%1"=="" goto ARG_LOOP_EXIT
 
-  if /I "%1"=="vc71"      set Compiler=vc71
-  if /I "%1"=="vc80"      set Compiler=vc80
-  if /I "%1"=="vc90"      set Compiler=vc90
-  if /I "%1"=="vc100"     set Compiler=vc100
-  if /I "%1"=="vc110"     set Compiler=vc110
-  if /I "%1"=="vc120"     set Compiler=vc120
-  if /I "%1"=="vc130"     set Compiler=vc130
-  if /I "%1"=="vc140"     set Compiler=vc140
-  if /I "%1"=="vc141"     set Compiler=vc141
-
-  if /I "%1"=="x86"      set Arch=%LibArchX86%
-  if /I "%1"=="win32"    set Arch=%LibArchX86%
+  if /I "%1"=="x86"      set Arch=Win32
+  if /I "%1"=="Win32"    set Arch=Win32
   if /I "%1"=="x64"      set Arch=x64
 
   if /I "%1"=="static"   set HasRtSta=S
@@ -51,10 +42,22 @@ if "%LibArchX86%"=="" set LibArchX86=Win32
   if /I "%1"=="rtdll"    set HasRtDll=L
   if /I "%1"=="dll"      set HasDll=L
 
+  if /I "%1"=="release"  set HasRel=r
+  if /I "%1"=="debug"    set HasDbg=d
+
   if /I "%1"=="EnableCuda" set EnableCuda=on
 
+  if /I "%1"=="vc71"     set VcVer=vc71
+  if /I "%1"=="vc80"     set VcVer=vc80
+  if /I "%1"=="vc90"     set VcVer=vc90
+  if /I "%1"=="vc100"    set VcVer=vc100
+  if /I "%1"=="vc110"    set VcVer=vc110
+  if /I "%1"=="vc120"    set VcVer=vc120
+  if /I "%1"=="vc130"    set VcVer=vc130
+  if /I "%1"=="vc140"    set VcVer=vc140
+  if /I "%1"=="vc141"    set VcVer=vc141
+
   set ARG=%1
-  rem if /I "%ARG:~0,8%"=="LibCopy:"    set LibCopyDir=%ARG:~8%
   if /I "%ARG:~0,7%"=="LibDir:"     set LibDir=%ARG:~7%
   if /I "%ARG:~0,10%"=="LibPrefix:" set StrPrefix=%ARG:~10%
   if /I "%ARG:~0,9%"=="LibRtSta:"   set StrRtSta=%ARG:~9%
@@ -67,23 +70,25 @@ if "%LibArchX86%"=="" set LibArchX86=Win32
 goto ARG_LOOP
 :ARG_LOOP_EXIT
 
-if "%Compiler%"=="" (
-  rem if /I not "%PATH:Microsoft Visual Studio 13.0=%"=="%PATH%" set Compiler=vc13
-  if /I not "%PATH:Microsoft Visual Studio\2017=%"=="%PATH%" set Compiler=vc141
-  if /I not "%PATH:Microsoft Visual Studio 14.0=%"=="%PATH%" set Compiler=vc140
-  if /I not "%PATH:Microsoft Visual Studio 12.0=%"=="%PATH%" set Compiler=vc120
-  if /I not "%PATH:Microsoft Visual Studio 11.0=%"=="%PATH%" set Compiler=vc110
-  if /I not "%PATH:Microsoft Visual Studio 10.0=%"=="%PATH%" set Compiler=vc100
-  if /I not "%PATH:Microsoft Visual Studio 9.0=%"=="%PATH%"  set Compiler=vc90
-  if /I not "%PATH:Microsoft Visual Studio 8=%"=="%PATH%"    set Compiler=vc80
+if "%VcVer%"=="" (
+  if /I not "%PATH:Microsoft Visual Studio .NET 2003=%"=="%PATH%" set VcVer=vc71
+  if /I not "%PATH:Microsoft Visual Studio 8=%"=="%PATH%"    set VcVer=vc80
+  if /I not "%PATH:Microsoft Visual Studio 9.0=%"=="%PATH%"  set VcVer=vc90
+  if /I not "%PATH:Microsoft Visual Studio 10.0=%"=="%PATH%" set VcVer=vc100
+  if /I not "%PATH:Microsoft Visual Studio 11.0=%"=="%PATH%" set VcVer=vc110
+  if /I not "%PATH:Microsoft Visual Studio 12.0=%"=="%PATH%" set VcVer=vc120
+  if /I not "%PATH:Microsoft Visual Studio 13.0=%"=="%PATH%" set VcVer=vc130
+  if /I not "%PATH:Microsoft Visual Studio 14.0=%"=="%PATH%" set VcVer=vc140
+  if /I not "%PATH:Microsoft Visual Studio\2017=%"=="%PATH%" set VcVer=vc141
 )
-if "%Compiler%"=="" (
-  echo unkown compiler
-  goto END
+
+if "%StrPrefix%"=="" (
+  if not "%VcVer%"=="" (
+    if "%StrPrefix%"=="" set StrPrefix=%VcVer%_
+  )
 )
 
 if "%Arch%"=="" (
-  rem if /I not "%PATH:Microsoft Visual Studio 13.0\VC\BIN\amd64=%"=="%PATH%" set Arch=x64
   if /I not "%PATH:Microsoft Visual Studio 14.0\VC\BIN\amd64=%"=="%PATH%" set Arch=x64
   if /I not "%PATH:Microsoft Visual Studio 12.0\VC\BIN\amd64=%"=="%PATH%" set Arch=x64
   if /I not "%PATH:Microsoft Visual Studio 11.0\VC\BIN\amd64=%"=="%PATH%" set Arch=x64
@@ -91,25 +96,25 @@ if "%Arch%"=="" (
   if /I not "%PATH:Microsoft Visual Studio 9.0\VC\BIN\amd64=%"=="%PATH%"  set Arch=x64
   if /I not "%PATH:Microsoft Visual Studio 8\VC\BIN\amd64=%"=="%PATH%"    set Arch=x64
 )
-if "%Arch%"=="" set Arch=%LibArchX86%
+if "%Arch%"=="" set Arch=Win32
 set Platform=%Arch%
 if "%Platform%"=="x86" set Platform=Win32
 
-if "%Compiler%"=="vc80" goto VC8VC9
-if "%Compiler%"=="vc90" goto VC8VC9
+if "%VcVer%"=="vc80" goto VC8VC9
+if "%VcVer%"=="vc90" goto VC8VC9
 goto SKIP_VC8VC9
 :VC8VC9
 set ADD_CMAKE_OPTS=%ADD_CMAKE_OPTS% -DWITH_OPENCL=0 -DWITH_OPENCL_SVM=0 -DWITH_OPENCLAMDFFT=0 -DWITH_OPENCLAMDBLAS=0
 :SKIP_VC8VC9
 
 set Generator=
-if "%Compiler%"=="vc141" set "Generator=Visual Studio 15 2017"
-if "%Compiler%"=="vc140" set "Generator=Visual Studio 14 2015"
-if "%Compiler%"=="vc120" set "Generator=Visual Studio 12 2013"
-if "%Compiler%"=="vc110" set "Generator=Visual Studio 11 2012"
-if "%Compiler%"=="vc100" set "Generator=Visual Studio 10 2010"
-if "%Compiler%"=="vc90"  set "Generator=Visual Studio 9 2008"
-if "%Compiler%"=="vc80"  set "Generator=Visual Studio 8 2005"
+if "%VcVer%"=="vc141" set "Generator=Visual Studio 15 2017"
+if "%VcVer%"=="vc140" set "Generator=Visual Studio 14 2015"
+if "%VcVer%"=="vc120" set "Generator=Visual Studio 12 2013"
+if "%VcVer%"=="vc110" set "Generator=Visual Studio 11 2012"
+if "%VcVer%"=="vc100" set "Generator=Visual Studio 10 2010"
+if "%VcVer%"=="vc90"  set "Generator=Visual Studio 9 2008"
+if "%VcVer%"=="vc80"  set "Generator=Visual Studio 8 2005"
 
 if "%Arch%"=="x64" set "Generator=%Generator% Win64"
 
@@ -124,20 +129,22 @@ if "%HasRel%%HasDbg%"=="" (
   set HasDbg=d
 )
 
-if "%StrRel%%StrDbg%"==""     set StrDbg=_debug
-if "%StrRtSta%%StrRtDll%"=="" set StrRtSta=_static
-
+if "%LibDir%"=="" set LibDir=lib
 if not exist %LibDir% mkdir %LibDir%
+
 if not exist build    mkdir build
 
 if "%EnableCuda%"=="on" goto SKIP_NO_CUDA
 set ADD_CMAKE_OPTS=%ADD_CMAKE_OPTS% %CMAKE_NO_CUDA_OPTS%
 :SKIP_NO_CUDA
 
+if not "%CcPythonPlatform%"=="%Arch%" (
+  set ADD_CMAKE_OPTS=%ADD_CMAKE_OPTS% -DBUILD_opencv_python2=OFF -DBUILD_opencv_python3=OFF
+)
+
 if "%HasRtDll%"=="L" call :Bld1 rtdll  %StrPrefix%%Arch%%StrRtDll%
 if "%HasRtSta%"=="S" call :Bld1 static %StrPrefix%%Arch%%StrRtSta%
 if "%HasDll%"=="D"   call :Bld1 dll    %StrPrefix%%Arch%%StrDll%
-
 
 endlocal
 goto :EOF
@@ -147,33 +154,38 @@ goto :EOF
 set RtType=%1
 set Target=%2
 
-set BldDir=build\%Target%
+rem set opencv_base=..\..
+rem set BldDir=build\%Target%
+set BldDir=..\build\%Target%
 if not exist %BldDir% mkdir %BldDir%
 
 pushd %BldDir%
+set opencv_base=..\..\sources
+set contrib_dir=..\..\opencv_contrib
 
+set ADD_CMAKE_OPTS=%ADD_CMAKE_OPTS% OPENCV_EXTRA_MODULES_PATH=%contrib_dir%
+rem set ADD_CMAKE_OPTS=%ADD_CMAKE_OPTS% -DOpenCV_INSTALL_BINARIES_PREFIX=../../../install/%Target%/
+
+if exist opencv.sln goto BLD1_SKIP1
 if "%RtType%"=="rtdll" goto BLD1_RTDLL
 if "%RtType%"=="dll"   goto BLD1_DLL
 :BLD1_STATIC
-  CMake -G "%Generator%" -DBUILD_SHARED_LIBS=0 -DBUILD_WITH_STATIC_CRT=1 %ADD_CMAKE_OPTS% ..\..
+  CMake -G "%Generator%" -DBUILD_SHARED_LIBS=0 -DBUILD_WITH_STATIC_CRT=1 %ADD_CMAKE_OPTS% %opencv_base%
   goto BLD1_SKIP1
 :BLD1_RTDLL
-  CMake -G "%Generator%" -DBUILD_SHARED_LIBS=0 -DBUILD_WITH_STATIC_CRT=0 %ADD_CMAKE_OPTS% ..\..
+  CMake -G "%Generator%" -DBUILD_SHARED_LIBS=0 -DBUILD_WITH_STATIC_CRT=0 %ADD_CMAKE_OPTS% %opencv_base%
   goto BLD1_SKIP1
 :BLD1_DLL
-  CMake -G "%Generator%" -DBUILD_SHARED_LIBS=1 -DBUILD_WITH_STATIC_CRT=0 %ADD_CMAKE_OPTS% ..\..
+  CMake -G "%Generator%" -DBUILD_SHARED_LIBS=1 -DBUILD_WITH_STATIC_CRT=0 %ADD_CMAKE_OPTS% %opencv_base%
 :BLD1_SKIP1
 
-msbuild opencv.sln  /t:Rebuild /p:Configuration=debug   /p:Platform=%Platform%
-msbuild opencv.sln  /t:Rebuild /p:Configuration=release /p:Platform=%Platform%
+rem if "%HasDbg%"=="d" msbuild opencv.sln /t:Rebuild /p:Configuration=debug   /p:Platform=%Platform% /maxcpucount
+if "%HasDbg%"=="d" msbuild INSTALL.vcxproj /p:Configuration=debug   /p:Platform=%Platform% /maxcpucount
+rem if "%HasRel%"=="r" msbuild opencv.sln /t:Rebuild /p:Configuration=release /p:Platform=%Platform% /maxcpucount
+if "%HasRel%"=="r" msbuild INSTALL.vcxproj /t:Rebuild /p:Configuration=release /p:Platform=%Platform% /maxcpucount
+
+
 
 popd
-
-set TgtDir=%LibDir%\%Target%
-if not exist %TgtDir%%StrDbg% mkdir %TgtDir%%StrDbg%
-if not exist %TgtDir%%StrRel% mkdir %TgtDir%%StrRel%
-
-copy %BldDir%\lib\debug\*.*   %TgtDir%%StrDbg%\
-copy %BldDir%\lib\release\*.* %TgtDir%%StrRel%\
 
 exit /b

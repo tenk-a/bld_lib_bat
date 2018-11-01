@@ -13,10 +13,9 @@ boost のように ランタイムのstatic/dll, ライブラリ自身のstatic/
 フォルダに１つ(1形式)生成するだけのものも多いので、そういうビルド＆フォルダ
 仕訳を多少楽にするためにバッチ化。
 
-vc8～vc14が対象...だが vc9,vc12 が主で他はビルド試してないのもある。
+vc8～vc14.1が対象...だが 今は vc14.1 が主で、他のverはどうなっているか不明。
+(当初は vc9,vc12 あたりを主で用いていた)
 (そもそもライブラリ・ビルドして力尽きて満足しちまってるような……)  
-※最近のオープンソースは vc12,14あたりがターゲットで古いには
-  未サポートになってきている気配.
 
 
 ## コンパイルするライブラリ
@@ -49,7 +48,7 @@ static|dllランタイム, 等の都合でフォルダ分けし直している�
 
 - 基本的に各ライブラリのディレクトリままの利用を想定だが、
 数が増えると利用時の指定が面倒なので、ファイル数の少ないライブラリに
-関しては　misc_inc/, misc_lib/ というディレクトリにもまとめている。
+関しては　misc_inc/, misc_lib/ というディレクトリにも まとめている。
 
 - ターゲットライブラリはdll化せずstaticリンクしての利用を想定。
 ターゲットライブラリ自身のdll版は、ビルドに用意されていれば一応ビルドしているが、
@@ -62,7 +61,7 @@ static|dllランタイム, 等の都合でフォルダ分けし直している�
 ## インストール
 
 - まず 各種ライブラリをまとめて置くフォルダを用意する。
-仮にここでは、コンパイラとしてvc12(vs2013)を使い、まとめ置きディレクトリを
+仮にここでは、コンパイラとしてvc14.1(vs2017)を使い、まとめ置きディレクトリを
 d:/libs_vc/ とする。
 
 - そのフォルダ(d:/libs_vc/) の直下に この  
@@ -74,13 +73,14 @@ d:/libs_vc/ とする。
   を作成。  
   エディタで開け、  
   
-        set CcName=vc120 (vc80～vc120のいずれか)       　　使用するvcコンパイラ  
+        set CcName=vc141 (vc80～vc141のいずれか)       　　使用するvcコンパイラ  
         set CcHasX64=0 or 1                            　　x86のみなら 0, x64版もビルドするなら 1  
         set CcNoRtStatic=0 or 1                        　　staticランタイム版を生成しない場合 1を設定  
         set CcCMakeDir=%ProgramFiles%\CMake\bin        　　cmake.exeのあるディレクトリ  
-        set CcNasmDir=%USERPROFILE%\AppData\Local\nasm 　　nasm.exe のあるディレクトリ  
+        set CcNasmDir=%USERPROFILE%\AppData\Local\bin\nasm nasm.exe のあるディレクトリ  
         set CcPerlDir=c:\Perl64\site\bin;c:\Perl64\bin 　　perl.exe のあるディレクトリ  
-  
+        set CcPython3Path=……                         　　python.exe のあるディレクトリ  
+
   を自身の環境に合わせて書き換える。
   
   - vcバージョン名は VSのマクロ変数$(PlatformToolsetVersion) の値が使えるように
@@ -94,7 +94,7 @@ d:/libs_vc/ とする。
     nasmをインストーラで入れたならこのままでいいはず。
   - openssl 等 perl を使う場合は perl のディレクトリを設定。
     例はWin64用ActivePerl のdefaultの場合。 
-  - CcCMakeDir,CcNasmDir,CcPerlDirを使わない場合でフォルダが存在しない場合は空にしておくのが無難。
+  - CcCMakeDir,CcNasmDir,CcPerlDirを使わない場合でフォルダが存在しない場合は空にしておくこと。
   - その他 同一ファイル内にある Cc???? はバッチ共通で使うデフォルト値。
 
 
@@ -127,12 +127,10 @@ d:/libs_vc/ とする。
 
 ## misc_inc
 
-misc_inc/ には、ライブラリ別にディレクトリを用意、その中にヘッダを入れている。
-なるべくヘッダは 本来のヘッダをincludeするラッパーとなるようにし、極力、実態のコピーはしない。
-(openssl等、量が多めならコピーする場合もある)
+misc_inc/ には、各ライブラリのヘッダをコピーしている。
+元々からサブディレクトリなものもあれば、量の多いものはサブディレクトリにしているものもある。  
 
 これを使えというわけでなく利用の一手段として。
-(misc_incのみあるいはmisc_libのみ使い他は元ライブラリ側使うというのも手)
 
 
 ## 生成するライブラリについて、misc_lib/ について
@@ -156,7 +154,7 @@ libs_vc??/misc_lib/ に入るものについては、
 ディレクトリ分けされてない各ライブラリのビルドについても似たような感じでディレクトリ分けしている。
 （このへんはライブラリごとに事情が違うので、ビルド後のディレクトリを確認のこと)
   
-先頭にはまず使用するVCのバージョン名がつく。vc10からのVisual Studio の
+先頭にはまず使用するVCのバージョン名がつく。vc10からの Visual Studio の
 マクロ変数 $(PlatformToolsetVersion) の値が使えるように vc10 や vc12 でなく vc90 や vc120 のように
 記述するようにしている。
 次に _static があれば static ランタイム版で(なければdllランタイム:msvcrt???.dllを使う)、
@@ -216,7 +214,7 @@ boost等ライブラリ側ビルドでディレクトリ分けがされてない
 一応、試したライブラリのバージョンではビルドできているが、新しいバージョンや古いバージョンの
 ライブラリでうまくいくかは不明（やってみなければわからない)
 
-以下は、主にvc9とvc12でチェック. vc12は一通り通るが vc9は通らないこともあり、その場合は
+以下は、主にvc14.1でチェック. vc12は一通り通るが vc9は通らないこともあり、その場合は
 vcの他のバージョンも試した。(ので言及してないVCバージョンでの成否は不明)
 
 
@@ -229,32 +227,30 @@ bld_系バッチで共通で使われるバッチとして、libs_config.bat(変
 #### zlib
 - データ(ファイル)圧縮関係
 - bld_zlib.bat (+ bld1_zlib.bat +共通bat)
-- ディレクトリは zlib*　- 試したバージョンは zlib-1.2.8
+- ディレクトリは zlib*　- 試したバージョンは zlib-1.2.8, 2018-11-03付近のgitリポジトリ
 - バッチ内では、win32/Makefile.vc の引数でCFLAGS等指定してコンパイルオプションを変えている。
 - dllライブラリ版を使用する場合は、zlib.h のinclude前にZLIB_DLLを#defineしておく必要がある。
 - libpng, tiff, boost, wxWidgets 等 各種ライブラリビルド時にソースなり .lib なりが参照される。
-- vc8-14 のビルド通るはず
+- vc8-14.1 のビルド通るはず
 
 
 #### bzip2(libbz2)
 - データ(ファイル)圧縮関係
 - bld_bzip2.bat (+ bld1_bzip2.bat +共通bat)
-- ディレクトリは bzip2* 　- 試したバージョンは bzip2-1.0.6
+- ディレクトリは bzip2* 　- 試したバージョンは bzip2-1.0.6, 2018-11-03付近のgitリポジトリ
 - バッチ内では、makefile.msc の引数でOPTFLAGS等各種指定してビルド。
 - boost ビルド時にソースincludeされる。
-- vc8-14 のビルド通るはず
+- vc8-14.1 のビルド通るはず
 
 
-#### lpng(libpng)
+#### libpng
 - png画像ファイル関係
-- bld_lpng.bat (+ bld1_lpng.bat +共通bat)
-- ディレクトリは lpng* 　- 試したバージョンは 最初:lpng1616 最新:lpng1629(ただし微修正必要. 後述)
+- bld_libpng.bat (+ bld1_libpng.bat +共通bat)
+- ディレクトリは lpng* 　- 試したバージョンは 1.6.35 / 2018-11-03付近のgitリポジトリ
 - zlib 必須
 - scripts/makefile.vcwin32 の引数でCFLAGS,CPPFLAGSを設定してビルド
 - libharuビルド時に参照される
-- vc8-14 のビルド通るはず
-- 1.6.29 にて pngrutil.c で inflateValidate() という関数が使われているが存在しない。
-とりあえず 425行付近の ret = inflateValidate(&png_ptr->zstream, 0); をコメントアウトして対処のこと。
+- vc8-14.1 のビルド通るはず
 
 
 #### jpeg(libjpeg)
@@ -264,64 +260,64 @@ bld_系バッチで共通で使われるバッチとして、libs_config.bat(変
 - バッチ内では、makefile.vc の引数で、cflags等の各種設定を変えてビルド
 - config.h がなければ config.vc をコピーして用意。不足してるwin32.makも生成
 - tiffビルド時に参照
-- vc8-14 のビルド通るはず
+- vc8-14.1 のビルド通るはず
 
 
 #### libjpeg-turbo
 - jpeg画像ファイル関係. libjpegの派生
 - bld_libjpeg-turbo.bat (+ bld1_libjpeg-turbo.bat +共通bat)
-- ディレクトリは libjpeg-turbo* 　- 試したバージョンは 2016-02-13付近のgitリポジトリ  (最新は 2017-06-23付近)
+- ディレクトリは libjpeg-turbo* 　- 試したバージョンは 2016-02-13付近のgitリポジトリ  (最新は 2018-11-03付近)
 (以前試した libjpeg-turbo-code-1537-trunk とはビルドスクリプト変わってたので 今のに合わせて修正済)
-- turbo版はlibjpegの派生で、libjpeg,libjpeg-turboの混在リンクは不可
-- misc_inc を使う場合は、 -Imisc_inc/jpeg-turbo -Imisc_inc のように先にturbo版を指定しておくことで対応(あるいはinculde <jpeg-turbo/jpeglib.h>するか)
+- turbo版はlibjpegの派生で、libjpeg,libjpeg-turbo, mozjpeg の混在は不可
+- misc_inc を使う場合は、libjpeg,libjpeg-turbo,mozjpeg のいづれか一つのみ（最後のビルドのもの)が有効
 - cmake, nasm 必須
 - DLLランタイム版のビルドは用意されていないので、無理やりバッチ内で、flags.make や CMakeLists.txt を書き換えた別ファイルを生成してビルド
-- vc8-14 のビルド通るはず
+- vc8-14.1 のビルド通るはず
 
 #### mozjpeg
 - jpeg画像ファイル関係. libjpeg-turbo の派生
 - bld_mozjpeg.bat (+ bld1_mozjpeg.bat +共通bat)
-- ディレクトリは mozjpeg* 　- 初めて試したバージョンは 2017-03-19付近のgitリポジトリ (最新は 2017-06-23付近)
+- ディレクトリは mozjpeg* 　- 初めて試したバージョンは 2017-03-19付近のgitリポジトリ (最新は 2018-11-03付近)
 - libjpeg,libjpeg-turbo,mozjpegの混在リンクは不可
-- misc_inc を使う場合は、 -Imisc_inc/mozjpeg -Imisc_inc のように先にmozjpeg版を指定しておくことで対応(あるいはinculde <mozjpeg/jpeglib.h>するか)
+- misc_inc を使う場合は、libjpeg,libjpeg-turbo,mozjpeg のいづれか一つのみ（最後のビルドのもの)が有効
 - cmake, nasm 必須
 - DLLランタイム版のビルドは用意されていないので、無理やりバッチ内で、flags.make や CMakeLists.txt を書き換えた別ファイルを生成してビルド
-- vc8-14 のビルド通るはず
+- vc8-14.1 のビルド通るはず
 
 
 #### tiff(libtiff)
 - tiff画像ファイル関係
 - bld_tiff.bat (+ bld1_tiff.bat +共通bat)
-- ディレクトリは tiff* 　- 試したバージョンは tiff-4.0.3
+- ディレクトリは tiff* 　- 初めて試したバージョンは tiff-4.0.3 (最新は 2018-11-03付近のリポジトリ)
 - zlib, libjpeg ほぼ必須. なくてもビルドできるが圧縮未対応になるので、予め zlib, libjpeg をビルド済のこと
 - ライブラリビルド時は zlib, libjpeg として mic_inc&misc_lib のものを使用
 - バッチ内では、Makefile.vc の引数で各種指定してビルド
-- vc8-14 のビルド通るはず
+- vc8-14.1 のビルド通るはず
 
 
 #### libharu
 - pdf関係
 - bld_libharu.bat (+ bld1_libharu.bat +共通bat)
-- ディレクトリは libharu* 　- 試したバージョンは libharu-RELEASE_2_3_0
-- zlib, lpng ほぼ必須。 予め ビルド済みのこと。 (無でビルドする方法はある模様)
+- ディレクトリは libharu* 　- 試したバージョンは libharu-RELEASE_2_3_0 (あるいは 2018-11-03付近でのリポジトリ)
+- zlib, libpng ほぼ必須。 予め ビルド済みのこと。 (無でビルドする方法はある模様)
 - ライブラリビルド時は zlib, libpng として mic_inc&misc_lib のものを使用
 - 無精して dll ライブラリ版は未生成。(ファイル名の都合もあり)
 - demo をコンパイルすると jpfont_demo.exe の実行でエラー。jpfont_demo.c 中のフォント名 MS-Mincyo が原因。 全てMS-Minchoに置換すればok
 - なので libharu をビルドする場合は予め 修正しておくこと
-- png_demo は生成されたpdfを開くとエラー発生("画像データに不足があります"で実際途中から表示無く)。 (lpngのバージョン違い?)
+- png_demo は生成されたpdfを開くとエラー発生("画像データに不足があります"で実際途中から表示無く)。 (libpngのバージョン違い?)
 - バッチ内では、script/makefile.msvc の引数で CFLAGS,LDFLAGS等の各種設定を変えてビルド
-- 上記ソース修正した状態で vc8-14 のビルド通るはず
+- 上記ソース修正した状態で vc8-14.1 のビルド通るはず
 
 
 #### glfw
 - OpenGL フレームワーク.
 - bld_glfw.bat (+ bld1_glfw.bat +共通bat)
-- ディレクトリは glfw* 　- 試したバージョンは 最初:glfw-3.1.1  最新:3.1.2
+- ディレクトリは glfw* 　- 試したバージョンは 最初:glfw-3.1.1  最新: 2018-11-03付近でのリポジトリ
 -- glfw-?.?.?/lib/ の下に vc??_x??[_static][_debug]  のようなディレクトリを作りその下に.libを配置
 - バッチ内では、CMake の引数で所定の変数を設定してビルド
 - depth/libmath.h が c99,c++ では通るがc89では通らない書き方で、testプログラムの類が.cで vc11以前では
 エラーになるため、これらはライブラリのみのビルドを行う。vc12以降はc99機能対応有なのでtestも含めてビルドする
-- 上記状態で vc8-14 のビルド通るはず
+- 上記状態で vc8-14.1 のビルド通るはず
 
 
 #### libogg
@@ -334,7 +330,7 @@ bld_系バッチで共通で使われるバッチとして、libs_config.bat(変
 - dllランタイム版 _rtdll は misc_lib/ へのコピー時に 他のライブラリとネイミングを合わせるため _static に付け直している
 - (_static版のランタイム指定が liboggとlibvorbisで違うような... dll(_dynamic)ライブラリ版しか使ってないの？)
 - msbuildで libogg_static.sln, libogg_dynamic.sln に所定の引数与えてビルド 
-- vc12,vc14 はビルド通ったが、vc8-11は全くダメだったり一部ダメだったりと不具合有(原因未調査)
+- vc12,vc14,vc14.1 はビルド通ったが、vc8-11は全くダメだったり一部ダメだったりと不具合有(原因未調査)
 
 
 #### libvorbis
@@ -351,20 +347,20 @@ bld_系バッチで共通で使われるバッチとして、libs_config.bat(変
   ネイミングを合わせるため _rtdll無にし、無のほうを _static に付け直している
 - vc11以前では何がしかビルド失敗(vc9以前はmsbuildがハング)。
   新し目のmsbuildを流用するとハングはしないがエラー有)
-- vc12,vc14 はビルド通ったが、vc8-11は全くダメだったり一部ダメだったりと不具合有(原因未調査)
+- vc12,vc14,vc14.1 はビルド通ったが、vc8-11は全くダメだったり一部ダメだったりと不具合有(原因未調査)
 
 
 #### openssl (libssl, libcrypto)
 - ssl関係
 - bld_openssl.bat (+ bld1_openssl.bat, tiny_replstr.exe +共通bat)
-- ディレクトリは openssl-?.?.? 　試したバージョンは openssl-1.1.0
+- ディレクトリは openssl-?.?.? 　試したバージョンは openssl-1.1.0f
 - perl必須. libs_config.bat に perlのpathを設定のこと。
 - ライブラリの生成のみ。実行ファイルは無視。(生成するけどすぐ削除)
 - dll ライブラリ版は未生成。※直にbld1_openssl.batでdll指定すればdll版生成可能。
 - misc_inc/ へは、バイパスヘッダでなく include/openssl/ フォルダのヘッダをそのままコピー。
 - perlで生成されたmakefileが/Mt版のみのため /Md用はテキスト置換して用意.
 - debug版の生成無し。debug版ディレクトリには release版をコピー。
-- vc8-14 のビルド通るはず
+- vc8-14.1 のビルド通るはず
 
 
 ### 大きめのライブラリ(misc_*/に置かない)
@@ -380,13 +376,13 @@ bld_系バッチで共通で使われるバッチとして、libs_config.bat(変
   そのままincludeできlibがリンクされるようにする必要がある
 (gil自体は ヘッダオンリーのライブラリのようで、boost構築時にjpeg,png,tiffについて何かする必要はない)
 - .lib は boost-?????/stage/vc??_(Win32|x64)[_static](_release|_debug)/ ディレクトリに生成される
-- vc8,9,12,14 のビルド通した(他は未確認)
+- vc8,9,12,14,vc14.1 のビルド通した(他は未確認)
 
 
 #### OpenCV
 - 画像処理ライブラリ
 - bld_opencv.bat (+bld1_opencv.bat +共通bat)
-- ディレクトリは opencv-?.?.? 　- 試したバージョンは opencv-3.1.0.zip (Sourcecode のみのzip)
+- ディレクトリは opencv-?.?.? 　- 試したバージョンは opencv-3.1.0.zip, 最新の試しは3.4
 - .lib は opencv-?.?.?/lib/vc??_(Win32|x64)[_static](_release|_debug)/ ディレクトリに生成
 - _static付がstaticランタイム版。無しがdllランタイム版。
 - dll(shared)版の生成は行っていない。(直に bld1_opencv.bat で dll 指定すれば可能)
@@ -394,10 +390,15 @@ bld_系バッチで共通で使われるバッチとして、libs_config.bat(変
 - ビルドは build/vc??_(Win32|x64)[_static](_release|_debug)/ ディレクトリを作ってそこで行っている。
   終了しても残っているので、不要なら削除のこと。
 - バッチ内では、CMake の引数で所定の変数を設定してビルド
-- vc10exp,vc12,14 でビルド通った。vc11はCMake中にエラー。  
+- v3.1.0は vc10exp,vc12,14 でビルド通った。vc11はCMake中にエラー。  
   vc9以下は公式未対応の模様。stdint.h必須だし。ただ代用stdint.h用意してOpenCL オフにすればvideoio関係
   以外はコンパイル通るかも。あとvc8,vc9はIDE上ではビルドを試せたがmsbuild.exeはハングして駄目だった。
-
+- v3.4は vc14,vc14.1 で試し.
+-- フォルダ構成を変更. opencv/sources に opencv.git の内容を置き、opencv/build でビルド、
+opencv/build/vc???_(x64|Win32)(_static)/install が、実際に使うフォルダになる。
+-- pythonをインストールしてると opencv_python がビルドされるが、 python側の Python.h で python??_d.lib
+のリンクが設定されてしまうが、実物なくリンクエラー(opencv側は python??.libを使うようにしてる模様).
+とりあえず opencv_python をビルドしないことで回避.
 
 #### wxWidgets v3
 - GUIフレームワーク
@@ -445,3 +446,9 @@ bld_系バッチで共通で使われるバッチとして、libs_config.bat(変
 - バッチ内では、dllランタイム版は、msbuild fltk.sln で Configuration, Platform を指定してビルド
 - static ランタイム版やx64版は用意されていないので .slnや.vcxprojを無理やり書き換えたものを生成してビルド
 - vc10exp,vc12,vc14はビルド通った。vc8,9,11は失敗(原因未調査)
+
+
+## 履歴
+- 2018-11-03 misc_inc/のヘッダをラッパーでなくヘッダ実体をコピーするように変更。
+このためラッパーヘッダによる暗黙のリンクがなくなったので、.libはそのつどリンク指定する必要あり.
+bld1_???.bat では libs_config.bat のCc????変数を直接みないようにして なるべくbld1_???単体利用可能にした.

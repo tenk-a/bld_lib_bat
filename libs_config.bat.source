@@ -1,12 +1,13 @@
-@echo off
+rem @echo off
 rem This batch-file license: boost software license version 1.0
 rem ==========================================================================
 rem user setting
 
-rem vc80,vc90,vc100,vc110,vc120,vc140  // 2005,2008,2010,2012,2013,2015
+rem vc80,vc90,vc100,vc110,vc120,vc140,vc141 // 2005,2008,2010,2012,2013,2015,2017
 set CcName=
 
 rem (VC++ Express Edition: CcHasX64=0 CcNoRtStatic=1)
+set CcHasX86=1
 set CcHasX64=1
 set CcNoRtStatic=
 
@@ -14,10 +15,16 @@ rem for glfw, libjpeg-turbo, openssl etc
 set CcCMakeDir=%ProgramFiles%\CMake\bin
 
 rem for libjpeg-turbo, OpenSSL
-set CcNasmDir=%USERPROFILE%\AppData\Local\nasm
+set CcNasmDir=%USERPROFILE%\AppData\Local\bin\nasm
 
 rem for openssl
 set CcPerlDir=c:\Perl64\site\bin;c:\Perl64\bin
+
+rem Python3 for OpenCV
+set CcPythonDir=%USERPROFILE%\AppData\Local\Programs\Python
+set CcPython3Path=%CcPythonDir%\Python37\Scripts\;%CcPythonDir%\Python37\;%CcPythonDir%\Launcher\;
+rem python is installed on Win32 or x64. Do not use undefined  *OpenCV: Now defining debug build fails with python??_d.lib error not found.
+set CcPythonPlatform=
 
 rem ==========================================================================
 rem
@@ -31,12 +38,13 @@ if "%CcName%"=="" (
 set CcLibDir=.\lib
 rem set CcLibPrefix=
 set CcLibPrefix=%CcName%_
-set CcLibArchX86=Win32
 set CcLibStrDebug=_debug
 set CcLibStrRelease=_release
 set CcLibStrDll=_dll
 set CcLibStrStatic=_static
 set CcLibStrRtDll=
 
-set CcMiscIncDir=misc_inc
-set CcMiscLibDir=misc_lib
+set CcLibsVcIncDir=misc_inc
+set CcLibsVcLibDir=misc_lib
+
+set CcBld1Arg=
