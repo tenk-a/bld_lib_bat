@@ -26,7 +26,7 @@ set CcPerlDir=c:\Perl64\site\bin;c:\Perl64\bin
 rem Python3 for OpenCV
 set CcPythonDir=%USERPROFILE%\AppData\Local\Programs\Python
 set CcPython3Path=%CcPythonDir%\Python37\Scripts\;%CcPythonDir%\Python37\;%CcPythonDir%\Launcher\;
-rem python is installed on Win32 or x64. Do not use undefined  *OpenCV: Now defining debug build fails with python??_d.lib error not found.
+rem python is installed on Win32 or x64. Do not use undefined. *OpenCV: Now defining debug build fails with python??_d.lib error not found.
 set CcPythonPlatform=
 
 rem ==========================================================================

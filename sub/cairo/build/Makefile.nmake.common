@@ -1,0 +1,88 @@
+#
+# Edit build/Makefile.nmake.features to enable features to build
+#
+
+!include $(top_srcdir)/build/Makefile.nmake.features
+!include $(top_srcdir)/build/Makefile.nmake.features-h
+
+!if "$(top_builddir)"==""
+top_builddir = $(top_srcdir)
+!endif
+
+CC = cl
+LD = link
+AR = lib
+
+!if "$(CFG)"=="debug"
+CFG_CFLAGS = -$(RTOPT)d -Od -Zi
+CFG_LDFLAGS = -DEBUG
+!else
+CFG_CFLAGS = -$(RTOPT) -DNDEBUG -O2
+CFG_LDFLAGS =
+!endif
+
+!if "$(PIXMAN_PATH)"==""
+PIXMAN_PATH = $(top_builddir)/../pixman
+!endif
+!if "$(PIXMAN_INC)"==""
+PIXMAN_INC = $(PIXMAN_PATH)/pixman
+!endif
+PIXMAN_CFLAGS = -I$(PIXMAN_INC)/
+!if "$(PIXMAN_LIB)"==""
+PIXMAN_LIB = $(PIXMAN_PATH)/pixman/$(CFG)/pixman-1.lib
+!endif
+PIXMAN_LIBS = $(PIXMAN_LIB)/pixman-1.lib
+
+CAIRO_LIBS =  gdi32.lib msimg32.lib user32.lib
+
+!if $(CAIRO_HAS_PNG_FUNCTIONS)== 1
+!if "$(LIBPNG_PATH)"==""
+LIBPNG_PATH = $(top_builddir)/../libpng
+!endif
+!if "$(LIBPNG_INC)"==""
+LIBPNG_INC = $(LIBPNG_PATH)
+!endif
+!if "$(LIBPNG_LIB)"==""
+LIBPNG_LIB = $(LIBPNG_PATH)
+!endif
+LIBPNG_CFLAGS = $(LIBPNG_CFLAGS) -I$(LIBPNG_INC)/
+CAIRO_LIBS = $(CAIRO_LIBS) $(LIBPNG_LIB)/libpng.lib
+!endif
+!if "$(CAIRO_HAS_PS_SURFACE)$(CAIRO_HAS_PDF_SURFACE)"=="00"
+!else
+!if "$(ZLIB_PATH)"==""
+ZLIB_PATH = $(top_builddir)/../zlib
+!endif
+!if "$(ZLIB_INC)"==""
+ZLIB_INC = $(ZLIB_PATH)
+!endif
+!if "$(ZLIB_LIB)"==""
+ZLIB_LIB = $(ZLIB_PATH)
+!endif
+ZLIB_CFLAGS = $(ZLIB_CFLAGS) -I$(ZLIB_INC)/
+CAIRO_LIBS = $(CAIRO_LIBS) $(ZLIB_LIB)/zlib.lib
+!endif
+
+DEFAULT_CFLAGS = -nologo $(CFG_CFLAGS) -utf-8
+DEFAULT_CFLAGS = $(DEFAULT_CFLAGS) -I. -I$(top_srcdir) -I$(top_srcdir)/src
+DEFAULT_CFLAGS = $(DEFAULT_CFLAGS) $(PIXMAN_CFLAGS) $(LIBPNG_CFLAGS) $(ZLIB_CFLAGS)
+
+CAIRO_CFLAGS = $(DEFAULT_CFLAGS) $(CFLAGS)
+
+DEFAULT_LDFLAGS = -nologo $(CFG_LDFLAGS)
+DEFAULT_ARFLAGS = -nologo
+
+CAIRO_LDFLAGS = $(DEFAULT_LDFLAGS) $(LDFLAGS)
+CAIRO_ARFLAGS = $(DEFAULT_ARFLAGS) $(LDFLAGS)
+
+# Some generic rules
+
+.c.obj:
+	@$(CC) $(CAIRO_CFLAGS) -c -Fo"$@" $<
+
+cairo-system-static.obj: cairo-system.c $(top_srcdir)/src/cairo-features.h
+	@$(CC) $(CAIRO_CFLAGS) -c -DCAIRO_WIN32_STATIC_BUILD=1 -Fo"$@" $<
+
+clean:
+	@del (CFG)\*.obj $(CFG)\*.dll $(CFG)\*.lib $(CFG)\*.pdb $(CFG)\*.ilk
+	@exit /b 0

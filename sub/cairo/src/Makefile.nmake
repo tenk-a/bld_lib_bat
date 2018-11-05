@@ -1,0 +1,43 @@
+#
+
+top_srcdir = ..
+
+!include $(top_srcdir)/build/Makefile.nmake.common
+!include Makefile.nmake.features
+
+SOURCES = $(enabled_cairo_sources)
+
+STATIC_SOURCES = cairo-system.c
+
+# OBJECTS = $(patsubst %.c, $(CFG)/%.obj, $(SOURCES))
+OBJECTS = $(SOURCES:.c =.obj )
+# OBJECTS_STATIC = $(patsubst %cairo-system.obj, %cairo-system-static.obj, $(OBJECTS))
+OBJECTS_STATIC = $(OBJECTS:cairo-system.obj=cairo-system-static.obj)
+
+cairo.dll: $(OBJECTS) $(top_srcdir)/src/cairo-features.h
+	@$(LD) $(CAIRO_LDFLAGS) -DLL -OUT:$@ $(CAIRO_LIBS) $(PIXMAN_LIBS) $(OBJECTS)
+
+cairo-static.lib: $(OBJECTS_STATIC) $(top_srcdir)/src/cairo-features.h
+	@$(AR) $(CAIRO_ARFLAGS) -OUT:$@ $(PIXMAN_LIBS) $(OBJECTS_STATIC)
+
+all: cairo-static.lib cairo.dll
+	@if not exist $(CFG) mkdir $(CFG)
+	@if exist *.lib move *.lib $(CFG)\ 
+	@if exist *.dll move *.dll $(CFG)\ 
+	@if exist *.obj move *.obj $(CFG)\ 
+	@if exist *.pdb move *.pdb $(CFG)\ 
+	@if exist *.ilk move *.ilk $(CFG)\ 
+	@if exist *.exp move *.exp $(CFG)\ 
+	@if not exist $(CFG)\win32 mkdir $(CFG)\win32
+	@if exist win32\*.obj move win32\*.obj $(CFG)\win32\ 
+	@echo Built successfully!
+	@echo You should copy the following files to a proper place now:
+	@echo 	cairo-version.h (NOTE: toplevel, not the src/cairo-version.h one!)
+	@echo 	src/cairo-features.h
+        @for %%x in ($(enabled_cairo_headers)) do echo 	src/%%x
+	@echo 	src/$(CFG)/cairo.dll
+	@echo 	src/$(CFG)/cairo-static.lib
+
+clean:
+	@del /s *.lib *.dll *.obj *.pdb *.ilk *.exp
+	@exit /b 0
