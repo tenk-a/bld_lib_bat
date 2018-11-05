@@ -138,6 +138,8 @@ if "%Arch%"=="x64" (
   set OPTS=SSE2=on SSSE3=off MMX=off
 )
 
+if not exist pixman\pixman-version.h copy ..\bld_lib_bat\sub\pixman\pixman\pixman-version.h pixman\
+
 if exist pixman\%CFG% if exist pixman\%CFG%\*.* del /q pixman\%CFG%\*.*
 
 %CcMingw32Make% -f Makefile.win32mt pixman %OPTS% "CFG=%CFG%" "RTOPT=%RTOPT%" "MAKE=%CcMingw32Make%"
