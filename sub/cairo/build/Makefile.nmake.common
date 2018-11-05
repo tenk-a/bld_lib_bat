@@ -2,6 +2,8 @@
 # Edit build/Makefile.nmake.features to enable features to build
 #
 
+top_srcdir = ..
+
 !include $(top_srcdir)/build/Makefile.nmake.features
 !include $(top_srcdir)/build/Makefile.nmake.features-h
 
