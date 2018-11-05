@@ -20,6 +20,11 @@ set hdr8=
 set hdr9=
 set Arg=%CcBld1Arg%
 
+if not exist tiny_replstr.exe (
+  call setcc.bat %Compl% Win32
+  call gen_replstr.bat
+)
+
 pushd ..
 
 set VcVer=

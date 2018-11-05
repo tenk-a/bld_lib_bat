@@ -14,10 +14,10 @@ OBJECTS = $(SOURCES:.c =.obj )
 # OBJECTS_STATIC = $(patsubst %cairo-system.obj, %cairo-system-static.obj, $(OBJECTS))
 OBJECTS_STATIC = $(OBJECTS:cairo-system.obj=cairo-system-static.obj)
 
-cairo.dll: $(OBJECTS) $(top_srcdir)/src/cairo-features.h
+cairo.dll: $(OBJECTS) ../src/cairo-features.h
 	@$(LD) $(CAIRO_LDFLAGS) -DLL -OUT:$@ $(CAIRO_LIBS) $(PIXMAN_LIBS) $(OBJECTS)
 
-cairo-static.lib: $(OBJECTS_STATIC) $(top_srcdir)/src/cairo-features.h
+cairo-static.lib: $(OBJECTS_STATIC) ../src/cairo-features.h
 	@$(AR) $(CAIRO_ARFLAGS) -OUT:$@ $(PIXMAN_LIBS) $(OBJECTS_STATIC)
 
 all: cairo-static.lib cairo.dll
