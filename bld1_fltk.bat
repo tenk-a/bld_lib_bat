@@ -95,11 +95,11 @@ set Platform=%Arch%
 if "%Platform%"=="x86" set Platform=Win32
 
 if not exist "ide\%VcSlnDir%" (
-  if "%VcVer%"=="vc141" call ..\bld_lib_bat\UpgradeFltkIdeVcproj.bat %VcSlnDir%
-  if "%VcVer%"=="vc140" call ..\bld_lib_bat\UpgradeFltkIdeVcproj.bat %VcSlnDir%
-  if "%VcVer%"=="vc130" call ..\bld_lib_bat\UpgradeFltkIdeVcproj.bat %VcSlnDir%
-  if "%VcVer%"=="vc120" call ..\bld_lib_bat\UpgradeFltkIdeVcproj.bat %VcSlnDir%
-  if "%VcVer%"=="vc110" call ..\bld_lib_bat\UpgradeFltkIdeVcproj.bat %VcSlnDir%
+  if "%VcVer%"=="vc141" call ..\bld_lib_bat\sub\UpgradeFltkIdeVcproj.bat %VcSlnDir%
+  if "%VcVer%"=="vc140" call ..\bld_lib_bat\sub\UpgradeFltkIdeVcproj.bat %VcSlnDir%
+  if "%VcVer%"=="vc130" call ..\bld_lib_bat\sub\UpgradeFltkIdeVcproj.bat %VcSlnDir%
+  if "%VcVer%"=="vc120" call ..\bld_lib_bat\sub\UpgradeFltkIdeVcproj.bat %VcSlnDir%
+  if "%VcVer%"=="vc110" call ..\bld_lib_bat\sub\UpgradeFltkIdeVcproj.bat %VcSlnDir%
   if not exist "ide\%VcSlnDir%" (
      echo not found ide\%VcSlnDir% directory
      goto :EOF

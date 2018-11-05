@@ -1,9 +1,10 @@
 @echo off
-rem generalte vc10-12 vcxproj for wxWidgets 3.0 Samples
+rem generalte vc10-14.1 vcxproj for wxWidgets 3.0 Samples
 setlocal
 
 set VcName=
 if "%CcName%"=="" (
+  if /I not "%PATH:Microsoft Visual Studio\2017=%"=="%PATH%" set VcName=vc141
   if /I not "%PATH:Microsoft Visual Studio 14.0=%"=="%PATH%" set VcName=vc140
   if /I not "%PATH:Microsoft Visual Studio 13.0=%"=="%PATH%" set VcName=vc130
   if /I not "%PATH:Microsoft Visual Studio 12.0=%"=="%PATH%" set VcName=vc120
