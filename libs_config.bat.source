@@ -14,9 +14,6 @@ set CcNoRtStatic=
 rem for glfw, libjpeg-turbo, openssl etc
 set CcCMakeDir=%ProgramFiles%\CMake\bin
 
-rem for pixman
-set CcMingw32Make=c:\bin\mingw32-make.exe
-
 rem for libjpeg-turbo, OpenSSL
 set CcNasmDir=%USERPROFILE%\AppData\Local\bin\nasm
 
@@ -28,6 +25,9 @@ set CcPythonDir=%USERPROFILE%\AppData\Local\Programs\Python
 set CcPython3Path=%CcPythonDir%\Python37\Scripts\;%CcPythonDir%\Python37\;%CcPythonDir%\Launcher\;
 rem python is installed on Win32 or x64. Do not use undefined. *OpenCV: Now defining debug build fails with python??_d.lib error not found.
 set CcPythonPlatform=
+
+rem for pixman
+set CcMingw32Make=c:\bin\mingw32-make.exe
 
 rem ==========================================================================
 rem

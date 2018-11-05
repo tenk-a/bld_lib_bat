@@ -25,8 +25,8 @@ vc8～vc14.1が対象...だが 今は vc14.1 が主で、他のverはどうな�
 これらは、それらの標準のincludeやlibのパスを使う。
 
 比較的小さいライブラリ
-- 現状 zlib, libbz2, libpng, jpeglib, libjpeg-turbo, libtiff, libharu,
-glfw3, libogg, libvorbis, openssl  
+- 現状 zlib, libbz2, libpng, mozjpeg(jpeglib, libjpeg-turbo), libtiff, libharu,
+glfw3, libogg, libvorbis, openssl, pixman, cairo  
 これらは misc_inc/ , misc_lib/ ディレクトリにも、まとめる。
 
 
@@ -74,20 +74,22 @@ d:/libs_vc/ とする。
   エディタで開け、  
   
         set CcName=vc141 (vc80～vc141のいずれか)       　　使用するvcコンパイラ  
-        set CcHasX64=0 or 1                            　　x86のみなら 0, x64版もビルドするなら 1  
+        set CcHasX86=0 or 1                            　　x86用を生成する場合1
+        set CcHasX64=0 or 1                            　　x64用を生成する場合1
         set CcNoRtStatic=0 or 1                        　　staticランタイム版を生成しない場合 1を設定  
         set CcCMakeDir=%ProgramFiles%\CMake\bin        　　cmake.exeのあるディレクトリ  
         set CcNasmDir=%USERPROFILE%\AppData\Local\bin\nasm nasm.exe のあるディレクトリ  
         set CcPerlDir=c:\Perl64\site\bin;c:\Perl64\bin 　　perl.exe のあるディレクトリ  
         set CcPython3Path=……                         　　python.exe のあるディレクトリ  
+		set CcMingw32Make=……                         　　mingw32-make.exeへのパス
 
   を自身の環境に合わせて書き換える。
   
   - vcバージョン名は VSのマクロ変数$(PlatformToolsetVersion) の値が使えるように
     vc9やvc12でなくvc90やvc120のように記述するようにしている。
   - vc++ express版の場合はCcHasX64=0、CcNoRtStatic=0にすることになる
-    (がexpress自身でのライブラリビルドは未確認。
-     今はvs2013のフリー版やvs2015のコミュニティー版を使えるし...)  
+    (express自身でのライブラリビルドは未確認。
+     vs2013のフリー版やvs2015,vs2017のコミュニティー版を使えるわけだし...)  
   - libjpeg-turbo や glfw, opencv 等は cmakeを使うので予めインストールし、ここにそのディレクトリを記述。
     win64環境で cmakeのインストーラで入れたならこのままでいいはず。
   - libjpeg-turbo や openssl 等 nasm を使う場合は nasmのディレクトリを設定。
@@ -98,11 +100,12 @@ d:/libs_vc/ とする。
   - その他 同一ファイル内にある Cc???? はバッチ共通で使うデフォルト値。
 
 
-- ビルドしたいライブラリを入手(ダンロード)して d:/libs_vc/ の直下に解凍。  
-  フォルダ名はバージョン番号等含んだデフォルトのままのこと。  
+- ビルドしたいライブラリを入手(ダンロード|clone)して d:/libs_vc/ の直下に解凍。  
+  ダウンロード物のフォルダ名はバージョン番号等含んだデフォルトのままを想定。  
   たとえば zlib だと zlib128.zip を入手＆解凍、  
       d:/libs_vc/zlib-1.2.8  
-  が出来る。  
+  が出来る。あるいは git リポジトリを clone して zlib ままでも。  
+  ※ gitリポジトリで作業したものは dl_zlib.bat のようにバッチ用意。  
   d:/libs_vc/bld_lib_bat/ をカレント・ディレクトリにして  
       bld_zlib.bat  
   を実行。  
@@ -285,10 +288,10 @@ bld_系バッチで共通で使われるバッチとして、libs_config.bat(変
 - vc8-14.1 のビルド通るはず
 
 
-#### tiff(libtiff)
+#### libtiff
 - tiff画像ファイル関係
-- bld_tiff.bat (+ bld1_tiff.bat +共通bat)
-- ディレクトリは tiff* 　- 初めて試したバージョンは tiff-4.0.3 (最新は 2018-11-03付近のリポジトリ)
+- bld_libtiff.bat (+ bld1_libtiff.bat +共通bat)
+- ディレクトリは libtiff* 　- 初めて試したバージョンは tiff-4.0.3 (最新は 2018-11-03付近のリポジトリ)
 - zlib, libjpeg ほぼ必須. なくてもビルドできるが圧縮未対応になるので、予め zlib, libjpeg をビルド済のこと
 - ライブラリビルド時は zlib, libjpeg として mic_inc&misc_lib のものを使用
 - バッチ内では、Makefile.vc の引数で各種指定してビルド
@@ -363,6 +366,25 @@ bld_系バッチで共通で使われるバッチとして、libs_config.bat(変
 - vc8-14.1 のビルド通るはず
 
 
+### pixman
+- 画像関係
+- bld_pixman.bat (+bld1_pixman.bat, tiny_replstr.exe+共通bat)
+- ディレクトリは pixman* 試したバージョンは 2018-11-03付近のgitリポジトリ
+- mingw32-make.exe が必要.(msys1時代までの古めのモノ)
+- vc2017 で Cinder の blocks/cairo を使えるようにするためにビルド. 
+- ライブラリのみ. テスト等は手付かず.
+
+### cairo
+- 画像関係
+- bld_cairo.bat (+bld1_cairo.bat, sub/cairo の makefile郡+共通bat)
+- ディレクトリは cairo* 試したバージョンは 2018-11-03付近のgitリポジトリ
+- vc2017 で Cinder の blocks/cairo を使えるようにするためにビルド. 
+- ライブラリのみ. テスト等は手付かず.
+- 元の makefile は多少手を加えれば msys1 環境でなら動作(mingw32-make や msys2不可)  
+  が、かなり面倒でまた目的の状態に小手先の置換では対応できなかったため、
+  現状の makefile を nmake 向けに書き直した。(ライブラリのversion upへの追従が面倒)
+
+
 ### 大きめのライブラリ(misc_*/に置かない)
 
 #### boost
@@ -393,7 +415,7 @@ bld_系バッチで共通で使われるバッチとして、libs_config.bat(変
 - v3.1.0は vc10exp,vc12,14 でビルド通った。vc11はCMake中にエラー。  
   vc9以下は公式未対応の模様。stdint.h必須だし。ただ代用stdint.h用意してOpenCL オフにすればvideoio関係
   以外はコンパイル通るかも。あとvc8,vc9はIDE上ではビルドを試せたがmsbuild.exeはハングして駄目だった。
-- v3.4は vc14,vc14.1 で試し.
+- v3.4は vc14,vc14.1 で試し. 現状中途半端
 -- フォルダ構成を変更. opencv/sources に opencv.git の内容を置き、opencv/build でビルド、
 opencv/build/vc???_(x64|Win32)(_static)/install が、実際に使うフォルダになる。
 -- pythonをインストールしてると opencv_python がビルドされるが、 python側の Python.h で python??_d.lib
@@ -449,6 +471,7 @@ opencv/build/vc???_(x64|Win32)(_static)/install が、実際に使うフォル�
 
 
 ## 履歴
-- 2018-11-03 misc_inc/のヘッダをラッパーでなくヘッダ実体をコピーするように変更。
-このためラッパーヘッダによる暗黙のリンクがなくなったので、.libはそのつどリンク指定する必要あり.
-bld1_???.bat では libs_config.bat のCc????変数を直接みないようにして なるべくbld1_???単体利用可能にした.
+- 2018-11-03 misc_inc/のヘッダをラッパーでなくヘッダ実体をコピーするように変更。  
+このためラッパーヘッダによる暗黙のリンクがなくなったので、.libはそのつどリンク指定する必要あり.  
+bld1_???.bat では libs_config.bat のCc????変数を直接みないようにして なるべくbld1_???単体利用可能にした.  
+現状 vc14.1でコンパイルしてみただけ、で実使用してないので不具合多そう
