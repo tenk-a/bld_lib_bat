@@ -67,7 +67,7 @@ set Arg=%Arg% LibPrefix:%LibPrefix% LibDir:%SrcLibSubDir%
 set Arg=%Arg% LibRel:%CcLibStrRelease% LibDbg:%CcLibStrDebug% LibRtSta:%CcLibStrStatic% LibRtDll:%CcLibStrRtDll%
 if "%CcNoRtStatic%"=="1" set Arg=%Arg% rtdll
 
-goto BUILD_SKIP
+rem goto BUILD_SKIP
 pushd %TgtDir%
 if "%CcHasX86%"=="1" (
   call ..\bld_lib_bat\setcc.bat %VcVer% Win32
