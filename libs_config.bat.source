@@ -32,12 +32,6 @@ set CcMingw32Make=c:\bin\mingw32-make.exe
 rem ==========================================================================
 rem
 
-if "%CcName%"=="" (
-  echo Please set CcName in "libs_config.bat"
-  pause
-  exit
-)
-
 set CcLibDir=.\lib
 rem set CcLibPrefix=
 set CcLibPrefix=%CcName%_
