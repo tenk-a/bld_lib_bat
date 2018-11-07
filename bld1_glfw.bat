@@ -21,6 +21,7 @@ set HasRel=
 set HasDbg=
 set HasRtSta=
 set HasRtDll=
+set HasTest=
 set CleanMode=
 set MakeTargetName=
 set VcVer=
@@ -40,6 +41,8 @@ set VcVer=
   if /I "%1"=="debug"    set HasDbg=d
 
   if /I "%1"=="clean"    set CleanMode=1
+
+  if /I "%1"=="test"     set HasTest=1
 
   if /I "%1"=="vc71"     set VcVer=vc71
   if /I "%1"=="vc80"     set VcVer=vc80
@@ -148,6 +151,7 @@ if exist src\*.lib move src\*.lib %DstDir%\
 if exist src\*.dll move src\*.dll %DstDir%\
 if exist src\*.pdb move src\*.pdb %DstDir%\
 
+if not "%HasTest%"=="1" goto TEST_SKIP
 if not exist %DstDir%\examples mkdir %DstDir%\examples
 if exist examples\*.exe move examples\*.exe %DstDir%\examples
 if exist examples\*.pdb move examples\*.pdb %DstDir%\examples
@@ -155,6 +159,7 @@ if exist examples\*.pdb move examples\*.pdb %DstDir%\examples
 if not exist %DstDir%\tests mkdir %DstDir%\tests
 if exist tests\*.exe move tests\*.exe %DstDir%\tests
 if exist tests\*.pdb move tests\*.pdb %DstDir%\tests
+:TEST_SKIP
 
 exit /b
 

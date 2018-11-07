@@ -79,9 +79,9 @@ if "%VcVer%"=="vc141" set ToolSet=msvc-14.1
 
 if "%ToolSet%"=="" goto USAGE
 
-if "%Arch%"==""    set Arch=Win32
+if "%Arch%"==""      set Arch=Win32
 if "%Arch%"=="Win32" set AddrModel=32
-if "%Arch%"=="x64" set AddrModel=64
+if "%Arch%"=="x64"   set AddrModel=64
 
 set /a ThreadNum=%NUMBER_OF_PROCESSORS%+1
 

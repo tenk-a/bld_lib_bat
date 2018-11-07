@@ -21,6 +21,7 @@ set HasRel=
 set HasDbg=
 set HasRtSta=
 set HasRtDll=
+set HasTest=
 set VcVer=
 
 :ARG_LOOP
@@ -36,6 +37,8 @@ set VcVer=
 
   if /I "%1"=="release"  set HasRel=r
   if /I "%1"=="debug"    set HasDbg=d
+
+  if /I "%1"=="test"     set HasTest=1
 
   if /I "%1"=="vc71"     set VcVer=vc71
   if /I "%1"=="vc80"     set VcVer=vc80
@@ -143,7 +146,12 @@ if "%BldType%"=="dbg" (
   set ldebug=/RELEASE
 )
 
-nmake -f makefile.vc "cflags=%cflags%" "cdebug=%BldOpts%" "cvars=%RtOpts%" "conlflags=%conlflags%" "conlibs=%conlibs%" "ldebug=%ldebug%"
+set MakeTgt=libjpeg.lib
+if "%HasTest%"=="1" (
+  set MakeTgt=all
+)
+
+nmake -f makefile.vc %MakeTgt% "cflags=%cflags%" "cdebug=%BldOpts%" "cvars=%RtOpts%" "conlflags=%conlflags%" "conlibs=%conlibs%" "ldebug=%ldebug%"
 if errorlevel 1 goto :EOF
 
 rem nmake -f makefile.vc test

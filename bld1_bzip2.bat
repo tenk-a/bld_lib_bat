@@ -21,6 +21,7 @@ set HasRel=
 set HasDbg=
 set HasRtSta=
 set HasRtDll=
+set HasTest=
 set VcVer=
 
 :ARG_LOOP
@@ -36,6 +37,8 @@ set VcVer=
 
   if /I "%1"=="release"  set HasRel=r
   if /I "%1"=="debug"    set HasDbg=d
+
+  if /I "%1"=="test"     set HasTest=1
 
   if /I "%1"=="vc71"     set VcVer=vc71
   if /I "%1"=="vc80"     set VcVer=vc80
@@ -126,7 +129,12 @@ if "%BldType%"=="dbg" (
   set BldOpts=-O2 -DNDEBUG
 )
 
-nmake -f makefile.msc CFLAGS=" -DWIN32 %RtOpts% %BldOpts% -D_FILE_OFFSET_BITS=64 -nologo"
+set MakeTgt=lib
+if "%HasTest%"=="1" (
+  set MakeTgt=all
+)
+
+nmake -f makefile.msc %MakeTgt% CFLAGS=" -DWIN32 %RtOpts% %BldOpts% -D_FILE_OFFSET_BITS=64 -nologo"
 
 set DstDir=%LibDir%\%Target%
 if not exist %DstDir% mkdir %DstDir%

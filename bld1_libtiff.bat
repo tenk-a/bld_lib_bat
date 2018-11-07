@@ -191,12 +191,4 @@ if exist libtiff\*.lib move libtiff\*.lib %DstDir%\
 if exist libtiff\*.dll move libtiff\*.dll %DstDir%\
 if exist libtiff\*.pdb move libtiff\*.pdb %DstDir%\
 
-rem if "%LibCopyDir%"=="" goto ENDIF_LibCopyDir
-rem if not exist %LibCopyDir% mkdir %LibCopyDir%
-rem if not exist %LibCopyDir%\%Target% mkdir %LibCopyDir%\%Target%
-rem if exist %DstDir%\*.lib copy %DstDir%\*.lib %LibCopyDir%\%Target%
-rem if exist %DstDir%\*.dll copy %DstDir%\*.dll %LibCopyDir%\%Target%
-rem if exist %DstDir%\*.pdb copy %DstDir%\*.pdb %LibCopyDir%\%Target%
-rem :ENDIF_LibCopyDir
-
 exit /b

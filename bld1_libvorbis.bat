@@ -16,6 +16,7 @@ set HasRel=
 set HasDbg=
 set HasRtSta=
 set HasRtDll=
+set HasTest=
 set VcVer=
 set OggDir=
 set SrcOggVerVc8=1.1.4
@@ -35,6 +36,8 @@ set SrcOggVerVc10=1.2.0
 
   if /I "%1"=="release"  set HasRel=r
   if /I "%1"=="debug"    set HasDbg=d
+
+  if /I "%1"=="test"     set HasTest=1
 
   if /I "%1"=="vc71"      set VcVer=vc71
   if /I "%1"=="vc80"      set VcVer=vc80
@@ -162,14 +165,14 @@ call :DelIntDir
 if %RtType%==static (
   call :gen_static
   msbuild vorbis_static.sln  /t:Build /p:Configuration=%BldType% /p:Platform=%Platform%
-  call :ExampleCompile %RtType%
+  if "%HasTest%"=="1" call :ExampleCompile %RtType%
 ) else (
   msbuild vorbis_dynamic.sln /t:Build /p:Configuration=%BldType% /p:Platform=%Platform%
-  call :ExampleCompile dll
+  if "%HasTest%"=="1" call :ExampleCompile dll
   call :DelIntDir
   call :gen_rtdll
   msbuild vorbis_rtdll.sln   /t:Build /p:Configuration=%BldType% /p:Platform=%Platform%
-  call :ExampleCompile %RtType%
+  if "%HasTest%"=="1" call :ExampleCompile %RtType%
 )
 call :DelIntDir
 popd

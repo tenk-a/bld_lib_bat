@@ -141,20 +141,6 @@ if exist libssl.pdb copy libssl.pdb %DstDir%\
 if exist libcrypto.lib copy libcrypto.lib %DstDir%\
 if exist libcrypto.pdb copy libcrypto.pdb %DstDir%\
 
-rem if not exist %LibCopyDir% goto SKIP_END
-rem set DstDir=%LibCopyDir%\%Target%_release
-rem if not exist %DstDir% mkdir %DstDir%
-rem if exist libssl.lib copy libssl.lib %DstDir%\
-rem if exist libssl.pdb copy libssl.pdb %DstDir%\
-rem if exist libcrypto.lib copy libcrypto.lib %DstDir%\
-rem if exist libcrypto.pdb copy libcrypto.pdb %DstDir%\
-rem set DstDir=%LibCopyDir%\%Target%_debug
-rem if not exist %DstDir% mkdir %DstDir%
-rem if exist libssl.lib copy libssl.lib %DstDir%\
-rem if exist libssl.pdb copy libssl.pdb %DstDir%\
-rem if exist libcrypto.lib copy libcrypto.lib %DstDir%\
-rem if exist libcrypto.pdb copy libcrypto.pdb %DstDir%\
-
 goto SKIP_END
 :SKIP_TO_DLL
 
@@ -172,20 +158,6 @@ if not exist %DstDir%\engines mkdir %DstDir%\engines
 if exist engines\*.lib move engines\*.lib %DstDir%\engines\
 if exist engines\*.dll move engines\*.dll %DstDir%\engines\
 if exist engines\*.pdb move engines\*.pdb %DstDir%\engines\
-
-rem if not exist %LibCopyDir% goto SKIP_END
-rem set DstDir=%LibCopyDir%\%Target%
-rem if not exist %DstDir% mkdir %DstDir%
-rem if exist libssl*.lib copy libssl*.lib %DstDir%\
-rem if exist libssl*.dll copy libssl*.dll %DstDir%\
-rem if exist libssl*.pdb copy libssl*.pdb %DstDir%\
-rem if exist libcrypto*.lib copy libcrypto*.lib %DstDir%\
-rem if exist libcrypto*.dll copy libcrypto*.dll %DstDir%\
-rem if exist libcrypto*.pdb copy libcrypto*.pdb %DstDir%\
-rem if not exist %DstDir%\engines mkdir %DstDir%\engines
-rem if exist engines\*.lib move engines\*.lib %DstDir%\engines\
-rem if exist engines\*.dll move engines\*.dll %DstDir%\engines\
-rem if exist engines\*.pdb move engines\*.pdb %DstDir%\engines\
 
 :SKIP_END
 

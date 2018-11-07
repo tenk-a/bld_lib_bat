@@ -386,8 +386,10 @@ bld_系バッチで共通で使われるバッチとして、libs_config.bat(変
 - 画像関係
 - bld_cairo.bat (+bld1_cairo.bat, sub/cairo の makefile郡+共通bat)
 - ディレクトリは cairo* 試したバージョンは ver.1.16 の gitリポジトリ
+- zlib.lib libpng.lib pixman-1.lib が必要.
 - mingw(32)の msys1 環境(あるいは mozila-build/) が必要.
 -- libs_config.bat の CcMsys1Paths に ～/msys/local/bin;～/msys/bin にパスを通す
+-- win10 で Defender 有効だとsh,bashでハング。Exploit protection を一通りoffにして回避した。
 - ライブラリのみ. テスト等は手付かず.
 - vc2017 で Cinder の blocks/cairo を使えるようにするためにビルド. 
 - 少なくとも vc14-14.1 のビルド通るはず

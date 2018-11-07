@@ -11,6 +11,7 @@ set StrRtDll=
 
 set HasRtSta=
 set HasRtDll=
+set HasTest=
 set VcVer=
 set VcSlnDir=
 
@@ -24,6 +25,8 @@ set VcSlnDir=
   if /I "%1"=="static"   set HasRtSta=S
   if /I "%1"=="rtsta"    set HasRtSta=S
   if /I "%1"=="rtdll"    set HasRtDll=L
+
+  if /I "%1"=="test"     set HasTest=1
 
   if /I "%1"=="vc71"     set VcVer=vc71
   if /I "%1"=="vc80"     set VcVer=vc80
@@ -172,6 +175,8 @@ for %%i in (%SrcDir%\*.lib) do (
 )
 if exist %SrcDir%\*.bsc move %SrcDir%\*.bsc %DstDir%\
 
+
+if not "%HasTest%"=="1" goto TEST_SKIP
 set SrcDir=test
 set DstDir=test\%Target%
 if not exist %DstDir% mkdir %DstDir%
@@ -180,8 +185,8 @@ if /I exist %SrcDir%\*.exe move %SrcDir%\*.exe %DstDir%\
 if /I exist %SrcDir%\*.dll move %SrcDir%\*.dll %DstDir%\
 if /I exist %SrcDir%\*.pdb move %SrcDir%\*.pdb %DstDir%\
 if /I exist %SrcDir%\*.lib move %SrcDir%\*.lib %DstDir%\
-del %SrcDir%\*.exp %SrcDir%\*.ilk
-
+if /I exist %SrcDir%\*.exp del %SrcDir%\*.exp
+if /I exist %SrcDir%\*.ilk del %SrcDir%\*.ilk
 
 set SrcDir=Fluid
 set DstDir=Fluid\%Target%
@@ -189,6 +194,7 @@ if not exist %DstDir% mkdir %DstDir%
 
 if /I exist %SrcDir%\*.exe move %SrcDir%\*.exe %DstDir%\
 if /I exist %SrcDir%\*.pdb move %SrcDir%\*.pdb %DstDir%\
+:TEST_SKIP
 
 exit /b
 

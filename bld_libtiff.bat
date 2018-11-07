@@ -20,9 +20,6 @@ set hdr8=
 set hdr9=
 set Arg=%CcBld1Arg%
 
-set Arg=debug static
-set CcHasX64=
-
 pushd ..
 
 set VcVer=

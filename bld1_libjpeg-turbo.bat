@@ -21,6 +21,7 @@ set HasRel=
 set HasDbg=
 set HasRtSta=
 set HasRtDll=
+rem set HasTest=
 set CleanMode=
 set VcVer=
 
@@ -39,6 +40,8 @@ set VcVer=
   if /I "%1"=="debug"    set HasDbg=d
 
   if /I "%1"=="clean"    set CleanMode=1
+
+  rem if /I "%1"=="test"     set HasTest=1
 
   if /I "%1"=="vc71"     set VcVer=vc71
   if /I "%1"=="vc80"     set VcVer=vc80

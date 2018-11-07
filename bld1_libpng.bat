@@ -24,6 +24,7 @@ set HasRtDll=
 set ZlibIncDir=
 set ZlibLibDir=
 set ZlibFile=
+set HasTest=
 set VcVer=
 
 :ARG_LOOP
@@ -39,6 +40,8 @@ set VcVer=
 
   if /I "%1"=="release"  set HasRel=r
   if /I "%1"=="debug"    set HasDbg=d
+
+  if /I "%1"=="test"     set HasTest=1
 
   if /I "%1"=="vc71"     set VcVer=vc71
   if /I "%1"=="vc80"     set VcVer=vc80
@@ -150,6 +153,7 @@ set CFLAGS=-nologo -I%ZlibIncDir% -D_CRT_SECURE_NO_DEPRECATE -D_CRT_SECURE_NO_WA
 nmake -f scripts/makefile.vcwin32 "CFLAGS=%CFLAGS%" "CPPFLAGS=%CPPFLAGS%"
 if errorlevel 1 exit /b
 
+if not "%HasTest%"=="1" goto TEST_SKIP
 set TgtFile=%ZlibLibDir%\%Target%\%ZlibFile%
 if exist %TgtFile% (
   cl %CPPFLAGS% %CFLAGS% pngtest.c libpng.lib %TgtFile%
@@ -164,6 +168,7 @@ if exist %TgtFile% (
   if not exist exe\%Target% mkdir exe\%Target%
   if /I exist *.exe move *.exe exe\%Target%
 )
+:TEST_SKIP
 
 set DstDir=%LibDir%\%Target%
 if not exist %DstDir% mkdir %DstDir%

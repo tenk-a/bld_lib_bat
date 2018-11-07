@@ -22,6 +22,7 @@ set HasRel=
 set HasDbg=
 set HasRtSta=
 set HasRtDll=
+set HasTest=
 set VcVer=
 
 :ARG_LOOP
@@ -37,6 +38,8 @@ set VcVer=
 
   if /I "%1"=="release"  set HasRel=r
   if /I "%1"=="debug"    set HasDbg=d
+
+  if /I "%1"=="test"     set HasTest=1
 
   if /I "%1"=="vc71"     set VcVer=vc71
   if /I "%1"=="vc80"     set VcVer=vc80
@@ -131,10 +134,6 @@ set CFLAGS=-nologo -DWIN32 -W3 -Oy- -Fd"zlib" %RtOpts% %BldOpts%
 nmake -f win32/Makefile.msc "CFLAGS=%CFLAGS%"
 if errorlevel 1 goto Bld1_Exit
 
-nmake -f win32/Makefile.msc test
-rem if errorlevel 1 goto Bld1_Exit
-if exist foo.gz del for.gz
-
 set DstDir=%LibDir%\%Target%
 if not exist %DstDir% mkdir %DstDir%
 
@@ -143,12 +142,16 @@ if /I exist *.dll move *.dll %DstDir%\
 if /I exist zlib.pdb move zlib.pdb %DstDir%\
 if /I exist zlib1.pdb move zlib1.pdb %DstDir%\
 
-
+if not "%HasTest%"=="1" goto TEST_SKIP
+nmake -f win32/Makefile.msc test
+rem if errorlevel 1 goto Bld1_Exit
+if exist foo.gz del for.gz
 if not exist test\exe mkdir test\exe
 set DstDir=test\exe\%Target%
 if not exist %DstDir% mkdir %DstDir%
 if /I exist *.exe move *.exe %DstDir%\
 if /I exist *.pdb move *.pdb %DstDir%\
+:TEST_SKIP
 
 del *.obj *.res *.manifest *.exp
 

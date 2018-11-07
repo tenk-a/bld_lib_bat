@@ -27,6 +27,7 @@ set HasRel=
 set HasDbg=
 set HasRtSta=
 set HasRtDll=
+set HasTest=
 set VcVer=
 
 :ARG_LOOP
@@ -42,6 +43,8 @@ set VcVer=
 
   if /I "%1"=="release"  set HasRel=r
   if /I "%1"=="debug"    set HasDbg=d
+
+  if /I "%1"=="test"     set HasTest=1
 
   if /I "%1"=="vc71"     set VcVer=vc71
   if /I "%1"=="vc80"     set VcVer=vc80
@@ -162,7 +165,9 @@ set LDFLAGS_DEMO2=/link /LIBPATH:. /LIBPATH:win32\msvc /LIBPATH:%PngSrcLibDir% /
 
 nmake -f script\Makefile.msvc clean
 
-rem nmake -f script\Makefile.msvc all "CFLAGS=%CFLAGS%" "LDFLAGS=%LDFLAGS%" "CFLAGS_DEMO=%CFLAGS_DEMO%" "LDFLAGS_DEMO2=%LDFLAGS_DEMO2%"
+nmake -f script\Makefile.msvc all  "CFLAGS=%CFLAGS%" "LDFLAGS=%LDFLAGS%" "CFLAGS_DEMO=%CFLAGS_DEMO%" "LDFLAGS_DEMO2=%LDFLAGS_DEMO2%"
+
+if not "%HasTest%"=="1" goto TEST_SKIP
 nmake -f script\Makefile.msvc demo "CFLAGS=%CFLAGS%" "LDFLAGS=%LDFLAGS%" "CFLAGS_DEMO=%CFLAGS_DEMO%" "LDFLAGS_DEMO2=%LDFLAGS_DEMO2%"
 
 pushd demo
@@ -174,6 +179,7 @@ if exist *.pdb move *.pdb %DstDir%\
 if exist *.exe.pdf move *.exe.pdf %DstDir%\
 if exist *.exe.manifest move *.exe.manifest %DstDir%\
 popd
+:TEST_SKIP
 
 set DstDir=%LibDir%\%Target%
 if not exist %DstDir% mkdir %DstDir%
