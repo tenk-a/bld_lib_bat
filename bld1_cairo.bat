@@ -1,11 +1,5 @@
 rem @echo off
-rem Compile zlib for vc
-rem usage: bld1_zlib [win32/x64] [debug/release] [static/rtdll] [libdir:DEST_DIR]
-rem ex)
-rem cd zlib-1.2.8
-rem ..\bld_lib_bat\bld1_zlib.bat x64 static
-rem ..\bld_lib_bat\bld1_zlib.bat libdir:..\lib
-rem
+rem Compile cairo for vc
 rem This batch-file license: boost software license version 1.0
 setlocal
 
@@ -98,15 +92,30 @@ if "%HasRel%%HasDbg%"=="" (
   set HasDbg=d
 )
 
+set ADD_COPTS=
+if "%VcVer%"=="vc140" set ADD_COPTS=-utf-8
+if "%VcVer%"=="vc141" set ADD_COPTS=-utf-8
+
 if "%LibDir%"=="" set LibDir=lib
 if not exist %LibDir% mkdir %LibDir%
 
-if not exist Makefile.nmake xcopy /s /y ..\bld_lib_bat\sub\cairo\*.* .\
+if not exist build\Makefile.win32.common.orig	copy build\Makefile.win32.common build\Makefile.win32.common.orig
+
+..\bld_lib_bat\tiny_replstr.exe ++ "CFG_CFLAGS := -MDd -Od -Zi" "CFG_CFLAGS := -$(RTOPT)d -Od -Zi %ADD_COPTS%" "CFG_CFLAGS := -MD -O2" "CFG_CFLAGS := -$(RTOPT) -DNDEBUG -O2 %ADD_COPTS%" "PIXMAN_LIBS := $(PIXMAN_PATH)/pixman/$(CFG)/pixman-1.lib" "PIXMAN_LIBS := $(PIXMAN_LIB_PATH)/pixman-1.lib" "CAIRO_LIBS +=  $(LIBPNG_PATH)/libpng.lib" "CAIRO_LIBS +=  $(LIBPNG_LIB_PATH)/libpng.lib" "CAIRO_LIBS += $(ZLIB_PATH)/zdll.lib" "CAIRO_LIBS += $(ZLIB_LIB_PATH)/zdll.lib" -- build\Makefile.win32.common.orig >build\Makefile.win32.common
+
+set "SV_PATH=%PATH%"
+set "PATH=%CcMsys1Paths%;%PATH%"
+
 
 if "%HasRtSta%%HasRel%"=="Sr" call :Bld1 rtsta rel %StrPrefix%%Arch%%StrRtSta%%StrRel%
 if "%HasRtSta%%HasDbg%"=="Sd" call :Bld1 rtsta dbg %StrPrefix%%Arch%%StrRtSta%%StrDbg%
 if "%HasRtDll%%HasRel%"=="Lr" call :Bld1 rtdll rel %StrPrefix%%Arch%%StrRtDll%%StrRel%
 if "%HasRtDll%%HasDbg%"=="Ld" call :Bld1 rtdll dbg %StrPrefix%%Arch%%StrRtDll%%StrDbg%
+
+set "PATH=%SV_PATH%"
+
+move build\Makefile.win32.common build\Makefile.win32.common.tmp
+move build\Makefile.win32.orig   build\Makefile.win32.common
 
 goto END
 
@@ -128,22 +137,19 @@ if "%BldType%"=="dbg" (
   set CFG=debug
 )
 
-if exist src\%CFG% if exist src\%CFG%\*.* del /q src\%CFG%\*.*
-if exist src\*.lib del /q src\*.lib
-if exist src\*.dll del /q src\*.dll
-if exist src\*.obj del /q src\*.obj
-if exist src\*.pdb del /q src\*.pdb
-if exist src\*.ilk del /q src\*.ilk
-if exist src\*.exp del /q src\*.exp
+if exist src\debug\*.* del /s /q src\debug\*.*
+if exist src\release\*.* del /s /q src\release\*.*
 
+pushd src
 set MINC=../../%CcLibsVcIncDir%
 set MLIB=../../%CcLibsVcLibDir%/%Target%
-nmake -f Makefile.nmake all CFG=%CFG% RTOPT=%RTOPT% PIXMAN_INC=%MINC% LIBPNG_INC=%MINC% ZLIB_INC=%MINC% PIXMAN_LIB=%MLIB% LIBPNG_LIB=%MLIB% ZLIB_LIB=%MLIB%
+make -f Makefile.win32 "CFG=%CFG%" "RTOPT=%RTOPT%" "PIXMAN_PATH=%MINC%" "LIBPNG_PATH=%MINC%" "ZLIB_PATH=%MINC%" "PIXMAN_LIB_PATH=%MLIB%" "LIBPNG_LIB_PATH=%MLIB%" "ZLIB_LIB_PATH=%MLIB%"
+popd
 
 if not exist %LibDir%\%Target% mkdir %LibDir%\%Target%
-copy src\%CFG%\*.lib %LibDir%\%Target%\
-copy src\%CFG%\*.dll %LibDir%\%Target%\
-copy src\%CFG%\cairo.pdb %LibDir%\%Target%\
+if exist src\%CFG%\*.lib     copy src\%CFG%\*.lib %LibDir%\%Target%\
+if exist src\%CFG%\*.dll     copy src\%CFG%\*.dll %LibDir%\%Target%\
+if exist src\%CFG%\cairo.pdb copy src\%CFG%\cairo.pdb %LibDir%\%Target%\
 
 exit /b
 

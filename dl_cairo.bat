@@ -1,1 +1,2 @@
-git clone git://anongit.freedesktop.org/git/cairo.git ..\cairo
+git clone git://anongit.freedesktop.org/git/cairo ../cairo
+git checkout 1.16

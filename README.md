@@ -2,15 +2,18 @@
 
 vc 対応の opensource ライブラリのいくつかを まとめてビルドするためのバッチ群。
 
-配布元のlibバイナリや、ライブラリのデフォルトの設定でコンパイルした場合
-Cランタイム(crt) が static か dll使用(msvcrt*.dll) かマチマチだったり、
-また(c++ の場合) 異なるバージョンの vc++ でコンパイルしたライブラリの
-リンクが弾かれることがあったりと配布ままのバイナリが使えないことがあるので
-結局ソースからビルドするはめになる。
-
 boost のように ランタイムのstatic/dll, ライブラリ自身のstatic/dll 対応
 別にファイル名を変えてくれるものもあるが、debug/releaseの区別なくソース
-フォルダに１つ(1形式)生成するだけのものも多いので、そういうビルド＆フォルダ
+フォルダに１つ(1形式)生成するだけのものも多く、
+配布元のlibバイナリや、ライブラリのデフォルトの設定だと
+Cランタイム(crt) が static か dll使用(msvcrt*.dll) かマチマチだったり、
+また(c++ の場合) 異なるバージョンの vc++ でコンパイルしたライブラリの
+リンクができないなど不便なので、 
+
+弾かれることがあったりと配布ままのバイナリが使えないことが多いため用意。
+
+
+いので、そういうビルド＆フォルダ
 仕訳を多少楽にするためにバッチ化。
 
 vc8～vc14.1が対象...だが 今は vc14.1 が主で、他のverはどうなっているか不明。
@@ -81,22 +84,24 @@ d:/libs_vc/ とする。
         set CcNasmDir=%USERPROFILE%\AppData\Local\bin\nasm nasm.exe のあるディレクトリ  
         set CcPerlDir=c:\Perl64\site\bin;c:\Perl64\bin 　　perl.exe のあるディレクトリ  
         set CcPython3Path=……                         　　python.exe のあるディレクトリ  
-		set CcMingw32Make=……                         　　mingw32-make.exeへのパス
-
-  を自身の環境に合わせて書き換える。
+		set CcWinGnuMake=……                          　　mingw32-make.exe(mozmake.exe)へのパス  
+        set CcMsys1Paths=…\msys\local\bin;…\msys\bin 　　msys1 のパス  
   
   - vcバージョン名は VSのマクロ変数$(PlatformToolsetVersion) の値が使えるように
     vc9やvc12でなくvc90やvc120のように記述するようにしている。
   - vc++ express版の場合はCcHasX64=0、CcNoRtStatic=0にすることになる
-    (express自身でのライブラリビルドは未確認。
-     vs2013のフリー版やvs2015,vs2017のコミュニティー版を使えるわけだし...)  
+    (expressでのビルドは未確認。vs2013以降のフリー版は x64 も staticランタイムも使えるので)
   - libjpeg-turbo や glfw, opencv 等は cmakeを使うので予めインストールし、ここにそのディレクトリを記述。
     win64環境で cmakeのインストーラで入れたならこのままでいいはず。
-  - libjpeg-turbo や openssl 等 nasm を使う場合は nasmのディレクトリを設定。
+  - libjpeg-turbo や openssl 等 nasm を使う場合は nasm のディレクトリを設定。
     nasmをインストーラで入れたならこのままでいいはず。
   - openssl 等 perl を使う場合は perl のディレクトリを設定。
     例はWin64用ActivePerl のdefaultの場合。 
-  - CcCMakeDir,CcNasmDir,CcPerlDirを使わない場合でフォルダが存在しない場合は空にしておくこと。
+  - pixman のビルドでは CcWinGnuMake= に mingw32-make あるいは mozilla-build の mozmake.exe を設定。
+    mozilla-build をインストールしていた場合はこのままでいいはず。
+  - cairo のビルドでは CcMsys1Paths= に msys1 か mozilla-build のlocal/bin,binのパスを設定
+    mozilla-build をインストールしていた場合はこのままでいいはず。
+  - CcCMakeDir,CcNasmDir,CcPerlDir等を使用しない場合でフォルダが存在しない場合は空にしておくこと。
   - その他 同一ファイル内にある Cc???? はバッチ共通で使うデフォルト値。
 
 
@@ -370,19 +375,23 @@ bld_系バッチで共通で使われるバッチとして、libs_config.bat(変
 - 画像関係
 - bld_pixman.bat (+bld1_pixman.bat, tiny_replstr.exe+共通bat)
 - ディレクトリは pixman* 試したバージョンは 2018-11-03付近のgitリポジトリ
-- mingw32-make.exe が必要.(msys1時代までの古めのモノ)
-- vc2017 で Cinder の blocks/cairo を使えるようにするためにビルド. 
+- mingw32-make.exe (mozmake.exe) が必要.
+-- libs_config.bat の CcWinGnuMake に exeファイルを指定
 - ライブラリのみ. テスト等は手付かず.
+- vc2017 で Cinder の blocks/cairo を使えるようにするためにビルド. 
+- 少なくとも vc14-14.1 のビルド通るはず
+
 
 ### cairo
 - 画像関係
 - bld_cairo.bat (+bld1_cairo.bat, sub/cairo の makefile郡+共通bat)
-- ディレクトリは cairo* 試したバージョンは 2018-11-03付近のgitリポジトリ
-- vc2017 で Cinder の blocks/cairo を使えるようにするためにビルド. 
+- ディレクトリは cairo* 試したバージョンは ver.1.16 の gitリポジトリ
+- mingw(32)の msys1 環境(あるいは mozila-build/) が必要.
+-- libs_config.bat の CcMsys1Paths に ～/msys/local/bin;～/msys/bin にパスを通す
 - ライブラリのみ. テスト等は手付かず.
-- 元の makefile は多少手を加えれば msys1 環境でなら動作(mingw32-make や msys2不可)  
-  が、かなり面倒でまた目的の状態に小手先の置換では対応できなかったため、
-  現状の makefile を nmake 向けに書き直した。(ライブラリのversion upへの追従が面倒)
+- vc2017 で Cinder の blocks/cairo を使えるようにするためにビルド. 
+- 少なくとも vc14-14.1 のビルド通るはず
+
 
 
 ### 大きめのライブラリ(misc_*/に置かない)
@@ -468,6 +477,14 @@ opencv/build/vc???_(x64|Win32)(_static)/install が、実際に使うフォル�
 - バッチ内では、dllランタイム版は、msbuild fltk.sln で Configuration, Platform を指定してビルド
 - static ランタイム版やx64版は用意されていないので .slnや.vcxprojを無理やり書き換えたものを生成してビルド
 - vc10exp,vc12,vc14はビルド通った。vc8,9,11は失敗(原因未調査)
+
+
+#### Cinder
+- マルチメディア・フレームワーク
+- samples や test の対応等していろいろ単純でなくなったので本家からforkした
+  https://github.com/tenk-a/Cinder  
+  に for_vc2017 ブランチで対応.
+
 
 
 ## 履歴

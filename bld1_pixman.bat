@@ -1,11 +1,5 @@
 rem @echo off
-rem Compile zlib for vc
-rem usage: bld1_zlib [win32/x64] [debug/release] [static/rtdll] [libdir:DEST_DIR]
-rem ex)
-rem cd zlib-1.2.8
-rem ..\bld_lib_bat\bld1_zlib.bat x64 static
-rem ..\bld_lib_bat\bld1_zlib.bat libdir:..\lib
-rem
+rem Compile pixman for vc
 rem This batch-file license: boost software license version 1.0
 setlocal
 
@@ -101,7 +95,7 @@ if "%HasRel%%HasDbg%"=="" (
 if "%LibDir%"=="" set LibDir=lib
 if not exist %LibDir% mkdir %LibDir%
 
-if "%CcMingw32Make%"=="" set CcMingw32Make=mingw32-make.exe
+if "%CcWinGnuMake%"=="" set CcWinGnuMake=mingw32-make.exe
 
 if not exist Makefile.win32mt.common ..\bld_lib_bat\tiny_replstr.exe ++ -MDd -$(RTOPT)d  -MD "-$(RTOPT) -DNDEBUG" -- Makefile.win32.common >Makefile.win32mt.common
 if not exist Makefile.win32mt        ..\bld_lib_bat\tiny_replstr.exe ++ Makefile.win32.common Makefile.win32mt.common "pixman -f Makefile.win32" "pixman -f Makefile.win32mt all" "all clean" "clean" -- Makefile.win32 >Makefile.win32mt
@@ -142,10 +136,10 @@ if not exist pixman\pixman-version.h copy ..\bld_lib_bat\sub\pixman\pixman\pixma
 
 if exist pixman\%CFG% if exist pixman\%CFG%\*.* del /q pixman\%CFG%\*.*
 
-%CcMingw32Make% -f Makefile.win32mt pixman %OPTS% "CFG=%CFG%" "RTOPT=%RTOPT%" "MAKE=%CcMingw32Make%"
+%CcWinGnuMake% -f Makefile.win32mt pixman %OPTS% "CFG=%CFG%" "RTOPT=%RTOPT%"
 
 if not exist %LibDir%\%Target% mkdir %LibDir%\%Target%
-move pixman\%CFG%\*.lib %LibDir%\%Target%\
+if exist pixman\%CFG%\*.lib    move pixman\%CFG%\*.lib %LibDir%\%Target%\
 
 exit /b
 
