@@ -1,11 +1,9 @@
 @echo off
 rem This batch-file license: boost software license version 1.0
 setlocal
-call libs_config.bat
 
 set TgtName=opencv
 set TgtDir=
-set BldDir=lib
 set SrcIncSubDir=include
 set SrcLibSubDir=build
 set DstIncSubDir=
@@ -20,20 +18,41 @@ set hdr6=
 set hdr7=
 set hdr8=
 set hdr9=
-set Arg=%CcBld1Arg%
+set Arg=
 
-set CcHasX86=1
-set CcHasX64=0
-set Arg=static debug
 
+call libs_config.bat
 pushd ..
 
+set HasX86=
+set HasX64=
+set HasRel=
+set HasDbg=
+set HasRtSta=
+set HasRtDll=
+set HasTest=
+set NoCopy=
+set NoBuild=
 set VcVer=
-set AddArg=
+set Arg=%Arg% %CcBld1Arg%
+rem if "%SrcLibSubDir%"=="" set "SrcLibSubDir=%CcLibDir%"
+
 :ARG_LOOP
   if "%1"=="" goto ARG_LOOP_EXIT
 
-  if not "%VcVer%"=="" goto VCVAR_SKIP
+  if /I "%1"=="x86"      set HasX86=1
+  if /I "%1"=="Win32"    set HasX86=1
+  if /I "%1"=="x64"      set HasX64=1
+
+  if /I "%1"=="static"   set HasRtSta=static
+  if /I "%1"=="rtsta"    set HasRtSta=static
+  if /I "%1"=="rtdll"    set HasRtDll=rtdll
+
+  if /I "%1"=="release"  set HasRel=release
+  if /I "%1"=="debug"    set HasDbg=debug
+
+  if /I "%1"=="test"     set HasTest=test
+
   if /I "%1"=="vc71"     set VcVer=vc71
   if /I "%1"=="vc80"     set VcVer=vc80
   if /I "%1"=="vc90"     set VcVer=vc90
@@ -43,17 +62,21 @@ set AddArg=
   if /I "%1"=="vc130"    set VcVer=vc130
   if /I "%1"=="vc140"    set VcVer=vc140
   if /I "%1"=="vc141"    set VcVer=vc141
-  goto ARG_NEXT
-:VCVAR_SKIP
+
+  if /I "%1"=="NoCopy"   set NoCopy=1
+  if /I "%1"=="NoBuild"  set NoBuild=1
   set A=%1
-  if /I "%A:~0,4%"=="add:" set AddArg=%A:~4%
-  if "%TgtDir%"==""      set TgtDir=%1
-:ARG_NEXT
+  if /I "%A:~0,4%"=="src:" set TgtDir=%A:~4%
+
   shift
 goto ARG_LOOP
 :ARG_LOOP_EXIT
+set A=
 
-set Arg=%Arg% %AddArg%
+if "%HasX86%%HasX64%"=="" (
+  set HasX86=%CcHasX86%
+  set HasX64=%CcHasX64%
+)
 
 set LibPrefix=%VcVer%_
 if "%VcVer%"=="" (
@@ -74,6 +97,7 @@ if not exist "%TgtDir%" (
   goto END
 )
 
+set Arg=%Arg% %HasRtSta% %HasRtDll% %HasRel% %HasDbg% %HasTest%
 set Arg=%Arg% LibPrefix:%LibPrefix% LibDir:%SrcLibSubDir%
 set Arg=%Arg% LibRel:%CcLibStrRelease% LibDbg:%CcLibStrDebug% LibRtSta:%CcLibStrStatic% LibRtDll:%CcLibStrRtDll%
 if "%CcNoRtStatic%"=="1" set Arg=%Arg% rtdll
@@ -81,11 +105,11 @@ if "%CcNoRtStatic%"=="1" set Arg=%Arg% rtdll
 rem goto BUILD_SKIP
 set TgtSrcDir=%TgtDir%\sources
 pushd %TgtSrcDir%
-if "%CcHasX86%"=="1" (
+if "%HasX86%"=="1" (
   call ..\..\bld_lib_bat\setcc.bat %VcVer% Win32
   call ..\..\bld_lib_bat\bld1_%TgtName%.bat %VcVer% Win32 %Arg%
 )
-if "%CcHasX64%"=="1" (
+if "%HasX64%"=="1" (
   call ..\..\bld_lib_bat\setcc.bat %VcVer% x64
   call ..\..\bld_lib_bat\bld1_%TgtName%.bat %VcVer% x64 %Arg%
 )

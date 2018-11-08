@@ -1,27 +1,32 @@
-@echo off
+rem @echo off
 rem This batch-file license: boost software license version 1.0
-setlocal
-
-set TgtName=libvorbis
-set TgtDir=
-set SrcIncSubDir=include\vorbis
-set SrcLibSubDir=
-set DstIncSubDir=vorbis
-set DstLibSubDir=
-set hdr1=vorbisenc.h
-set hdr2=vorbisfile.h
-set hdr3=codec.h
-set hdr4=
-set hdr5=
-set hdr6=
-set hdr7=
-set hdr8=
-set hdr9=
-set Arg=
-set NeedTinyReplStr=1
-
-
+rem setlocal
 call libs_config.bat
+
+rem set TgtName=
+rem set TgtDir=
+rem set SrcIncSubDir=
+rem set SrcLibSubDir=
+rem set DstIncSubDir=
+rem set DstLibSubDir=
+rem set hdr1=
+rem set hdr2=
+rem set hdr3=
+rem set hdr4=
+rem set hdr5=
+rem set hdr6=
+rem set hdr7=
+rem set hdr8=
+rem set hdr9=
+rem set Arg=
+
+
+if "%NeedTinyReplStr%"=="" goto TinyReplStr_SKIP
+if exist tiny_replstr.exe  goto TinyReplStr_SKIP
+call setcc.bat %Compl% Win32
+call gen_replstr.bat
+:TinyReplStr_SKIP
+
 pushd ..
 
 set HasX86=
@@ -102,7 +107,7 @@ set Arg=%Arg% LibPrefix:%LibPrefix% LibDir:%SrcLibSubDir%
 set Arg=%Arg% LibRel:%CcLibStrRelease% LibDbg:%CcLibStrDebug% LibRtSta:%CcLibStrStatic% LibRtDll:%CcLibStrRtDll%
 if "%CcNoRtStatic%"=="1" set Arg=%Arg% rtdll
 
-rem goto BUILD_SKIP
+if "%NoBuild%"=="1" goto BUILD_SKIP
 pushd %TgtDir%
 if "%HasX86%"=="1" (
   call ..\bld_lib_bat\setcc.bat %VcVer% Win32
@@ -150,69 +155,51 @@ if "%DstIncSubDir%"=="" goto SKIP2
   if not exist "%DstIncDir%" mkdir "%DstIncDir%"
   if exist     "%DstIncDir%" del /q "%DstIncDir%\*.*"
 :SKIP2
-if not "%hdr1%"=="" copy %SrcIncDir%\%hdr1% %DstIncDir%\
-if not "%hdr2%"=="" copy %SrcIncDir%\%hdr2% %DstIncDir%\
-if not "%hdr3%"=="" copy %SrcIncDir%\%hdr3% %DstIncDir%\
-if not "%hdr4%"=="" copy %SrcIncDir%\%hdr4% %DstIncDir%\
-if not "%hdr5%"=="" copy %SrcIncDir%\%hdr5% %DstIncDir%\
-if not "%hdr6%"=="" copy %SrcIncDir%\%hdr6% %DstIncDir%\
-if not "%hdr7%"=="" copy %SrcIncDir%\%hdr7% %DstIncDir%\
-if not "%hdr8%"=="" copy %SrcIncDir%\%hdr8% %DstIncDir%\
-if not "%hdr9%"=="" copy %SrcIncDir%\%hdr9% %DstIncDir%\
+if not "%hdr1%"=="" copy %SrcIncDir%\%hdr1% %DstIncDir%\ 
+if not "%hdr2%"=="" copy %SrcIncDir%\%hdr2% %DstIncDir%\ 
+if not "%hdr3%"=="" copy %SrcIncDir%\%hdr3% %DstIncDir%\ 
+if not "%hdr4%"=="" copy %SrcIncDir%\%hdr4% %DstIncDir%\ 
+if not "%hdr5%"=="" copy %SrcIncDir%\%hdr5% %DstIncDir%\ 
+if not "%hdr6%"=="" copy %SrcIncDir%\%hdr6% %DstIncDir%\ 
+if not "%hdr7%"=="" copy %SrcIncDir%\%hdr7% %DstIncDir%\ 
+if not "%hdr8%"=="" copy %SrcIncDir%\%hdr8% %DstIncDir%\ 
+if not "%hdr9%"=="" copy %SrcIncDir%\%hdr9% %DstIncDir%\ 
 exit /b
 
 
 :LibCopy
+if not "%ReplacementLibCopy%"=="" (
+  call %ReplacementLibCopy% InnrLibCopy %1 %2 %3 %4 %5
+  exit /b
+)
 set Prefix=%1
 set Arch=%2
 set Rt=%3
 set Conf=%4
 set SubDir=%5
-set SrcConf=
-if "%Conf%"=="rel" set SrcConf=release
-if "%Conf%"=="dbg" set SrcConf=debug
-
 if "%Rt%"=="rtsta" set Rt=%CcLibStrStatic%
 if "%Rt%"=="rtdll" set Rt=%CcLibStrRtDll%
 if "%Conf%"=="rel" set Conf=%CcLibStrRelease%
 if "%Conf%"=="dbg" set Conf=%CcLibStrDebug%
 
-set SlnDir=
-if "%VcVer%"=="vc141" set SlnDir=VS2017
-if "%VcVer%"=="vc140" set SlnDir=VS2015
-if "%VcVer%"=="vc130" set SlnDir=VS2014
-if "%VcVer%"=="vc120" set SlnDir=VS2013
-if "%VcVer%"=="vc110" set SlnDir=VS2012
-if "%VcVer%"=="vc100" set SlnDir=VS2010
-if "%VcVer%"=="vc90"  set SlnDir=VS2008
-if "%VcVer%"=="vc80"  set SlnDir=VS2005
-if "%VcVer%"=="vc71"  set SlnDir=VS2003
+set LibDir1=%Prefix%%Arch%%Rt%%Conf%
 
-set SrcLibDir=%TgtDir%\win32\%SlnDir%\%Arch%\%SrcConf%
+set SrcLibDir=%TgtDir%\%SrcLibSubDir%\%LibDir1%
 if not exist %SrcLibDir% exit /b
 
-set LibDir1=%Prefix%%Arch%%Rt%%Conf%
 set DstLibDir=%CcLibsVcLibDir%\%LibDir1%
 if not exist %DstLibDir% mkdir %DstLibDir%
 if not "%SubDir%"=="" (
   set DstLibDir=%DstLibDir%\%SubDir%
   if not exist %DstLibDir% mkdir %DstLibDir%
 )
-
-if "%RtType%"=="static" (
-  if exist %SrcLibDir%\libvorbis_static.lib copy %SrcLibDir%\libvorbis_static.lib %DstLibDir%\
-  if exist %SrcLibDir%\libvorbisfile_static.lib copy %SrcLibDir%\libvorbisfile_static.lib %DstLibDir%\
-) else (
-  if exist %SrcLibDir%\libvorbis_rtdll.lib copy %SrcLibDir%\libvorbis_rtdll.lib %DstLibDir%\libvorbis_static.lib
-  rem if exist %SrcLibDir%\libvorbis_rtdll.lib copy %SrcLibDir%\libvorbis_rtdll.lib %DstLibDir%\
-  if exist %SrcLibDir%\libvorbis.lib copy %SrcLibDir%\libvorbis.lib %DstLibDir%\
-  if exist %SrcLibDir%\libvorbis.dll copy %SrcLibDir%\libvorbis.dll %DstLibDir%\
-  if exist %SrcLibDir%\libvorbis.pdb copy %SrcLibDir%\libvorbis.pdb %DstLibDir%\
-)
+if exist %SrcLibDir%\*.lib copy /b %SrcLibDir%\*.lib %DstLibDir%\
+if exist %SrcLibDir%\*.dll copy /b %SrcLibDir%\*.dll %DstLibDir%\
+if exist %SrcLibDir%\*.pdb copy /b %SrcLibDir%\*.pdb %DstLibDir%\
 
 exit /b
 
 
 :END
 popd
-endlocal
+rem endlocal
