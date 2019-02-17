@@ -103,6 +103,8 @@ if not exist Makefile.win32mt        ..\bld_lib_bat\tiny_replstr.exe ++ Makefile
 
 if not exist pixman\Makefile.win32mt ..\bld_lib_bat\tiny_replstr.exe ++ Makefile.win32.common Makefile.win32mt.common -- pixman\Makefile.win32 >pixman\Makefile.win32mt
 
+call :GetPixmanVersion
+..\bld_lib_bat\tiny_replstr.exe ++ @PIXMAN_VERSION_MAJOR@ %PIXMAN_VERSION_MAJOR% @PIXMAN_VERSION_MINOR@ %PIXMAN_VERSION_MINOR% @PIXMAN_VERSION_MICRO@ %PIXMAN_VERSION_MICRO% -- pixman\pixman-version.h.in >pixman\pixman-version.h
 
 if "%HasRtSta%%HasRel%"=="Sr" call :Bld1 rtsta rel %StrPrefix%%Arch%%StrRtSta%%StrRel%
 if "%HasRtSta%%HasDbg%"=="Sd" call :Bld1 rtsta dbg %StrPrefix%%Arch%%StrRtSta%%StrDbg%
@@ -133,7 +135,7 @@ if "%Arch%"=="x64" (
   set OPTS=SSE2=on SSSE3=off MMX=off
 )
 
-if not exist pixman\pixman-version.h copy ..\bld_lib_bat\sub\pixman\pixman\pixman-version.h pixman\
+rem if not exist pixman\pixman-version.h copy ..\bld_lib_bat\sub\pixman\pixman\pixman-version.h pixman\
 
 if exist pixman\%CFG% if exist pixman\%CFG%\*.* del /q pixman\%CFG%\*.*
 
@@ -144,6 +146,20 @@ if exist pixman\%CFG%\*.lib    move pixman\%CFG%\*.lib %LibDir%\%Target%\
 
 exit /b
 
+
+:GetPixmanVersion
+if not exist ..\bld_lib_bat\get_pixman_version.exe call :gen_get_pixman_version_exe
+..\bld_lib_bat\get_pixman_version.exe configure.ac >__pixman_version.bat
+call __pixman_version.bat
+del  __pixman_version.bat
+exit /b
+
+:gen_get_pixman_version_exe
+pushd ..\bld_lib_bat
+cl src\get_pixman_version.c
+del get_pixman_version.obj
+popd
+exit /b
 
 :END
 endlocal
