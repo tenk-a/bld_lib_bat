@@ -12,27 +12,28 @@ boost のように、コンパイラ別,cpu別,ランタイムのstatic/dll,ラ�
 
 vc8～vc14.1が対象、だが 今は vc14.1 が主で、他のverはどうなっているか不明。
 (当初は vc9,vc12 あたりを主で用いていた)
-(そもそもライブラリ・ビルドだけで力尽きて満足してしまってる気配)  
+(そもそもライブラリ・ビルドだけで力尽きて満足してしまってる気配)
 
 
 ## コンパイルするライブラリ
 
 大きめのライブラリ
-- 現状 boost, OpenCV, wxWidgets, fltk  
+- 現状 boost, OpenCV, wxWidgets, fltk
 これらは、それらの標準のincludeやlibのパスを使う。
 
 比較的小さいライブラリ
 - 現状 zlib, libbz2, libpng, mozjpeg(jpeglib, libjpeg-turbo), libtiff, libharu,
-glfw3, libogg, libvorbis, openssl, pixman, cairo  
+glfw3, libogg, libvorbis, openssl, pixman, cairo
 これらは misc_inc/ , misc_lib/ ディレクトリにも、まとめる。
 
 
 ## 方針
 
 - 極力、展開したライブラリ・ソース中のファイルを編集しない。
-が、ライブラリの出力先等、そのフォルダ内にファイルの追加は有。
+が、ライブラリの出力先等、そのフォルダ内にファイルの追加は有る。
 また、Makefileに対し引数でオプション設定変更したりは当然する。
-(稀にどうしてもソース修正の必要なモノ有り)
+稀にどうしてもソース修正の必要なモノも有り、テキスト置換した
+ファイルを生成したりもする。
 
 - ライブラリを貯めるディレクトリを用意し、そこに各種ライブラリを
 展開しておき、バッチでビルド。生成されたライブラリは、基本的には
@@ -61,26 +62,26 @@ static|dllランタイム, 等の都合でフォルダ分けし直している�
 仮にここでは、コンパイラとしてvc14.1(vs2017)を使い、まとめ置きディレクトリを
 d:/libs_vc/ とする。
 
-- そのフォルダ(d:/libs_vc/) の直下に この  
-  bld_lib_bat/  
+- そのフォルダ(d:/libs_vc/) の直下に この
+  bld_lib_bat/
 を配置。(d:/libs_vc/bld_lib_bat/)
 
-- bld_lib_bat/ にある libs_config.bat.source をコピーして  
-        bld_lib_bat/libs_config.bat  
-  を作成。  
-  エディタで開け、  
-  
-        set CcName=vc141 (vc80～vc141のいずれか)       　　使用するvcコンパイラ  
+- bld_lib_bat/ にある libs_config.bat.source をコピーして
+        bld_lib_bat/libs_config.bat
+  を作成。
+  エディタで開け、
+
+        set CcName=vc141 (vc80～vc141のいずれか)       　　使用するvcコンパイラ
         set CcHasX86=0 or 1                            　　x86用を生成する場合1
         set CcHasX64=0 or 1                            　　x64用を生成する場合1
-        set CcNoRtStatic=0 or 1                        　　staticランタイム版を生成しない場合 1を設定  
-        set CcCMakeDir=%ProgramFiles%\CMake\bin        　　cmake.exeのあるディレクトリ  
-        set CcNasmDir=%USERPROFILE%\AppData\Local\bin\nasm nasm.exe のあるディレクトリ  
-        set CcPerlDir=c:\Perl64\site\bin;c:\Perl64\bin 　　perl.exe のあるディレクトリ  
-        set CcPython3Path=……                         　　python.exe のあるディレクトリ  
-		set CcWinGnuMake=……                          　　mingw32-make.exe(mozmake.exe)へのパス  
-        set CcMsys1Paths=…\msys\local\bin;…\msys\bin 　　msys1 のパス  
-  
+        set CcNoRtStatic=0 or 1                        　　staticランタイム版を生成しない場合 1を設定
+        set CcCMakeDir=%ProgramFiles%\CMake\bin        　　cmake.exeのあるディレクトリ
+        set CcNasmDir=%USERPROFILE%\AppData\Local\bin\nasm nasm.exe のあるディレクトリ
+        set CcPerlDir=c:\Perl64\site\bin;c:\Perl64\bin 　　perl.exe のあるディレクトリ
+        set CcPython3Path=……                         　　python.exe のあるディレクトリ
+		set CcWinGnuMake=……                          　　mingw32-make.exe(mozmake.exe)へのパス
+        set CcMsys1Paths=…\msys\local\bin;…\msys\bin 　　msys1 のパス
+
   - vcバージョン名は VSのマクロ変数$(PlatformToolsetVersion) の値が使えるように
     vc9やvc12でなくvc90やvc120のように記述するようにしている。
   - vc++ express版の場合はCcHasX64=0、CcNoRtStatic=0にすることになる
@@ -90,7 +91,7 @@ d:/libs_vc/ とする。
   - libjpeg-turbo や openssl 等 nasm を使う場合は nasm のディレクトリを設定。
     nasmをインストーラで入れたならこのままでいいはず。
   - openssl 等 perl を使う場合は perl のディレクトリを設定。
-    例はWin64用ActivePerl のdefaultの場合。 
+    例はWin64用ActivePerl のdefaultの場合。
   - pixman のビルドでは CcWinGnuMake= に mingw32-make あるいは mozilla-build の mozmake.exe を設定。
     mozilla-build をインストールしていた場合はこのままでいいはず。
   - cairo のビルドでは CcMsys1Paths= に msys1 か mozilla-build のlocal/bin,binのパスを設定
@@ -99,30 +100,31 @@ d:/libs_vc/ とする。
   - その他 同一ファイル内にある Cc???? はバッチ共通で使うデフォルト値。
 
 
-- ビルドしたいライブラリを入手(ダンロード|clone)して d:/libs_vc/ の直下に解凍。  
-  ダウンロード物のフォルダ名はバージョン番号等含んだデフォルトのままを想定。  
-  たとえば zlib だと zlib128.zip を入手＆解凍、  
-      d:/libs_vc/zlib-1.2.8  
-  が出来る。あるいは git リポジトリを clone して zlib ままでも。  
-  ※ gitリポジトリで作業したものは dl_zlib.bat のようにバッチ用意。  
-  d:/libs_vc/bld_lib_bat/ をカレント・ディレクトリにして  
-      bld_zlib.bat  
-  を実行。  
-      d:/libs_vc/misc_inc/  
+- ビルドしたいライブラリを入手(ダンロード|clone)してたとえば
+     d:/libs_vc/
+  の直下に解凍。
+  ダウンロード物のフォルダ名はバージョン番号等含んだデフォルトのままを想定。
+  たとえば zlib だと zlib128.zip を入手＆解凍、
+      d:/libs_vc/zlib-1.2.8
+  が出来る。あるいは git リポジトリを clone して zlib ままでも。
+  ※ gitリポジトリで作業したものは dl_zlib.bat のようにバッチ用意。
+  d:/libs_vc/bld_lib_bat/ をカレント・ディレクトリにして
+      bld_zlib.bat
+  を実行。
+      d:/libs_vc/misc_inc/
   にヘッダ zlib.h が生成され
-  (作られた zlib.h は zlib-1.2.8 にある本物のzlib.h をincludeするだけのラッパー)  
-      d:/libs_vc/misc_lib/vc120_Win32_release  
-      d:/libs_vc/misc_lib/vc120_Win32_debug  
-      d:/libs_vc/misc_lib/vc120_Win32_static_release  
-      d:/libs_vc/misc_lib/vc120_Win32_static_debug  
-      d:/libs_vc/misc_lib/vc120_x64_release  
-      d:/libs_vc/misc_lib/vc120_x64_debug  
-      d:/libs_vc/misc_lib/vc120_x64_static_release  
-      d:/libs_vc/misc_lib/vc120_x64_static_debug  
-  等に zlib.lib が生成される。  
+      d:/libs_vc/misc_lib/vc120_Win32_release
+      d:/libs_vc/misc_lib/vc120_Win32_debug
+      d:/libs_vc/misc_lib/vc120_Win32_static_release
+      d:/libs_vc/misc_lib/vc120_Win32_static_debug
+      d:/libs_vc/misc_lib/vc120_x64_release
+      d:/libs_vc/misc_lib/vc120_x64_debug
+      d:/libs_vc/misc_lib/vc120_x64_static_release
+      d:/libs_vc/misc_lib/vc120_x64_static_debug
+  等に zlib.lib が生成される。
   ※ ターゲットディレクトリ名はzlib*のように指定して、名前ソートで最後に見つかった
      モノを使うが、わかりにくいので複数のバージョンを置くのは避けたほうがよいだろう。
-  
+
   一度ビルドを始めると、x86,x64のdllランタイム版&static版をdebug&release共にビルド(計8種類)
   をビルドをするので、かなり時間がかかることが多いので余裕のあるときに行うこと。
 
@@ -130,7 +132,7 @@ d:/libs_vc/ とする。
 ## misc_inc
 
 misc_inc/ には、各ライブラリのヘッダをコピーしている。
-元々からサブディレクトリなものもあれば、量の多いものはサブディレクトリにしているものもある。  
+元々からサブディレクトリなものもあれば、量の多いものはサブディレクトリにしているものもある。
 
 これを使えというわけでなく利用の一手段として。
 
@@ -141,7 +143,7 @@ boostやwxWidgetsのように元から仕分け対応済のモノもあるが、
 設定違い別にディレクトリを変えたり名前を変えたりしていないライブラリも多々あるため、
 仕分け対応していないライブラリについては、このバッチ群独自にディレクトリ分けしている。
 
-libs_vc??/misc_lib/ に入るものについては、
+d:/libs_vc/misc_lib/ に入るものについては、
 - vc120_Win32_release
 - vc120_Win32_debug
 - vc120_Win32_static_release
@@ -150,22 +152,22 @@ libs_vc??/misc_lib/ に入るものについては、
 - vc120_x64_debug
 - vc120_x64_static_release
 - vc120_x64_static_debug
-  
-のようになる。  
+
+のようになる。
 
 ディレクトリ分けされてない各ライブラリのビルドについても似たような感じでディレクトリ分けしている。
 （このへんはライブラリごとに事情が違うので、ビルド後のディレクトリを確認のこと)
-  
+
 先頭にはまず使用するVCのバージョン名がつく。vc10からの Visual Studio の
 マクロ変数 $(PlatformToolsetVersion) の値が使えるように vc10 や vc12 でなく vc90 や vc120 のように
 記述するようにしている。
 次に _static があれば static ランタイム版で(なければdllランタイム:msvcrt???.dllを使う)、
-最後に _release | _debug ビルドを表している。  
-  
-vc10 以降ならば Visual Studio の追加のライブラリの欄に  
-  (ディレクトリ…)/libs_vc/misc_lib/vc$(PlatformToolsetVersion)_$(PlatformName)_$(Configuration)  
-  や  
-  (ディレクトリ…)/libs_vc/misc_lib/vc$(PlatformToolsetVersion)_$(PlatformName)_static_$(Configuration)  
+最後に _release | _debug ビルドを表している。
+
+vc10 以降ならば Visual Studio の追加のライブラリの欄に
+  (ディレクトリ…)/misc_lib/vc$(PlatformToolsetVersion)_$(PlatformName)_$(Configuration)
+  や
+  (ディレクトリ…)/misc_lib/vc$(PlatformToolsetVersion)_$(PlatformName)_static_$(Configuration)
 の感じに追加するのを想定。
 static版でも、ソリューション構成側で static_release, static_debug を用意している場合は最初の指定でよいだろう。
 
@@ -179,14 +181,14 @@ debugビルドやランタイムの区別のため、元とは違うポストフ
 
 dllライブラリ版は用意されている場合は、staticライブラリ版を別名で生成していて _static や -static が
 後ろについていることも多そう。なので、そうでないものもそれに倣った。
-  
+
 ※紛らわしいが、ディレクトリ名のstatic はランタイムを表し、ライブラリファイル名に付く
 staticはターゲットライブラリがstaticリンクであることを表している。
-  
+
 ※ 生成ディレクトリ名を調整(変更)したい場合は libs_config.bat を弄る。
-たとえば vcバージョン名を付けたくなければ CcNamePrefix を  
-    set CcLibPrefix=  
-のように空に設定。 
+たとえば vcバージョン名を付けたくなければ CcNamePrefix を
+    set CcLibPrefix=
+のように空に設定。
 
 
 ## makefileやvcxproj等に対する文字列置換
@@ -216,8 +218,8 @@ boost等ライブラリ側ビルドでディレクトリ分けがされてない
 一応、試したライブラリのバージョンではビルドできているが、新しいバージョンや古いバージョンの
 ライブラリでうまくいくかは不明（やってみなければわからない)
 
-以下は、主にvc14.1でチェック. vc12は一通り通るが vc9は通らないこともあり、その場合は
-vcの他のバージョンも試した。(ので言及してないVCバージョンでの成否は不明)
+以下は、主にvc14.1でチェック. vc12は一通り通るが vc9は通らないこともあり.
+(言及してないVCバージョンでの成否は不明)
 
 
 ### ファイル数の少ないライブラリ(misc_inc,misc_lib 配置のもの)
@@ -331,7 +333,7 @@ bld_系バッチで共通で使われるバッチとして、sub/subr_lib_type1.
   バッチ内で書き換えて staticランタイム版をビルド、逆にdllランタイム版の名前を _rtdll 付きに変えている
 - dllランタイム版 _rtdll は misc_lib/ へのコピー時に 他のライブラリとネイミングを合わせるため _static に付け直している
 - (_static版のランタイム指定が liboggとlibvorbisで違うような... dll(_dynamic)ライブラリ版しか使ってないの？)
-- msbuildで libogg_static.sln, libogg_dynamic.sln に所定の引数与えてビルド 
+- msbuildで libogg_static.sln, libogg_dynamic.sln に所定の引数与えてビルド
 - vc12,vc14,vc14.1 はビルド通ったが、vc8-11は全くダメだったり一部ダメだったりと不具合有(原因未調査)
 
 
@@ -367,12 +369,12 @@ bld_系バッチで共通で使われるバッチとして、sub/subr_lib_type1.
 
 ### pixman
 - 画像関係
-- bld_pixman.bat (+bld1_pixman.bat, tiny_replstr.exe+共通bat)
-- ディレクトリは pixman* 試したバージョンは 2018-11-03付近のgitリポジトリ
+- bld_pixman.bat (+bld1_pixman.bat, tiny_replstr.exe+get_pixman_version.exe+共通bat)
+- ディレクトリは pixman*  試したバージョンは 2019-02-17(当初 2018-11-03)付近のgitリポジトリ
 - mingw32-make.exe (mozmake.exe) が必要.
 -- libs_config.bat の CcWinGnuMake に exeファイルを指定
 - ライブラリのみ. テスト等は手付かず.
-- vc2017 で Cinder の blocks/cairo を使えるようにするためにビルド. 
+- vc2017 で Cinder の blocks/cairo を使えるようにするためにビルド.
 - 少なくとも vc14-14.1 のビルド通るはず
 
 
@@ -385,7 +387,7 @@ bld_系バッチで共通で使われるバッチとして、sub/subr_lib_type1.
 -- libs_config.bat の CcMsys1Paths に ～/msys/local/bin;～/msys/bin にパスを通す
 -- win10 で Defender 有効だとsh,bashでハング。Exploit protection を一通りoffにして回避した。
 - ライブラリのみ. テスト等は手付かず.
-- vc2017 で Cinder の blocks/cairo を使えるようにするためにビルド. 
+- vc2017 で Cinder の blocks/cairo を使えるようにするためにビルド.
 - 少なくとも vc14-14.1 のビルド通るはず
 
 
@@ -417,14 +419,14 @@ bld_系バッチで共通で使われるバッチとして、sub/subr_lib_type1.
 - ビルドは build/vc??_(Win32|x64)[_static](_release|_debug)/ ディレクトリを作ってそこで行っている。
   終了しても残っているので、不要なら削除のこと。
 - バッチ内では、CMake の引数で所定の変数を設定してビルド
-- v3.1.0は vc10exp,vc12,14 でビルド通った。vc11はCMake中にエラー。  
+- v3.1.0は vc10exp,vc12,14 でビルド通った。vc11はCMake中にエラー。
   vc9以下は公式未対応の模様。stdint.h必須だし。ただ代用stdint.h用意してOpenCL オフにすればvideoio関係
   以外はコンパイル通るかも。あとvc8,vc9はIDE上ではビルドを試せたがmsbuild.exeはハングして駄目だった。
 - v3.4は vc14,vc14.1 で試し. 現状中途半端
 -- フォルダ構成を変更. opencv/sources に opencv.git の内容を置き、opencv/build でビルド、
 opencv/build/vc???_(x64|Win32)(_static)/install が、実際に使うフォルダになる。
--- pythonをインストールしてると opencv_python がビルドされるが、 python側の Python.h で python??_d.lib
-のリンクが設定されてしまうが、実物なくリンクエラー(opencv側は python??.libを使うようにしてる模様).
+-- pythonをインストールしていると opencv_python がビルドされるが、 python側の Python.h で python??_d.lib
+のリンクが設定されてしまうため実物なくリンクエラー(opencv側は python??.libを使うようにしてる模様).
 とりあえず opencv_python をビルドしないことで回避.
 
 #### wxWidgets v3
@@ -432,25 +434,25 @@ opencv/build/vc???_(x64|Win32)(_static)/install が、実際に使うフォル�
 - bld_wxWidgets.bat (+ bld1_wxWidgets.bat + UpgradeWxWidgetsSampleVcproj.bat +共通bat)
 - ディレクトリは wxWidgets-3.?.? 　- 試したバージョンは 最初:wxWidgets-3.0.2  最新:wxWidgets-3.1.0
 - でっかいし環境整ってるので、wxWidgetsの環境のまま使用
-- ただし生成されたライブラリは lib/ ディレクトリ直下にwx標準とは違う  
-    vc??(_x64)_rtdll_lib/   　　　　dllランタイム版  
-    vc??(_x64)_static_lib/  　　　　staticランタイム版  
-    vc??(_x64)_dll/         　　　　dllライブラリ版  
-  のようなディレクトリに配置。  
+- ただし生成されたライブラリは lib/ ディレクトリ直下にwx標準とは違う
+    vc??(_x64)_rtdll_lib/   　　　　dllランタイム版
+    vc??(_x64)_static_lib/  　　　　staticランタイム版
+    vc??(_x64)_dll/         　　　　dllライブラリ版
+  のようなディレクトリに配置。
   が実際に使うときは wxWidgets 内部での include の都合もあり、vc??_rtdll_lib か vc??_static_lib かどちらかを
-  vc_lib (x64版なら vc_x64_lib) に rename する必要がある。（dll版の場合は vc_dll）  
+  vc_lib (x64版なら vc_x64_lib) に rename する必要がある。（dll版の場合は vc_dll）
   (ただコンパイラオプションで wxMSVC_VERSION_AUTO マクロを定義した場合は、vc120_lib のようにvcバージョンが
   ついたディレクトリが対象になるので、都合に合わせてrenameすることになる)
 - debug版ライブラリは、release版のファイル名の最後に 'd' を付加した名前になっている
 - v3.1.0では直っているようだが、vc14(vs2015)で wxWidgets v3.0.2 のソースを
   コンパイルすると tif_config.h の #define sprintf _sprintf が、
-  vc14の stdio.h でのマクロ対策#errorのせいでエラーになる  
-  なのでvc14でコンパイルする場合は src/tiff/libtiff/tif_config.h の 367 行目付近の  
-    #define snprintf _snprintf  
-  の行を  
-    #if !defined(_MSC_VER) || _MSC_VER < 1900  
-    #define snprintf _snprintf  
-    #endif  
+  vc14の stdio.h でのマクロ対策#errorのせいでエラーになる
+  なのでvc14でコンパイルする場合は src/tiff/libtiff/tif_config.h の 367 行目付近の
+    #define snprintf _snprintf
+  の行を
+    #if !defined(_MSC_VER) || _MSC_VER < 1900
+    #define snprintf _snprintf
+    #endif
   のように書き換える必要がある。
 - バッチ内では makefile.vc に所定の引数渡してビルド
 - vc9,12,14 はビルド通った。 他vcについては未確認
@@ -463,11 +465,11 @@ opencv/build/vc???_(x64|Win32)(_static)/install が、実際に使うフォル�
 - でかいので、fltkの環境のまま使用
 - zlibやpngライブラリを使っているが、ソースは予め配布ライブラリ内に含まれている
 - デバッグ用ライブラリについては、元のまま 最後に d がついたモノを使うことになる
-- .lib は lib/ の下の  
-    vc??_Win32/  
-    vc??_Win32_static/  
-    vc??_x64/  
-    vc??_x64_static/  
+- .lib は lib/ の下の
+    vc??_Win32/
+    vc??_Win32_static/
+    vc??_x64/
+    vc??_x64_static/
   に作られる。
 - _static付がstaticランタイム版で デバッグ版に関してはディレクトリ別でなくファイル名の最後に 'd' がつく。
 - バッチ内では、dllランタイム版は、msbuild fltk.sln で Configuration, Platform を指定してビルド
@@ -478,13 +480,13 @@ opencv/build/vc???_(x64|Win32)(_static)/install が、実際に使うフォル�
 #### Cinder
 - マルチメディア・フレームワーク
 - samples や test の対応等していろいろ単純でなくなったので本家からforkした
-  https://github.com/tenk-a/Cinder  
+  https://github.com/tenk-a/Cinder
   に for_vc2017 ブランチで対応.
 
 
 
 ## 履歴
-- 2018-11-03 misc_inc/のヘッダをラッパーでなくヘッダ実体をコピーするように変更。  
-このためラッパーヘッダによる暗黙のリンクがなくなったので、.libはそのつどリンク指定する必要あり.  
-bld1_???.bat では libs_config.bat のCc????変数を直接みないようにして なるべくbld1_???単体利用可能にした.  
-現状 vc14.1でコンパイルしてみただけ、で実使用してないので不具合多そう
+- 2018-11-03 misc_inc/のヘッダをラッパーでなくヘッダ実体をコピーするように変更。
+このためラッパーヘッダによる暗黙のリンクがなくなったので、.libはそのつどリンク指定する必要あり.
+bld1_???.bat では libs_config.bat のCc????変数を直接みないようにして なるべくbld1_???単体利用可能にした.
+現状 vc14.1でコンパイルしてみただけ、で実使用してないので不具合はなにかあるだろう.
