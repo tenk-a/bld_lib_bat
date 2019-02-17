@@ -20,15 +20,6 @@ rem set hdr8=
 rem set hdr9=
 rem set Arg=
 
-
-if "%NeedTinyReplStr%"=="" goto TinyReplStr_SKIP
-if exist tiny_replstr.exe  goto TinyReplStr_SKIP
-call setcc.bat %Compl% Win32
-call gen_replstr.bat
-:TinyReplStr_SKIP
-
-pushd ..
-
 set HasX86=
 set HasX64=
 set HasRel=
@@ -77,6 +68,14 @@ if "%SrcLibSubDir%"=="" set "SrcLibSubDir=%CcLibDir%"
 goto ARG_LOOP
 :ARG_LOOP_EXIT
 set A=
+
+if "%NeedTinyReplStr%"=="" goto TinyReplStr_SKIP
+if exist tiny_replstr.exe  goto TinyReplStr_SKIP
+call setcc.bat %VcVer% Win32
+call gen_replstr.bat
+:TinyReplStr_SKIP
+
+pushd ..
 
 if "%HasX86%%HasX64%"=="" (
   set HasX86=%CcHasX86%
