@@ -1,0 +1,17 @@
+set TgtName=flatbuffers
+set TgtDir=
+set TgtGit=https://github.com/google/flatbuffers.git
+set SrcIncSubDir=
+set InstallIncSubDir=
+set InstallLibSubDir=
+set hdr1=
+set hdr2=
+set hdr3=
+set hdr4=
+set hdr5=
+set hdr6=
+set hdr7=
+set hdr8=
+set hdr9=
+set Arg=
+set NoBuild=1

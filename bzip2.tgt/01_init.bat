@@ -1,0 +1,16 @@
+set TgtName=bzip2
+set TgtDir=
+set TgtGit=git://sourceware.org/git/bzip2.git
+set SrcIncSubDir=
+set InstallIncSubDir=
+set InstallLibSubDir=
+set hdr1=bzlib.h
+set hdr2=
+set hdr3=
+set hdr4=
+set hdr5=
+set hdr6=
+set hdr7=
+set hdr8=
+set hdr9=
+set Arg=

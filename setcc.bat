@@ -30,6 +30,8 @@ set CcNameArch=%CcName%
 if /I not "%CcArch%"=="Win32" set "CcNameArch=%CcName%%CcArch%"
 
 rem
+if /i "%CcNameArch%"=="vc142"      goto L_VC142
+if /i "%CcNameArch%"=="vc142x64"   goto L_VC142x64
 if /i "%CcNameArch%"=="vc141"      goto L_VC141
 if /i "%CcNameArch%"=="vc141x64"   goto L_VC141x64
 if /i "%CcNameArch%"=="vc140"      goto L_VC14
@@ -50,6 +52,8 @@ if /i "%CcNameArch%"=="vc71"       goto L_VC71
 if /i "%CcNameArch%"=="vc70"       goto L_VC70
 if /i "%CcNameArch%"=="vc60"       goto L_VC6
 
+if /i "%CcNameArch%"=="vc14.2"     goto L_VC142
+if /i "%CcNameArch%"=="vc14.2x64"  goto L_VC142x64
 if /i "%CcNameArch%"=="vc14.1"     goto L_VC141
 if /i "%CcNameArch%"=="vc14.1x64"  goto L_VC141x64
 if /i "%CcNameArch%"=="vc14"       goto L_VC14
@@ -125,8 +129,8 @@ if /i "%CcNameArch%"=="java"        goto L_JAVA
 
 @echo setcc [COMPILER] [x86/x64]
 @echo   COMPILER:
-@echo       vc141,vc140,vc120,vc110,vc100,vc90,vc80
-@echo       vc141x64,vc140x64,vc120x64,vc110x64,vc100x64,vc90x64,vc80x64
+@echo       vc142,vc141,vc140,vc120,vc110,vc100,vc90,vc80
+@echo       vc142x64,vc141x64,vc140x64,vc120x64,vc110x64,vc100x64,vc90x64,vc80x64
 @echo       tdm32,mingw32,cygwin32,oragnec,dmc,bcc32c,bc55,ow19,ow20
 @echo       tdm64,mingw64,cygwin64
 @echo       tinyc,pcc,pellesc,lccwin
@@ -136,40 +140,51 @@ if /i "%CcNameArch%"=="java"        goto L_JAVA
 
 rem ## vc ######################################
 
+:L_VC142x64
+    set COMPILER=vc142x64
+    set VCVARS_BAT=vcvars64.bat
+    set VCYEAR=2019
+    goto L_VC141_SKIP_1
+:L_VC142
+    set COMPILER=vc142
+    set VCVARS_BAT=vcvars32.bat
+    set VCYEAR=2019
 :L_VC141x64
     set COMPILER=vc141x64
     set VCVARS_BAT=vcvars64.bat
+    set VCYEAR=2017
     goto L_VC141_SKIP_1
 :L_VC141
     set COMPILER=vc141
     set VCVARS_BAT=vcvars32.bat
+    set VCYEAR=2017
 :L_VC141_SKIP_1
     set "PATH=%setcc_base_path%"
-    if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Enterprise\Common7\Tools\VsMSBuildCmd.bat"   goto VC141_Enterprise64
-    if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Professional\Common7\Tools\VsMSBuildCmd.bat" goto VC141_Professional64
-    if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\Common7\Tools\VsMSBuildCmd.bat"    goto VC141_Community64
-    if exist "%ProgramFiles%\Microsoft Visual Studio\2017\Enterprise\Common7\Tools\VsMSBuildCmd.bat"   goto VC141_Enterprise
-    if exist "%ProgramFiles%\Microsoft Visual Studio\2017\Professional\Common7\Tools\VsMSBuildCmd.bat" goto VC141_Professional
-    if exist "%ProgramFiles%\Microsoft Visual Studio\2017\Community\Common7\Tools\VsMSBuildCmd.bat"    goto VC141_Community
-    echo ERROR: Not found "Microsoft Visual Studio 2017"
+    if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\%VCYEAR%\Enterprise\Common7\Tools\VsMSBuildCmd.bat"   goto VC141_Enterprise64
+    if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\%VCYEAR%\Professional\Common7\Tools\VsMSBuildCmd.bat" goto VC141_Professional64
+    if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\%VCYEAR%\Community\Common7\Tools\VsMSBuildCmd.bat"    goto VC141_Community64
+    if exist "%ProgramFiles%\Microsoft Visual Studio\%VCYEAR%\Enterprise\Common7\Tools\VsMSBuildCmd.bat"   goto VC141_Enterprise
+    if exist "%ProgramFiles%\Microsoft Visual Studio\%VCYEAR%\Professional\Common7\Tools\VsMSBuildCmd.bat" goto VC141_Professional
+    if exist "%ProgramFiles%\Microsoft Visual Studio\%VCYEAR%\Community\Common7\Tools\VsMSBuildCmd.bat"    goto VC141_Community
+    echo ERROR: Not found "Microsoft Visual Studio %VCYEAR%"
     goto L_END
 :VC141_Enterprise64
-    call "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Enterprise\VC\Auxiliary\Build\%VCVARS_BAT%"
+    call "%ProgramFiles(x86)%\Microsoft Visual Studio\%VCYEAR%\Enterprise\VC\Auxiliary\Build\%VCVARS_BAT%"
     goto L_END
 :VC141_Professional64
-    call "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Professional\VC\Auxiliary\Build\%VCVARS_BAT%"
+    call "%ProgramFiles(x86)%\Microsoft Visual Studio\%VCYEAR%\Professional\VC\Auxiliary\Build\%VCVARS_BAT%"
     goto L_END
 :VC141_Community64
-    call "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\%VCVARS_BAT%"
+    call "%ProgramFiles(x86)%\Microsoft Visual Studio\%VCYEAR%\Community\VC\Auxiliary\Build\%VCVARS_BAT%"
     goto L_END
 :VC141_Enterprise
-    call "%ProgramFiles%\Microsoft Visual Studio\2017\Enterprise\VC\Auxiliary\Build\%VCVARS_BAT%"
+    call "%ProgramFiles%\Microsoft Visual Studio\%VCYEAR%\Enterprise\VC\Auxiliary\Build\%VCVARS_BAT%"
     goto L_END
 :VC141_Professional
-    call "%ProgramFiles%\Microsoft Visual Studio\2017\Professional\VC\Auxiliary\Build\%VCVARS_BAT%"
+    call "%ProgramFiles%\Microsoft Visual Studio\%VCYEAR%\Professional\VC\Auxiliary\Build\%VCVARS_BAT%"
     goto L_END
 :VC141_Community
-    call "%ProgramFiles%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\%VCVARS_BAT%"
+    call "%ProgramFiles%\Microsoft Visual Studio\%VCYEAR%\Community\VC\Auxiliary\Build\%VCVARS_BAT%"
     goto L_END
 
 :L_VC14

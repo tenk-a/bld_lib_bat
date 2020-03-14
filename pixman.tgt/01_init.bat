@@ -1,0 +1,17 @@
+set TgtName=pixman
+set TgtDir=
+set TgtGit=git://anongit.freedesktop.org/git/pixman.git
+set SrcIncSubDir=pixman
+set InstallIncSubDir=
+set InstallLibSubDir=
+set hdr1=pixman.h
+set hdr2=pixman-version.h
+set hdr3=
+set hdr4=
+set hdr5=
+set hdr6=
+set hdr7=
+set hdr8=
+set hdr9=
+set Arg=
+set NeedTinyReplStr=1

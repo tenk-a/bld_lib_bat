@@ -7,8 +7,8 @@ rem set TgtName=
 rem set TgtDir=
 rem set SrcIncSubDir=
 rem set SrcLibSubDir=
-rem set DstIncSubDir=
-rem set DstLibSubDir=
+rem set InstallIncSubDir=
+rem set InstallLibSubDir=
 rem set hdr1=
 rem set hdr2=
 rem set hdr3=
@@ -27,18 +27,20 @@ set HasDbg=
 set HasRtSta=
 set HasRtDll=
 set HasTest=
-set NoCopy=
+set NoInstall=
 set NoBuild=
 set VcVer=
+set Arch=
 set Arg=%Arg% %CcBld1Arg%
 if "%SrcLibSubDir%"=="" set "SrcLibSubDir=%CcLibDir%"
 
 :ARG_LOOP
   if "%1"=="" goto ARG_LOOP_EXIT
 
-  if /I "%1"=="x86"      set HasX86=1
-  if /I "%1"=="Win32"    set HasX86=1
-  if /I "%1"=="x64"      set HasX64=1
+  if /I "%1"=="x86"      set HasX86=x86
+  if /I "%1"=="Win32"    set HasX86=x86
+  if /I "%1"=="x64"      set HasX64=x64
+  if /I "%1"=="Win64"    set HasX64=x64
 
   if /I "%1"=="static"   set HasRtSta=static
   if /I "%1"=="rtsta"    set HasRtSta=static
@@ -58,8 +60,9 @@ if "%SrcLibSubDir%"=="" set "SrcLibSubDir=%CcLibDir%"
   if /I "%1"=="vc130"    set VcVer=vc130
   if /I "%1"=="vc140"    set VcVer=vc140
   if /I "%1"=="vc141"    set VcVer=vc141
+  if /I "%1"=="vc142"    set VcVer=vc142
 
-  if /I "%1"=="NoCopy"   set NoCopy=1
+  if /I "%1"=="NoInstall"   set NoInstall=1
   if /I "%1"=="NoBuild"  set NoBuild=1
   set A=%1
   if /I "%A:~0,4%"=="src:" set TgtDir=%A:~4%
@@ -69,6 +72,44 @@ goto ARG_LOOP
 :ARG_LOOP_EXIT
 set A=
 
+set FoundCompiler=
+if not "%VcVer%"=="" goto SKIP_VC_VER
+  if /I not "%PATH:Microsoft Visual Studio .NET 2003=%"=="%PATH%" set VcVer=vc71
+  if /I not "%PATH:Microsoft Visual Studio 8=%"=="%PATH%"    set VcVer=vc80
+  if /I not "%PATH:Microsoft Visual Studio 9.0=%"=="%PATH%"  set VcVer=vc90
+  if /I not "%PATH:Microsoft Visual Studio 10.0=%"=="%PATH%" set VcVer=vc100
+  if /I not "%PATH:Microsoft Visual Studio 11.0=%"=="%PATH%" set VcVer=vc110
+  if /I not "%PATH:Microsoft Visual Studio 12.0=%"=="%PATH%" set VcVer=vc120
+  if /I not "%PATH:Microsoft Visual Studio 13.0=%"=="%PATH%" set VcVer=vc130
+  if /I not "%PATH:Microsoft Visual Studio 14.0=%"=="%PATH%" set VcVer=vc140
+  if /I not "%PATH:Microsoft Visual Studio\2017=%"=="%PATH%" set VcVer=vc141
+  if /I not "%PATH:Microsoft Visual Studio\2019=%"=="%PATH%" set VcVer=vc142
+  if not "%VcVer%"=="" set FoundCompiler="Found"
+:SKIP_VC_VER
+if "%VcVer%"=="" set VcVer=%CcDefaultVer%
+
+if "%FoundCompiler%%HasX86%%HasX64%"=="Found" (
+  if "%VcVer%"=="vc142"    if /I not "%PATH:\bin\HostX64\x64=%"=="%PATH%" set HasX64=x64
+  if "%VcVer%"=="vc141"    if /I not "%PATH:\bin\HostX64\x64=%"=="%PATH%" set HasX64=x64
+  if /I not "%PATH:Microsoft Visual Studio 14.0\VC\BIN\amd64=%"=="%PATH%" set HasX64=x64
+  if /I not "%PATH:Microsoft Visual Studio 13.0\VC\BIN\amd64=%"=="%PATH%" set HasX64=x64
+  if /I not "%PATH:Microsoft Visual Studio 12.0\VC\BIN\amd64=%"=="%PATH%" set HasX64=x64
+  if /I not "%PATH:Microsoft Visual Studio 11.0\VC\BIN\amd64=%"=="%PATH%" set HasX64=x64
+  if /I not "%PATH:Microsoft Visual Studio 10.0\VC\BIN\amd64=%"=="%PATH%" set HasX64=x64
+  if /I not "%PATH:Microsoft Visual Studio 9.0\VC\BIN\amd64=%"=="%PATH%"  set HasX64=x64
+  if /I not "%PATH:Microsoft Visual Studio 8\VC\BIN\amd64=%"=="%PATH%"    set HasX64=x64
+  if "%HasX64%"=="" set HasX86=x86
+)
+
+if "%Arch%"=="" set Arch=Win32
+
+set LibPrefix=%VcVer%_
+
+if "%HasX86%%HasX64%"=="" (
+  set HasX86=x86
+  set HasX64=x64
+)
+
 if "%NeedTinyReplStr%"=="" goto TinyReplStr_SKIP
 if exist tiny_replstr.exe  goto TinyReplStr_SKIP
 call setcc.bat %VcVer% Win32
@@ -77,20 +118,7 @@ call gen_replstr.bat
 
 pushd ..
 
-if "%HasX86%%HasX64%"=="" (
-  set HasX86=%CcHasX86%
-  set HasX64=%CcHasX64%
-)
-
-set LibPrefix=%VcVer%_
-if "%VcVer%"=="" (
-  set VcVer=%CcName%
-  set LibPrefix=%CcLibPrefix%
-)
-
-if "%TgtDir%"=="" (
-  for /f %%i in ('dir /b /on /ad %TgtName%*') do set TgtDir=%%i
-)
+rem if "%TgtDir%"=="" ( for /f %%i in ('dir /b /on /ad %TgtName%*') do set TgtDir=%%i )
 
 if "%TgtDir%"=="" (
   echo ERROR: not found source directory
@@ -103,40 +131,40 @@ if not exist "%TgtDir%" (
 
 set Arg=%Arg% %HasRtSta% %HasRtDll% %HasRel% %HasDbg% %HasTest%
 set Arg=%Arg% LibPrefix:%LibPrefix% LibDir:%SrcLibSubDir%
-set Arg=%Arg% LibRel:%CcLibStrRelease% LibDbg:%CcLibStrDebug% LibRtSta:%CcLibStrStatic% LibRtDll:%CcLibStrRtDll%
+set Arg=%Arg% LibRel:%CcStrRelease% LibDbg:%CcStrDebug% LibRtSta:%CcStrStatic% LibRtDll:%CcStrRtDll%
 if "%CcNoRtStatic%"=="1" set Arg=%Arg% rtdll
 
 if "%NoBuild%"=="1" goto BUILD_SKIP
-pushd %TgtDir%
-if "%HasX86%"=="1" (
-  call ..\bld_lib_bat\setcc.bat %VcVer% Win32
-  call ..\bld_lib_bat\bld1_%TgtName%.bat %VcVer% Win32 %Arg%
-)
-if "%HasX64%"=="1" (
-  call ..\bld_lib_bat\setcc.bat %VcVer% x64
-  call ..\bld_lib_bat\bld1_%TgtName%.bat %VcVer% x64 %Arg%
-)
-popd
+  pushd %TgtDir%
+  if not "%HasX64%"=="x64" goto BUILD_SKIP64
+    call .\setcc.bat %VcVer% x64
+    call .\bld1_%TgtName%.bat %VcVer% x64 %Arg%
+  :BUILD_SKIP64
+  if not "%HasX86%"=="1" goto BUILD_SKIP32
+    call .\setcc.bat %VcVer% Win32
+    call .\bld1_%TgtName%.bat %VcVer% Win32 %Arg%
+  :BUILD_SKIP32
+  popd
 :BUILD_SKIP
 
-if "%NoCopy%"=="1" goto COPY_SKIP
-if not exist %CcLibsVcIncDir% mkdir %CcLibsVcIncDir%
-if not exist %CcLibsVcLibDir% mkdir %CcLibsVcLibDir%
+if "%NoInstall%"=="1" goto COPY_SKIP
+  if not exist %CcInstallIncDir% mkdir %CcInstallIncDir%
+  if not exist %CcInstallLibDir% mkdir %CcInstallLibDir%
 
-if "%LibPrefix%"=="" set LibPrefix=vc_
+  call :HdrCopy
 
-call :HdrCopy
-
-call :LibCopy %LibPrefix% Win32 rtsta rel %DstLibSubDir%
-call :LibCopy %LibPrefix% Win32 rtsta dbg %DstLibSubDir%
-call :LibCopy %LibPrefix% Win32 rtdll rel %DstLibSubDir%
-call :LibCopy %LibPrefix% Win32 rtdll dbg %DstLibSubDir%
-if "%CcHasX64%"=="1" (
-  call :LibCopy %LibPrefix% x64 rtsta rel %DstLibSubDir%
-  call :LibCopy %LibPrefix% x64 rtsta dbg %DstLibSubDir%
-  call :LibCopy %LibPrefix% x64 rtdll rel %DstLibSubDir%
-  call :LibCopy %LibPrefix% x64 rtdll dbg %DstLibSubDir%
-)
+  if "%HasX64%"=="x64" (
+    call :LibCopy %LibPrefix% x64 rtsta rel %InstallLibSubDir%
+    call :LibCopy %LibPrefix% x64 rtsta dbg %InstallLibSubDir%
+    call :LibCopy %LibPrefix% x64 rtdll rel %InstallLibSubDir%
+    call :LibCopy %LibPrefix% x64 rtdll dbg %InstallLibSubDir%
+  )
+  if "%HasX32%"=="1" (
+    call :LibCopy %LibPrefix% Win32 rtsta rel %InstallLibSubDir%
+    call :LibCopy %LibPrefix% Win32 rtsta dbg %InstallLibSubDir%
+    call :LibCopy %LibPrefix% Win32 rtdll rel %InstallLibSubDir%
+    call :LibCopy %LibPrefix% Win32 rtdll dbg %InstallLibSubDir%
+  )
 :COPY_SKIP
 
 goto END
@@ -147,13 +175,13 @@ set SrcIncDir=%TgtDir%
 if not "%SrcIncSubDir%"=="" (
   set SrcIncDir=%SrcIncDir%\%SrcIncSubDir%
 )
-set DstIncDir=%CcLibsVcIncDir%
+set DstIncDir=%CcInstallIncDir%
 if not exist "%DstIncDir%" mkdir "%DstIncDir%"
-if "%DstIncSubDir%"=="" goto SKIP2
-  set DstIncDir=%DstIncDir%\%DstIncSubDir%
+if "%InstallIncSubDir%"=="" goto SKIP_HdrCopy2
+  set DstIncDir=%DstIncDir%\%InstallIncSubDir%
   if not exist "%DstIncDir%" mkdir "%DstIncDir%"
   if exist     "%DstIncDir%" del /q "%DstIncDir%\*.*"
-:SKIP2
+:SKIP_HdrCopy2
 if not "%hdr1%"=="" copy %SrcIncDir%\%hdr1% %DstIncDir%\ 
 if not "%hdr2%"=="" copy %SrcIncDir%\%hdr2% %DstIncDir%\ 
 if not "%hdr3%"=="" copy %SrcIncDir%\%hdr3% %DstIncDir%\ 
@@ -167,26 +195,22 @@ exit /b
 
 
 :LibCopy
-if not "%ReplacementLibCopy%"=="" (
-  call %ReplacementLibCopy% InnrLibCopy %1 %2 %3 %4 %5
-  exit /b
-)
 set Prefix=%1
 set Arch=%2
 set Rt=%3
 set Conf=%4
 set SubDir=%5
-if "%Rt%"=="rtsta" set Rt=%CcLibStrStatic%
-if "%Rt%"=="rtdll" set Rt=%CcLibStrRtDll%
-if "%Conf%"=="rel" set Conf=%CcLibStrRelease%
-if "%Conf%"=="dbg" set Conf=%CcLibStrDebug%
+if "%Rt%"=="rtsta" set Rt=%CcStrStatic%
+if "%Rt%"=="rtdll" set Rt=%CcStrRtDll%
+if "%Conf%"=="rel" set Conf=%CcStrRelease%
+if "%Conf%"=="dbg" set Conf=%CcStrDebug%
 
 set LibDir1=%Prefix%%Arch%%Rt%%Conf%
 
 set SrcLibDir=%TgtDir%\%SrcLibSubDir%\%LibDir1%
 if not exist %SrcLibDir% exit /b
 
-set DstLibDir=%CcLibsVcLibDir%\%LibDir1%
+set DstLibDir=%CcInstallLibDir%\%LibDir1%
 if not exist %DstLibDir% mkdir %DstLibDir%
 if not "%SubDir%"=="" (
   set DstLibDir=%DstLibDir%\%SubDir%

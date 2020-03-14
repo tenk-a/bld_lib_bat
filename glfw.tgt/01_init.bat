@@ -1,0 +1,16 @@
+set TgtName=glfw
+set TgtDir=
+set TgtGit=https://github.com/glfw/glfw.git
+set SrcIncSubDir=include\GLFW
+set InstallIncSubDir=GLFW
+set InstallLibSubDir=
+set hdr1=glfw3.h
+set hdr2=glfw3native.h
+set hdr3=
+set hdr4=
+set hdr5=
+set hdr6=
+set hdr7=
+set hdr8=
+set hdr9=
+set Arg=
