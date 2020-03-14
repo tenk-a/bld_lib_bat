@@ -1,6 +1,6 @@
 set TgtName=libtiff
 set TgtDir=
-set TgtGit=https://gitlab.com/libtiff/libtiff.git
+set GitUrl=https://gitlab.com/libtiff/libtiff.git
 set SrcIncSubDir=libtiff
 set InstallIncSubDir=
 set InstallLibSubDir=

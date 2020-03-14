@@ -5,6 +5,7 @@ rem user setting
 
 
 rem ==========================================================================
+if not "%CcLibsRoot%"=="" goto :EOF
 
 rem Directory for installing libraries.
 set CcLibsRoot=..
@@ -25,7 +26,7 @@ rem S_VAR S_VRA S_AVR S_ARV S_RVA S_RAV J_VA J_AV
 rem ex) D_VAR -> vc142\x64\static\release
 rem ex) S_ARV -> Win32_rtdll_vc120\debug
 rem ex) D_VA  -> vc140\x64\release_static
-set CcInstallPathType=D_VAR
+set CcInstallPathType=D_VA
 
 rem ?_VA|?_AV: add runtime's string.
 set CcStrRtDll=

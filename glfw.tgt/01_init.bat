@@ -1,6 +1,6 @@
 set TgtName=glfw
 set TgtDir=
-set TgtGit=https://github.com/glfw/glfw.git
+set GitUrl=https://github.com/glfw/glfw.git
 set SrcIncSubDir=include\GLFW
 set InstallIncSubDir=GLFW
 set InstallLibSubDir=

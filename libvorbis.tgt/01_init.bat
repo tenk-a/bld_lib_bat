@@ -1,7 +1,8 @@
+rem vc14.0 ok  vc14.1 vc14.2 ng
 set TgtName=libvorbis
-set TgtDir=
-set TgtZipUrl=http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.6.zip
-set TgtZip=libvorbis-1.3.6
+set TgtDir=libvorbis-1.3.6
+set ZipUrl=http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.6.zip
+set ZipDir=libvorbis-1.3.6
 set SrcIncSubDir=include\vorbis
 set InstallIncSubDir=vorbis
 set InstallLibSubDir=
@@ -16,4 +17,5 @@ set hdr8=
 set hdr9=
 set Arg=
 set NeedTinyReplStr=1
-set OggDir=..\libogg
+set OggDir=%CcLibsRoot%\libogg-1.3.4
+set OggVer=1.3.4

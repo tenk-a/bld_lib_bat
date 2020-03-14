@@ -1,6 +1,6 @@
 set TgtName=pixman
 set TgtDir=
-set TgtGit=git://anongit.freedesktop.org/git/pixman.git
+set GitUrl=git://anongit.freedesktop.org/git/pixman.git
 set SrcIncSubDir=pixman
 set InstallIncSubDir=
 set InstallLibSubDir=

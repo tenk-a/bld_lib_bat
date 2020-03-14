@@ -7,14 +7,6 @@ shift
 set Arch=%1
 shift
 
-set LibDir=
-set StrPrefix=
-set StrRel=_release
-set StrDbg=_debug
-set StrRtSta=_static
-set StrRtDll=
-set StrDll=_dll
-
 set HasRel=
 set HasDbg=
 set HasRtSta=
@@ -26,7 +18,7 @@ set CleanMode=
   if "%1"=="" goto ARG_LOOP_EXIT
 
   if /I "%1"=="static"   set HasRtSta=S
-  if /I "%1"=="rtsta"    set HasRtSta=S
+  if /I "%1"=="static"    set HasRtSta=S
   if /I "%1"=="rtdll"    set HasRtDll=L
 
   if /I "%1"=="release"  set HasRel=r
@@ -34,34 +26,21 @@ set CleanMode=
 
   if /I "%1"=="clean"    set CleanMode=1
 
-  if /I "%ARG:~0,7%"=="LibDir:"     set LibDir=%ARG:~7%
-  if /I "%ARG:~0,10%"=="LibPrefix:" set StrPrefix=%ARG:~10%
-  if /I "%ARG:~0,9%"=="LibRtSta:"   set StrRtSta=%ARG:~9%
-  if /I "%ARG:~0,9%"=="LibRtDll:"   set StrRtDll=%ARG:~9%
-  if /I "%ARG:~0,7%"=="LibRel:"     set StrRel=%ARG:~7%
-  if /I "%ARG:~0,7%"=="LibDbg:"     set StrDbg=%ARG:~7%
-
   shift
 goto ARG_LOOP
 :ARG_LOOP_EXIT
 
-if "%StrPrefix%"=="" (
-  if not "%VcVer%"=="" (
-    if "%StrPrefix%"=="" set StrPrefix=%VcVer%_
-  )
-)
-
 if "%Arch%"=="" set Arch=Win32
 
-if not exist bld mkdir bld
+if not exist %CcTgtBldDir% mkdir %CcTgtBldDir%
 
 
-if "%CleanMode%"=="1" (
-  pushd bld
+if not "%CleanMode%"=="1" goto SKIP1
+  pushd %CcTgtBldDir%
   call :Clean
   popd
   goto :EOF
-)
+:SKIP1
 
 if "%HasRtSta%%HasRtDll%"=="" (
   set HasRtSta=S
@@ -72,82 +51,81 @@ if "%HasRel%%HasDbg%"=="" (
   set HasDbg=d
 )
 
-if "%LibDir%"=="" set LibDir=lib
-
-pushd bld
-if "%HasRtSta%%HasRel%"=="Sr" call :Bld1 rtsta release %StrPrefix%%Arch%%StrRtSta%%StrRel%
-if "%HasRtSta%%HasDbg%"=="Sd" call :Bld1 rtsta debug   %StrPrefix%%Arch%%StrRtSta%%StrDbg%
-if "%HasRtDll%%HasRel%"=="Lr" call :Bld1 rtdll release %StrPrefix%%Arch%%StrRtDll%%StrRel%
-if "%HasRtDll%%HasDbg%"=="Ld" call :Bld1 rtdll debug   %StrPrefix%%Arch%%StrRtDll%%StrDbg%
-popd
+rem pushd %CcTgtBldDir%
+if "%HasRtSta%%HasRel%"=="Sr" call :Bld1 static release
+if "%HasRtSta%%HasDbg%"=="Sd" call :Bld1 static debug
+if "%HasRtDll%%HasRel%"=="Lr" call :Bld1 rtdll  release
+if "%HasRtDll%%HasDbg%"=="Ld" call :Bld1 rtdll  debug
+rem popd
 
 goto END
 
-
 :Bld1
-set RtType=%1
-set BldType=%2
-set Target=%3
+set Rt=%1
+set Conf=%2
 
-if not exist %Target% mkdir %Target%
+set StrLibPath=
+call %CcBatDir%\sub\StrLibPath.bat %CcTgtLibPathType% %CcTgtBldDir% %VcVer% %Arch% %Rt% %Conf%
+set TgtLibDir=%StrLibPath%
+if not exist %TgtLibDir% mkdir %TgtLibDir%
 
-pushd %Target%
-set DstBaseDir=..\..
+set DstBaseDir=%CD%
+pushd %TgtLibDir%
 
-call :Clean
+rem call :Clean
+
+set StrLibPath=
+call %CcBatDir%\sub\StrLibPath.bat %CcInstallPathType% %CcInstallLibDir% %VcVer% %Arch% %Rt% %Conf%
+set LibDir=%StrLibPath%
 
 set ADD_CMAKE_OPTS=
-if %RtType%==rtdll (
+if %Rt%==rtdll (
     set ADD_CMAKE_OPTS=-DWITH_CRT_DLL=true
 ) else (
     set ADD_CMAKE_OPTS=-DWITH_CRT_DLL=false
 )
-CMake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=%BldType% %ADD_CMAKE_OPTS% %DstBaseDir%\
-if errorlevel 1 (
-  popd
-  exit /b
-)
+set ADD_CMAKE_OPTS=%ADD_CMAKE_OPTS% -DZLIB_INCLUDE_DIR=%CcInstallIncDir% -DZLIB_LIBRARY=%LibDir%\zlib.lib
+set ADD_CMAKE_OPTS=%ADD_CMAKE_OPTS% -DPNG_PNG_INCLUDE_DIR=%CcInstallIncDir% -DPNG_LIBRARY=%LibDir%\libpng.lib
 
-rem if %RtType%==rtdll (
-rem   call :ReplaceMTtoMD
-rem )
-if %RtType%==rtsta (
-    call :ReplaceMDtoMT
+if not exist Makefile (
+  CMake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=%Conf% %ADD_CMAKE_OPTS% %DstBaseDir%\
+  if errorlevel 1 goto BLD1_RET
+  if %Rt%==static call :ReplaceMDtoMT
 )
 
 nmake
-if errorlevel 1 (
-  popd
-  exit /b
-)
-
-set DstLibDir=%DstBaseDir%\%LibDir%
-if not exist %DstLibDir% mkdir %DstLibDir%
-set DstLibDir=%DstLibDir%\%Target%
-
-set DstExeDir=%DstBaseDir%\exe
-if not exist %DstExeDir% mkdir %DstExeDir%
-set DstExeDir=%DstExeDir%\%Target%
+if errorlevel 1 goto BLD1_RET
 
 del *.obj *.exp *.ilk *.res *.resource.txt *.manifest
 
 if not exist %DstBaseDir%\jconfig.h    copy jconfig.h    %DstBaseDir%\
 if not exist %DstBaseDir%\jconfigint.h copy jconfigint.h %DstBaseDir%\
 
-if exist *.lib move *.lib %DstLibDir%\
-if exist *.dll move *.dll %DstLibDir%\
-if exist turbojpeg.pdb move turbojpeg.pdb %DstLibDir%\
-if exist sharedlib\*.lib move sharedlib\*.lib %DstLibDir%\
-if exist sharedlib\*.dll move sharedlib\*.dll %DstLibDir%\
-if exist sharedlib\jpeg.pdb move sharedlib\jpeg.pdb %DstLibDir%\
+set StrLibPath=
+call %CcBatDir%\sub\StrLibPath.bat %CcTgtLibPathType% %DstBaseDir%\%CcTgtLibDir% %VcVer% %Arch% %Rt% %Conf%
+set TgtLibDir=%StrLibPath%
+if not exist %TgtLibDir% mkdir %TgtLibDir%
 
+if exist *.lib move *.lib %TgtLibDir%\
+if exist *.dll move *.dll %TgtLibDir%\
+if exist turbojpeg.pdb move turbojpeg.pdb %TgtLibDir%\
+if exist sharedlib\*.lib move sharedlib\*.lib %TgtLibDir%\
+if exist sharedlib\*.dll move sharedlib\*.dll %TgtLibDir%\
+if exist sharedlib\jpeg.pdb move sharedlib\jpeg.pdb %TgtLibDir%\
+
+goto EXE_SKIP
+set StrLibPath=
+call %CcBatDir%\sub\StrLibPath.bat %CcTgtLibPathType% %DstBaseDir%\exe %VcVer% %Arch% %Rt% %Conf%
+set DstExeDir=%StrLibPath%
+if not exist %DstExeDir% mkdir %DstExeDir%
 if exist *.exe move *.exe %DstExeDir%\
 if exist *.pdb move *.pdb %DstExeDir%\
 if exist sharedlib\*.exe move sharedlib\*.exe %DstExeDir%\
 if exist sharedlib\*.pdb move sharedlib\*.pdb %DstExeDir%\
+:EXE_SKIP
 
+:BLD1_RET
 popd
-
 exit /b
 
 
@@ -165,22 +143,6 @@ exit /b
 ..\bld_lib_bat\tiny_replstr.exe -x ++ "/MT" "/MD" -- %1
 exit /b
 
-rem	:Rep1MTtoMD
-rem	set TgtReplFile=%1
-rem	set BakReplFile=%1.bak
-rem	if exist %BakReplFile% del %BakReplFile%
-rem	move %TgtReplFile% %BakReplFile%
-rem	type nul >%TgtReplFile%
-rem	for /f "delims=" %%A in (%BakReplFile%) do (
-rem	    set line=%%A
-rem	    call :Rep1SubMTtoMD
-rem	)
-rem	exit /b
-rem	:Rep1SubMTtoMD
-rem	echo %line:/MT=/MD%>>%TgtReplFile%
-rem	exit /b
-
-
 :ReplaceMDtoMT
 for /R %%i in (CMakeCache.txt) do (
   if exist %%i call :Rep1MDtoMT %%i
@@ -190,21 +152,6 @@ exit /b
 :Rep1MDtoMT
 ..\bld_lib_bat\tiny_replstr.exe -x ++ "/MD" "/MT" -- %1
 exit /b
-
-rem	:Rep1MDtoMT
-rem	set TgtReplFile=%1
-rem	set BakReplFile=%1.bak
-rem	if exist %BakReplFile% del %BakReplFile%
-rem	move %TgtReplFile% %BakReplFile%
-rem	type nul >%TgtReplFile%
-rem	for /f "delims=" %%A in (%BakReplFile%) do (
-rem	    set line=%%A
-rem	    call :Rep1SubMDtoMT
-rem	)
-rem	exit /b
-rem	:Rep1SubMDtoMT
-rem	echo %line:/MD=/MT%>>%TgtReplFile%
-rem	exit /b
 
 :END
 endlocal

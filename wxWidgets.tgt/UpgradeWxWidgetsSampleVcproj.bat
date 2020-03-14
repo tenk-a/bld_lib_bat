@@ -1,15 +1,21 @@
-@echo off
+rem @echo off
 rem generalte vc10-14.2 vcxproj for wxWidgets 3.0 Samples
 setlocal
 
 set VcVer=%1
-shift
-if "%VcVer%"="" set VcVer=%VcName%
-
-
 if "%VcVer%"=="" goto ERR
 
-pushd Samples
+pushd %~dp0
+pushd ..
+call bld_config.bat
+pushd %CcLibsRoot%
+set CcLibsRoot=%CD%
+popd
+call setcc.bat %VcVer%
+popd
+call 01_init.bat
+
+pushd %CcLibsRoot%\%TgtName%\Samples
 
 for /R /D %%j in (*) do (
   cd %%j
@@ -17,6 +23,7 @@ for /R /D %%j in (*) do (
   cd ..
 )
 
+popd
 popd
 goto :EOF
 

@@ -1,4 +1,3 @@
-@echo off
 rem This batch-file license: boost software license version 1.0
 setlocal
 
@@ -12,12 +11,6 @@ set HasDbg=
 set HasRtSta=
 set HasRtDll=
 set HasTest=
-set LibDir=
-set StrPrefix=
-set StrRel=_release
-set StrDbg=_debug
-set StrRtSta=_static
-set StrRtDll=
 set LibRootDir=%~dp0..
 
 :ARG_LOOP
@@ -30,27 +23,9 @@ set LibRootDir=%~dp0..
   if /I "%ARG%"=="debug"    set HasDbg=d
   if /I "%ARG%"=="test"     set HasTest=1
 
-  if /I "%ARG:~0,7%"=="LibDir:"     set LibDir=%ARG:~7%
-  if /I "%ARG:~0,10%"=="LibPrefix:" set StrPrefix=%ARG:~10%
-  if /I "%ARG:~0,9%"=="LibRtSta:"   set StrRtSta=%ARG:~9%
-  if /I "%ARG:~0,9%"=="LibRtDll:"   set StrRtDll=%ARG:~9%
-  if /I "%ARG:~0,7%"=="LibRel:"     set StrRel=%ARG:~7%
-  if /I "%ARG:~0,7%"=="LibDbg:"     set StrDbg=%ARG:~7%
-
-  if /I "%ARG:~0,11%"=="ZlibIncDir:" set ZlibIncDir=%ARG:~11%
-  if /I "%ARG:~0,11%"=="ZlibLibDir:" set ZlibLibDir=%ARG:~11%
-  if /I "%ARG:~0,10%"=="PngIncDir:"  set PngIncDir=%ARG:~10%
-  if /I "%ARG:~0,10%"=="PngLibDir:"  set PngLibDir=%ARG:~10%
-
   shift
 goto ARG_LOOP
 :ARG_LOOP_EXIT
-
-if "%StrPrefix%"=="" (
-  if not "%VcVer%"=="" (
-    if "%StrPrefix%"=="" set StrPrefix=%VcVer%_
-  )
-)
 
 if "%HasRtSta%%HasRtDll%"=="" (
   set HasRtSta=S
@@ -61,45 +36,32 @@ if "%HasRel%%HasDbg%"=="" (
   set HasDbg=d
 )
 
-if "%ZlibIncDir%"=="" (
-  for /f %%i in ('dir /b /on /ad %LibRootDir%\zlib*') do set ZlibIncDir=%LibRootDir%\%%i
-)
-if "%ZlibLibDir%"=="" (
-  set ZlibLibDir=%ZlibIncDir%\lib
-)
-
-if "%PngIncDir%"=="" (
-  for /f %%i in ('dir /b /on /ad %LibRootDir%\libpng*') do set PngIncDir=%LibRootDir%\%%i
-)
-if "%PngLibDir%"=="" (
-  set PngLibDir=%PngIncDir%\lib
-)
-
-if "%LibDir%"=="" set LibDir=lib
-if not exist %LibDir% mkdir %LibDir%
-
-if "%HasRtSta%%HasRel%"=="Sr" call :Bld1 rtsta rel %StrPrefix%%Arch%%StrRtSta%%StrRel%
-if "%HasRtSta%%HasDbg%"=="Sd" call :Bld1 rtsta dbg %StrPrefix%%Arch%%StrRtSta%%StrDbg%
-if "%HasRtDll%%HasRel%"=="Lr" call :Bld1 rtdll rel %StrPrefix%%Arch%%StrRtDll%%StrRel%
-if "%HasRtDll%%HasDbg%"=="Ld" call :Bld1 rtdll dbg %StrPrefix%%Arch%%StrRtDll%%StrDbg%
+if "%HasRtSta%%HasRel%"=="Sr" call :Bld1 static release
+if "%HasRtSta%%HasDbg%"=="Sd" call :Bld1 static debug
+if "%HasRtDll%%HasRel%"=="Lr" call :Bld1 rtdll  release
+if "%HasRtDll%%HasDbg%"=="Ld" call :Bld1 rtdll  debug
 
 endlocal
 goto :EOF
 
 
 :Bld1
-set RtType=%1
-set BldType=%2
-set Target=%3
+set Rt=%1
+set Conf=%2
+
+set StrLibPath=
+call %CcBatDir%\sub\StrLibPath.bat %CcTgtLibPathType% _ %VcVer% %Arch% %Rt% %Conf%
+set Target=%StrLibPath%
+
 set ZlibSrcLibDir=%ZlibLibDir%\%Target%
 set PngSrcLibDir=%PngLibDir%\%Target%
 
-if "%RtType%"=="rtdll" (
+if "%Rt%"=="rtdll" (
   set RtOpts=-MD
 ) else (
   set RtOpts=-MT
 )
-if "%BldType%"=="dbg" (
+if "%Conf%"=="debug" (
   set BldOpts=-Zi
   set ldebug=/DEBUG
   set RtOpts=%RtOpts%d
@@ -114,14 +76,19 @@ set LDFLAGS= /LIBPATH:%PngSrcLibDir% /LIBPATH:%ZlibSrcLibDir% /LIBPATH:win32\msv
 set CFLAGS_DEMO= -nologo -W3 -D_CRT_SECURE_NO_DEPRECATE %BldOpts% %RtOpts%  -Iinclude -Iwin32\include -D__WIN32__
 set LDFLAGS_DEMO2=/link /LIBPATH:. /LIBPATH:win32\msvc /LIBPATH:%PngSrcLibDir% /LIBPATH:%ZlibSrcLibDir% libhpdf.lib libpng.lib zlib.lib
 
+pause
 nmake -f script\Makefile.msvc clean
+pause
 
 nmake -f script\Makefile.msvc all  "CFLAGS=%CFLAGS%" "LDFLAGS=%LDFLAGS%" "CFLAGS_DEMO=%CFLAGS_DEMO%" "LDFLAGS_DEMO2=%LDFLAGS_DEMO2%"
+pause
 
 if not "%HasTest%"=="1" goto TEST_SKIP
 nmake -f script\Makefile.msvc demo "CFLAGS=%CFLAGS%" "LDFLAGS=%LDFLAGS%" "CFLAGS_DEMO=%CFLAGS_DEMO%" "LDFLAGS_DEMO2=%LDFLAGS_DEMO2%"
+pause
 
 pushd demo
+if not exist *.exe goto TEST_SKIP
 if not exist exe mkdir exe
 set DstDir=exe\%Target%
 if not exist %DstDir% mkdir %DstDir%
@@ -132,9 +99,10 @@ if exist *.exe.manifest move *.exe.manifest %DstDir%\
 popd
 :TEST_SKIP
 
-set DstDir=%LibDir%\%Target%
+set DstDir=%CcTgtLibDir%\%Target%
 if not exist %DstDir% mkdir %DstDir%
 if exist *.lib move *.lib %DstDir%\
+pause
 rem if exist *.dll move *.dll %DstDir%\
 rem if exist *.pdb move *.pdb %DstDir%\
 

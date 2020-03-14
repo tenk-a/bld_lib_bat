@@ -1,6 +1,6 @@
 set TgtName=cairo
 set TgtDir=
-set TgtGit=git://anongit.freedesktop.org/git/cairo
+set GitUrl=git://anongit.freedesktop.org/git/cairo
 set SrcIncSubDir=src
 set InstallIncSubDir=cairo
 set InstallLibSubDir=

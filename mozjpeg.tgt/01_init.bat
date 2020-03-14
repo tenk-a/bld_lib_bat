@@ -1,9 +1,9 @@
 set TgtName=mozjpeg
 set TgtDir=
-set TgtGit=https://github.com/mozilla/mozjpeg.git
+set GitUrl=https://github.com/mozilla/mozjpeg.git
 set SrcIncSubDir=
 set InstallIncSubDir=mozjpeg
-set InstallLibSubDir=
+set InstallLibSubDir=mozjpeg
 set hdr1=jpeglib.h
 set hdr2=jconfig.h
 set hdr3=jmorecfg.h
@@ -14,3 +14,4 @@ set hdr7=
 set hdr8=
 set hdr9=
 set Arg=
+set CcTgtBldDir=compile

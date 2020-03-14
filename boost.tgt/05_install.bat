@@ -5,12 +5,12 @@ set HasX64=%4
 
 set SrcIncDir=%TgtDir%\boost
 set DstIncDir=%CcInstallIncDir%\boost
+if exist %DstIncDir% rmdir /s /q %DstIncDir%
 if not exist "%DstIncDir%" mkdir "%DstIncDir%"
-rmdir /S %DstIncDir%
-xcopy %SrcIncDir% %DstIncDir% /R /Y /I /K
+xcopy %SrcIncDir% %DstIncDir% /R /Y /I /K /E
 
-call :LibCopy x64
-call :LibCopy Win32
+if not "%HasX64%"=="-" call :LibCopy x64
+if not "%HasX86%"=="-" call :LibCopy Win32
 
 goto :EOF
 
@@ -46,8 +46,10 @@ if /I "%CcInstallPathType%"=="J_ARV" set DstDir=%CcInstallLibDir%\%Arch%_%VcVer%
 if /I "%CcInstallPathType%"=="J_RAV" set DstDir=%CcInstallLibDir%\%Arch%_%VcVer%
 
 if "%DstDir%"=="" exit /b 1
+set DstDir=%DstDir%\boost
+if not exist %DstDir% mkdir %DstDir%
 
-xcopy %StageDir% %DstDir% /R /Y /I /K
+copy /b %StageDir%\lib\*.* %DstDir%\
 
 exit /b
 

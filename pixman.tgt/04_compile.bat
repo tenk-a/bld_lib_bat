@@ -12,12 +12,6 @@ set HasDbg=
 set HasRtSta=
 set HasRtDll=
 set HasTest=
-set LibDir=
-set StrPrefix=
-set StrRel=_release
-set StrDbg=_debug
-set StrRtSta=_static
-set StrRtDll=
 
 :ARG_LOOP
   set ARG=%1
@@ -29,22 +23,9 @@ set StrRtDll=
   if /I "%ARG%"=="debug"    set HasDbg=d
   if /I "%ARG%"=="test"     set HasTest=1
 
-  if /I "%ARG:~0,7%"=="LibDir:"     set LibDir=%ARG:~7%
-  if /I "%ARG:~0,10%"=="LibPrefix:" set StrPrefix=%ARG:~10%
-  if /I "%ARG:~0,9%"=="LibRtSta:"   set StrRtSta=%ARG:~9%
-  if /I "%ARG:~0,9%"=="LibRtDll:"   set StrRtDll=%ARG:~9%
-  if /I "%ARG:~0,7%"=="LibRel:"     set StrRel=%ARG:~7%
-  if /I "%ARG:~0,7%"=="LibDbg:"     set StrDbg=%ARG:~7%
-
   shift
 goto ARG_LOOP
 :ARG_LOOP_EXIT
-
-if "%StrPrefix%"=="" (
-  if not "%VcVer%"=="" (
-    if "%StrPrefix%"=="" set StrPrefix=%VcVer%_
-  )
-)
 
 if "%HasRtSta%%HasRtDll%"=="" (
   set HasRtSta=S
@@ -54,9 +35,6 @@ if "%HasRel%%HasDbg%"=="" (
   set HasRel=r
   set HasDbg=d
 )
-
-if "%LibDir%"=="" set LibDir=lib
-if not exist %LibDir% mkdir %LibDir%
 
 if "%CcWinGnuMake%"=="" set CcWinGnuMake=mingw32-make.exe
 
@@ -68,30 +46,30 @@ if not exist pixman\Makefile.win32mt ..\bld_lib_bat\tiny_replstr.exe ++ Makefile
 call :GetPixmanVersion
 ..\bld_lib_bat\tiny_replstr.exe ++ @PIXMAN_VERSION_MAJOR@ %PIXMAN_VERSION_MAJOR% @PIXMAN_VERSION_MINOR@ %PIXMAN_VERSION_MINOR% @PIXMAN_VERSION_MICRO@ %PIXMAN_VERSION_MICRO% -- pixman\pixman-version.h.in >pixman\pixman-version.h
 
-if "%HasRtSta%%HasRel%"=="Sr" call :Bld1 rtsta rel %StrPrefix%%Arch%%StrRtSta%%StrRel%
-if "%HasRtSta%%HasDbg%"=="Sd" call :Bld1 rtsta dbg %StrPrefix%%Arch%%StrRtSta%%StrDbg%
-if "%HasRtDll%%HasRel%"=="Lr" call :Bld1 rtdll rel %StrPrefix%%Arch%%StrRtDll%%StrRel%
-if "%HasRtDll%%HasDbg%"=="Ld" call :Bld1 rtdll dbg %StrPrefix%%Arch%%StrRtDll%%StrDbg%
+if "%HasRtSta%%HasRel%"=="Sr" call :Bld1 static release
+if "%HasRtSta%%HasDbg%"=="Sd" call :Bld1 static debug
+if "%HasRtDll%%HasRel%"=="Lr" call :Bld1 rtdll  release
+if "%HasRtDll%%HasDbg%"=="Ld" call :Bld1 rtdll  debug
 
 goto END
 
 
 :Bld1
-set RtType=%1
-set BldType=%2
-set Target=%3
+set Rt=%1
+set Conf=%2
+
+set StrLibPath=
+call %CcBatDir%\sub\StrLibPath.bat %CcTgtLibPathType% %CcTgtLibDir% %VcVer% %Arch% %Rt% %Conf%
+set TgtLibDir=%StrLibPath%
+if not exist %TgtLibDir% mkdir %TgtLibDir%
 
 set RTOPT=
-if "%RtType%"=="rtdll" (
+if "%Rt%"=="rtdll" (
   set RTOPT=MD
 ) else (
   set RTOPT=MT
 )
 
-set CFG=release
-if "%BldType%"=="dbg" (
-  set CFG=debug
-)
 set OPTS=SSE2=on SSSE3=off MMX=on
 if "%Arch%"=="x64" (
   set OPTS=SSE2=on SSSE3=off MMX=off
@@ -99,25 +77,25 @@ if "%Arch%"=="x64" (
 
 rem if not exist pixman\pixman-version.h copy ..\bld_lib_bat\sub\pixman\pixman\pixman-version.h pixman\
 
-if exist pixman\%CFG% if exist pixman\%CFG%\*.* del /q pixman\%CFG%\*.*
+if exist pixman\%Conf% if exist pixman\%Conf%\*.* del /q pixman\%Conf%\*.*
 
-%CcWinGnuMake% -f Makefile.win32mt pixman %OPTS% "CFG=%CFG%" "RTOPT=%RTOPT%"
+"%CcWinGnuMake%" -f Makefile.win32mt pixman %OPTS% "CFG=%Conf%" "RTOPT=%RTOPT%"
 
-if not exist %LibDir%\%Target% mkdir %LibDir%\%Target%
-if exist pixman\%CFG%\*.lib    move pixman\%CFG%\*.lib %LibDir%\%Target%\
+if not exist %TgtLibDir% mkdir %TgtLibDir%
+if exist pixman\%Conf%\*.lib   move pixman\%Conf%\*.lib %TgtLibDir%\
 
 exit /b
 
 
 :GetPixmanVersion
-if not exist ..\bld_lib_bat\pixman.tgt\get_pixman_version.exe call :gen_get_pixman_version_exe
-..\bld_lib_bat\pixman.tgt\get_pixman_version.exe configure.ac >__pixman_version.bat
+if not exist %CcBatDir%\pixman.tgt\get_pixman_version.exe call :gen_get_pixman_version_exe
+%CcBatDir%\pixman.tgt\get_pixman_version.exe configure.ac >__pixman_version.bat
 call __pixman_version.bat
 del  __pixman_version.bat
 exit /b
 
 :gen_get_pixman_version_exe
-pushd ..\bld_lib_bat\pixman.tgt
+pushd %CcBatDir%\pixman.tgt
 cl get_pixman_version.c
 del get_pixman_version.obj
 popd

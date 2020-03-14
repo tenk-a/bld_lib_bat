@@ -1,79 +1,11 @@
-@echo off
-rem This batch-file license: boost software license version 1.0
+@rem Compile wxWidgets for vc
+@rem This batch-file license: boost software license version 1.0
 setlocal
 
 set VcVer=%1
 shift
 set Arch=%1
 shift
-
-set HasRel=
-set HasDbg=
-set HasRtSta=
-set HasRtDll=
-set HasTest=
-set LibDir=
-set StrPrefix=
-set StrRel=_release
-set StrDbg=_debug
-set StrRtSta=_static
-set StrRtDll=
-
-:ARG_LOOP
-  set ARG=%1
-
-  if "%ARG%"=="" goto ARG_LOOP_EXIT
-  if /I "%ARG%"=="static"   set HasRtSta=S
-  if /I "%ARG%"=="rtdll"    set HasRtDll=L
-  if /I "%ARG%"=="release"  set HasRel=r
-  if /I "%ARG%"=="debug"    set HasDbg=d
-  if /I "%ARG%"=="test"     set HasTest=1
-
-  if /I "%ARG:~0,7%"=="LibDir:"     set LibDir=%ARG:~7%
-  if /I "%ARG:~0,10%"=="LibPrefix:" set StrPrefix=%ARG:~10%
-  if /I "%ARG:~0,9%"=="LibRtSta:"   set StrRtSta=%ARG:~9%
-  if /I "%ARG:~0,9%"=="LibRtDll:"   set StrRtDll=%ARG:~9%
-  if /I "%ARG:~0,7%"=="LibRel:"     set StrRel=%ARG:~7%
-  if /I "%ARG:~0,7%"=="LibDbg:"     set StrDbg=%ARG:~7%
-
-  shift
-goto ARG_LOOP
-:ARG_LOOP_EXIT
-
-if "%StrPrefix%"=="" (
-  if not "%VcVer%"=="" (
-    if "%StrPrefix%"=="" set StrPrefix=%VcVer%_
-  )
-)
-
-if "%HasRtSta%%HasRtDll%"=="" (
-  set HasRtSta=S
-  set HasRtDll=L
-)
-if "%HasRel%%HasDbg%"=="" (
-  set HasRel=r
-  set HasDbg=d
-)
-
-
-
-
-
-
-
-
-
-
-rem Compile wxWidgets for vc
-rem This batch-file license: boost software license version 1.0
-setlocal
-
-set VcVer=%1
-shift
-set Arch=%1
-shift
-
-set StrPrefix=
 
 set StrRtSta=_static
 set StrRtDll=
@@ -100,52 +32,54 @@ set CppOpt="USE_OPENGL=1"
 
   if /I "%ARG%"=="test"	  set HasTest=1
 
-  if /I "%ARG:~0,7%"=="LibDir:"     set LibDir=%ARG:~7%
-  if /I "%ARG:~0,10%"=="LibPrefix:" set StrPrefix=%ARG:~10%
-  if /I "%ARG:~0,9%"=="LibRtSta:"   set StrRtSta=%ARG:~9%
-  if /I "%ARG:~0,9%"=="LibRtDll:"   set StrRtDll=%ARG:~9%
-  if /I "%ARG:~0,9%"=="LibDll:"     set StrDll=%ARG:~9%
-
   shift
 goto ARG_LOOP
 :ARG_LOOP_EXIT
 
-if "%StrPrefix%"=="" (
-  if not "%VcVer%"=="" (
-    if "%StrPrefix%"=="" set StrPrefix=%VcVer%_
-  )
-)
-
-if "%Arch%"=="" set Arch=Win32
-set ArchName=%Arch%_
-if "%Arch%"=="Win32" set ArchName=
-
-
 if "%HasRtSta%%HasRtDll%%HasDll%"=="" (
   set HasRtSta=S
   set HasRtDll=L
-  set HasDll=D
+)
+if "%HasRel%%HasDbg%"=="" (
+  set HasRel=r
+  set HasDbg=d
 )
 
-if "%HasRtSta%"=="S" call :Bld1 "RUNTIME_LIBS=static"  static_lib lib
-if "%HasRtDll%"=="L" call :Bld1 "RUNTIME_LIBS=dynamic" rtdll_lib  lib
-if "%HasDll%"=="D"   call :Bld1 "SHARED=1"             dll        dll
+@rem if "%HasRtSta%%HasRel%"=="Sr" call :Bld1 "RUNTIME_LIBS=static"  static relese  lib
+@rem if "%HasRtSta%%HasDbg%"=="Sd" call :Bld1 "RUNTIME_LIBS=static"  static debug   lib
+@rem if "%HasRtDll%%HasRel%"=="Lr" call :Bld1 "RUNTIME_LIBS=dynamic" rtdll  release lib
+@rem if "%HasRtDll%%HasDbg%"=="Ld" call :Bld1 "RUNTIME_LIBS=dynamic" rtdll  debug   lib
+@rem if "%HasDll%%HasRel%"=="Dr"   call :Bld1 "SHARED=1"             dll    release dll
+@rem if "%HasDll%%HasDbg%"=="Dd"   call :Bld1 "SHARED=1"             dll    debug   dll
 
-rem if "%HasTest%"=="1"  call :BuildSample
+if "%HasRtSta%"=="S" call :Bld1 "RUNTIME_LIBS=static"  static lib
+if "%HasRtDll%"=="L" call :Bld1 "RUNTIME_LIBS=dynamic" rtdll  lib
+if "%HasDll%"=="D"   call :Bld1 "SHARED=1"             dll    dll
 
+rem goto TEST_SKIP
+if "%HasTest%"==""  goto TEST_SKIP
+if "%HasRtSta%"=="S" call :Test "RUNTIME_LIBS=static"  static
+if "%HasRtDll%"=="L" call :Test "RUNTIME_LIBS=dynamic" rtdll
+if "%HasDll%"=="D"   call :Test "SHARED=1"             dll
+:TEST_SKIP
 endlocal
 goto :EOF
 
 :Bld1
 set RtOpt=%~1
-set Postfix=%2
-set TargetOldPostfix=%3
+set Rt=%2
+set TargetLibName=%3
+set Conf=release
 
 set TargetOld=vc_
 if "%Arch%"=="x64" set TargetOld=%TargetOld%%Arch%_
-set TargetOld=%TargetOld%%TargetOldPostfix%
+set TargetOld=%TargetOld%%TargetLibName%
 
-set Target=%StrPrefix%%ArchName%%Postfix%
+
+set StrLibPath=
+call %CcBatDir%\sub\StrLibPath.bat %CcTgtLibPathType% _ %VcVer% %Arch% %Rt% release
+set TgtDir=%CcTgtLibDir%\%StrLibPath%
+if not exist %TgtDir% mkdir %TgtDir%
 
 set CpuOpt=
 if "%Arch%"=="x64" set "CpuOpt=TARGET_CPU=X64"
@@ -153,15 +87,54 @@ if "%Arch%"=="x64" set "CpuOpt=TARGET_CPU=X64"
 set CFLAGSSET=
 rem if /I "%CcName%"=="vc140" set "CFLAGSSET=CFLAGS=-Dsnprintf=snprintf"
 
+rem goto BLD1_SKIP2
 cd .\build\msw
-nmake -f makefile.vc %CpuOpt% %RtOpt% %CppOpt% %CFLAGSSET% BUILD=release clean
-nmake -f makefile.vc %CpuOpt% %RtOpt% %CppOpt% %CFLAGSSET% BUILD=release
+nmake -f makefile.vc %CpuOpt% %RtOpt% %CppOpt% %CFLAGSSET% BUILD=%Conf% clean
+nmake -f makefile.vc %CpuOpt% %RtOpt% %CppOpt% %CFLAGSSET% BUILD=%Conf%
 rem nmake -f makefile.vc %CpuOpt% %RtOpt% %CppOpt% %CFLAGSSET% BUILD=debug   clean
 rem nmake -f makefile.vc %CpuOpt% %RtOpt% %CppOpt% %CFLAGSSET% BUILD=debug
 cd ..\..
+:BLD1_SKIP2
 
-if not %TargetOld%==%Target% (
-  move lib\%TargetOld% lib\%Target%
+if not lib\%TargetOld%==%TgtDir% (
+  move lib\%TargetOld% %TgtDir%
 )
+
+set StrLibPath=
+call %CcBatDir%\sub\StrLibPath.bat %CcTgtLibPathType% _ %VcVer% %Arch% %Rt% debug
+set TgtDirD=%CcTgtLibDir%\%StrLibPath%
+if not exist %TgtDirD% mkdir %TgtDirD%
+xcopy %TgtDir% %TgtDirD% /R /Y /I /K /E
+
+xcopy %TgtDir%\mswu include\mswu /R /Y /I /K /E
+
+exit /b
+
+
+:Test
+set RtOpt=%~1
+set Rt=%2
+set Conf=release
+
+set StrLibPath=
+call %CcBatDir%\sub\StrLibPath.bat %CcTgtLibPathType% _ %VcVer% %Arch% %Rt% %Conf%
+set LibDir=%CcTgtLibDir%\%StrLibPath%
+
+set CpuOpt=
+if "%Arch%"=="x64" set "CpuOpt=TARGET_CPU=X64"
+
+set CFLAGSSET=
+rem if /I "%CcName%"=="vc140" set "CFLAGSSET=CFLAGS=-Dsnprintf=snprintf"
+set CFLAGSSET=%CFLAGSSET% 
+
+set LIBDIRNAME=..\..\%LibDir%
+
+rem goto TEST_SKIP2
+pushd samples
+nmake -f makefile.vc %CpuOpt% %RtOpt% %CppOpt% %CFLAGSSET% BUILD=%Conf% clean
+nmake -f makefile.vc %CpuOpt% %RtOpt% %CppOpt% %CFLAGSSET% BUILD=%Conf%
+popd
+
+:TEST_SKIP2
 
 exit /b

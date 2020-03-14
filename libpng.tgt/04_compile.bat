@@ -1,5 +1,5 @@
+@rem This batch-file license: boost software license version 1.0
 @echo off
-rem This batch-file license: boost software license version 1.0
 setlocal
 
 set VcVer=%1
@@ -12,12 +12,6 @@ set HasDbg=
 set HasRtSta=
 set HasRtDll=
 set HasTest=
-set LibDir=
-set StrPrefix=
-set StrRel=_release
-set StrDbg=_debug
-set StrRtSta=_static
-set StrRtDll=
 
 :ARG_LOOP
   set ARG=%1
@@ -29,13 +23,6 @@ set StrRtDll=
   if /I "%ARG%"=="debug"    set HasDbg=d
   if /I "%ARG%"=="test"     set HasTest=1
 
-  if /I "%ARG:~0,7%"=="LibDir:"     set LibDir=%ARG:~7%
-  if /I "%ARG:~0,10%"=="LibPrefix:" set StrPrefix=%ARG:~10%
-  if /I "%ARG:~0,9%"=="LibRtSta:"   set StrRtSta=%ARG:~9%
-  if /I "%ARG:~0,9%"=="LibRtDll:"   set StrRtDll=%ARG:~9%
-  if /I "%ARG:~0,7%"=="LibRel:"     set StrRel=%ARG:~7%
-  if /I "%ARG:~0,7%"=="LibDbg:"     set StrDbg=%ARG:~7%
-
   if /I "%ARG:~0,9%"=="ZlibIncDir:" set ZlibIncDir=%ARG:~10%
   if /I "%ARG:~0,9%"=="ZlibLibDir:" set ZlibLibDir=%ARG:~10%
   if /I "%ARG:~0,9%"=="ZlibFile:"   set ZlibFile=%ARG:~9%
@@ -43,13 +30,6 @@ set StrRtDll=
 goto ARG_LOOP
 :ARG_LOOP_EXIT
 
-if "%StrPrefix%"=="" (
-  if not "%VcVer%"=="" (
-    if "%StrPrefix%"=="" set StrPrefix=%VcVer%_
-  )
-)
-
-rem if "%ZlibIncDir%"=="" ( for /D %%i in (..\zlib*.*) do set ZlibIncDir=%%i )
 if "%ZlibLibDir%"=="" (
   set ZlibLibDir=%ZlibIncDir%\lib
 )
@@ -66,22 +46,23 @@ if "%HasRel%%HasDbg%"=="" (
   set HasDbg=d
 )
 
-if "%LibDir%"=="" set LibDir=lib
-if not exist %LibDir% mkdir %LibDir%
+if "%HasRtSta%%HasRel%"=="Sr" call :Bld1 static release
+if "%HasRtSta%%HasDbg%"=="Sd" call :Bld1 static debug
+if "%HasRtDll%%HasRel%"=="Lr" call :Bld1 rtdll  release
+if "%HasRtDll%%HasDbg%"=="Ld" call :Bld1 rtdll  debug
 
-if "%HasRtSta%%HasRel%"=="Sr" call :Bld1 rtsta rel %StrPrefix%%Arch%%StrRtSta%%StrRel%
-if "%HasRtSta%%HasDbg%"=="Sd" call :Bld1 rtsta dbg %StrPrefix%%Arch%%StrRtSta%%StrDbg%
-if "%HasRtDll%%HasRel%"=="Lr" call :Bld1 rtdll rel %StrPrefix%%Arch%%StrRtDll%%StrRel%
-if "%HasRtDll%%HasDbg%"=="Ld" call :Bld1 rtdll dbg %StrPrefix%%Arch%%StrRtDll%%StrDbg%
-
-endlocal
-goto :EOF
+goto END
 
 
 :Bld1
-set RtType=%1
-set BldType=%2
+set Rt=%1
+set Conf=%2
 set Target=%3
+
+set StrLibPath=
+call %CcBatDir%\sub\StrLibPath.bat %CcTgtLibPathType% %CcTgtLibDir% %VcVer% %Arch% %Rt% %Conf%
+set TgtLibDir=%StrLibPath%
+if not exist %TgtLibDir% mkdir %TgtLibDir%
 
 if exist *.obj del *.obj
 if exist *.res del *.res
@@ -90,12 +71,12 @@ if exist *.exp del *.exp
 if exist *.exe del *.exe
 if exist *.pdb del *.pdb
 
-if "%RtType%"=="rtdll" (
+if "%Rt%"=="rtdll" (
   set RtOpts=-MD
 ) else (
   set RtOpts=-MT
 )
-if "%BldType%"=="dbg" (
+if "%Conf%"=="debug" (
   set BldOpts=-O2 -Zi
   set RtOpts=%RtOpts%d
 ) else (
@@ -108,26 +89,10 @@ set CFLAGS=-nologo -I%ZlibIncDir% -D_CRT_SECURE_NO_DEPRECATE -D_CRT_SECURE_NO_WA
 nmake -f scripts/makefile.vcwin32 "CFLAGS=%CFLAGS%" "CPPFLAGS=%CPPFLAGS%"
 if errorlevel 1 exit /b
 
-if not "%HasTest%"=="1" goto TEST_SKIP
-set TgtFile=%ZlibLibDir%\%Target%\%ZlibFile%
-if exist %TgtFile% (
-  cl %CPPFLAGS% %CFLAGS% pngtest.c libpng.lib %TgtFile%
-  .\pngtest.exe
-  if errorlevel 1 (
-    echo ERROR: pngtest
-    rem goto :EOF
-  ) else (
-    echo pngtest ok
-  )
-  if not exist exe mkdir exe
-  if not exist exe\%Target% mkdir exe\%Target%
-  if exist *.exe move *.exe exe\%Target%
-)
-:TEST_SKIP
+if "%HasTest%"=="1" call :TEST
 
-set DstDir=%LibDir%\%Target%
-if not exist %DstDir% mkdir %DstDir%
-if exist *.lib move *.lib %DstDir%\
+if not exist %TgtLibDir% mkdir %TgtLibDir%
+if exist *.lib move *.lib %TgtLibDir%\
 
 if exist *.obj del *.obj
 if exist *.res del *.res
@@ -138,4 +103,29 @@ if exist *.pdb del *.pdb
 
 echo "%LibCopyDir%"
 
+exit /b
+
+:TEST
+set StrLibPath=
+call %CcBatDir%\sub\StrLibPath.bat %CcTgtLibPathType% exe %VcVer% %Arch% %Rt% %Conf%
+set ExeDir=%StrLibPath%
+set StrLibPath=
+call %CcBatDir%\sub\StrLibPath.bat %CcTgtLibPathType% %ZlibLibDir% %VcVer% %Arch% %Rt% %Conf%
+set ZipLibPath=%StrLibPath%\%ZlibFile%
+if not exist %ZipLibPath% goto TEST_SKIP1
+  cl %CPPFLAGS% %CFLAGS% pngtest.c libpng.lib %ZipLibPath%
+  .\pngtest.exe
+  if errorlevel 1 (
+    echo ERROR: pngtest
+    pause
+  ) else (
+    echo pngtest ok
+  )
+  if not exist %ExeDir% mkdir %ExeDir%
+  if exist *.exe move *.exe %ExeDir%\
+:TEST_SKIP1
+exit /b
+
+:END
+endlocal
 exit /b

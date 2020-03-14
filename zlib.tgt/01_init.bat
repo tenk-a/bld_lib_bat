@@ -1,6 +1,6 @@
 set TgtName=zlib
 set TgtDir=
-set TgtGit=https://github.com/madler/zlib.git
+set GitUrl=https://github.com/madler/zlib.git
 set SrcIncSubDir=
 set InstallIncSubDir=
 set InstallLibSubDir=

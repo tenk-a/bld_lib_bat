@@ -1,10 +1,10 @@
-set TgtName=bzip2
+set TgtName=glm
 set TgtDir=
-set GitUrl=git://sourceware.org/git/bzip2.git
-set SrcIncSubDir=
-set InstallIncSubDir=
+set GitUrl=https://github.com/g-truc/glm.git
+set SrcIncSubDir=glm
+set InstallIncSubDir=glm
 set InstallLibSubDir=
-set hdr1=bzlib.h
+set hdr1=*
 set hdr2=
 set hdr3=
 set hdr4=

@@ -12,12 +12,7 @@ set HasDbg=
 set HasRtSta=
 set HasRtDll=
 set HasTest=
-set LibDir=
-set StrPrefix=
-set StrRel=_release
-set StrDbg=_debug
-set StrRtSta=_static
-set StrRtDll=
+set HasClean=
 
 set CleanMode=
 
@@ -30,28 +25,20 @@ set CleanMode=
   if /I "%ARG%"=="release"  set HasRel=r
   if /I "%ARG%"=="debug"    set HasDbg=d
   if /I "%ARG%"=="test"     set HasTest=1
+  if /I "%ARG%"=="clean"    set HasClean=1
 
   if /I "%1"=="clean"    set CleanMode=1
-
-  if /I "%ARG:~0,7%"=="LibDir:"     set LibDir=%ARG:~7%
-  if /I "%ARG:~0,10%"=="LibPrefix:" set StrPrefix=%ARG:~10%
-  if /I "%ARG:~0,9%"=="LibRtSta:"   set StrRtSta=%ARG:~9%
-  if /I "%ARG:~0,9%"=="LibRtDll:"   set StrRtDll=%ARG:~9%
-  if /I "%ARG:~0,7%"=="LibRel:"     set StrRel=%ARG:~7%
-  if /I "%ARG:~0,7%"=="LibDbg:"     set StrDbg=%ARG:~7%
 
   shift
 goto ARG_LOOP
 :ARG_LOOP_EXIT
 
-if "%StrPrefix%"=="" (
-  if not "%VcVer%"=="" (
-    if "%StrPrefix%"=="" set StrPrefix=%VcVer%_
-  )
-)
-
-call :Clean
-if "%CleanMode%"=="1" goto :EOF
+if not "%CleanMode%"=="1" goto SKIP1
+  pushd %CcTgtBldDir%
+  call :Clean
+  popd
+  goto :EOF
+:SKIP1
 
 if "%HasRtSta%%HasRtDll%"=="" (
   set HasRtSta=S
@@ -62,116 +49,137 @@ if "%HasRel%%HasDbg%"=="" (
   set HasDbg=d
 )
 
-
-if "%LibDir%"=="" set LibDir=lib
-if not exist %LibDir% mkdir %LibDir%
-
 if not exist jconfig.h copy jconfig.vc jconfig.h
 
-if "%HasRtSta%%HasRel%"=="Sr" call :Bld1 rtsta release %StrPrefix%%Arch%%StrRtSta%%StrRel%
-if "%HasRtSta%%HasDbg%"=="Sd" call :Bld1 rtsta debug   %StrPrefix%%Arch%%StrRtSta%%StrDbg%
-if "%HasRtDll%%HasRel%"=="Lr" call :Bld1 rtdll release %StrPrefix%%Arch%%StrRtDll%%StrRel%
-if "%HasRtDll%%HasDbg%"=="Ld" call :Bld1 rtdll debug   %StrPrefix%%Arch%%StrRtDll%%StrDbg%
+if "%HasRtSta%%HasRel%"=="Sr" call :Bld1 static release
+if "%HasRtSta%%HasDbg%"=="Sd" call :Bld1 static debug
+if "%HasRtDll%%HasRel%"=="Lr" call :Bld1 rtdll  release
+if "%HasRtDll%%HasDbg%"=="Ld" call :Bld1 rtdll  debug
 
 endlocal
 goto :EOF
 
 
 :Bld1
-set RtType=%1
-set BldType=%2
-set Target=%3
+set Rt=%1
+set Conf=%2
 
-call :Clean
+set StrLibPath=
+call %CcBatDir%\sub\StrLibPath.bat %CcTgtLibPathType% %CcTgtBldDir% %VcVer% %Arch% %Rt% %Conf%
+set TgtLibDir=%StrLibPath%
+if not exist %TgtLibDir% mkdir %TgtLibDir%
+
+set DstBaseDir=%CD%
+pushd %TgtLibDir%
+
+rem call :Clean
+
+set StrLibPath=
+call %CcBatDir%\sub\StrLibPath.bat %CcInstallPathType% %CcInstallLibDir% %VcVer% %Arch% %Rt% %Conf%
+set LibDir=%StrLibPath%
 
 set ADD_CMAKE_OPTS=
-if %RtType%==rtdll (
+if %Rt%==rtdll (
     set ADD_CMAKE_OPTS=-DWITH_CRT_DLL=true
 ) else (
     set ADD_CMAKE_OPTS=-DWITH_CRT_DLL=false
 )
-CMake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=%BldType% %ADD_CMAKE_OPTS%
-if errorlevel 1 goto :EOF
+set ADD_CMAKE_OPTS=%ADD_CMAKE_OPTS% -DZLIB_INCLUDE_DIR=%CcInstallIncDir% -DZLIB_LIBRARY=%LibDir%\zlib.lib
+set ADD_CMAKE_OPTS=%ADD_CMAKE_OPTS% -DPNG_PNG_INCLUDE_DIR=%CcInstallIncDir% -DPNG_LIBRARY=%LibDir%\libpng.lib
 
-rem if %RtType%==rtdll (
-rem   call :ReplaceMTtoMD
-rem )
-if %RtType%==rtsta (
-  call :ReplaceMDtoMT
+if not exist Makefile (
+  CMake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=%Conf% %ADD_CMAKE_OPTS% %DstBaseDir%\
+  if errorlevel 1 goto BLD1_RET
+  if %Rt%==static call :ReplaceMDtoMT
 )
 
 nmake
-if errorlevel 1 goto :EOF
+if errorlevel 1 goto BLD1_RET
 
-set DstDir=%LibDir%\%Target%
-if not exist %DstDir% mkdir %DstDir%
-if not exist %DstDir%\exe mkdir %DstDir%\exe
+del *.obj *.exp *.ilk *.res *.resource.txt *.manifest
 
-del *.obj *.res *.resource.txt *.manifest *.exp *.ilk
+if not exist %DstBaseDir%\jconfig.h    copy jconfig.h    %DstBaseDir%\
+if not exist %DstBaseDir%\jconfigint.h copy jconfigint.h %DstBaseDir%\
 
-if exist *.lib move *.lib %DstDir%\
-if exist *.dll move *.dll %DstDir%\
-if exist turbojpeg.pdb move turbojpeg.pdb %DstDir%\
-if exist sharedlib\*.lib move sharedlib\*.lib %DstDir%\
-if exist sharedlib\*.dll move sharedlib\*.dll %DstDir%\
-if exist sharedlib\jpeg.pdb move sharedlib\jpeg.pdb %DstDir%\
+set StrLibPath=
+call %CcBatDir%\sub\StrLibPath.bat %CcTgtLibPathType% %DstBaseDir%\%CcTgtLibDir% %VcVer% %Arch% %Rt% %Conf%
+set TgtLibDir=%StrLibPath%
+if not exist %TgtLibDir% mkdir %TgtLibDir%
 
-if exist *.exe move *.exe %DstDir%\exe\
-if exist *.pdb move *.pdb %DstDir%\exe\
-if exist sharedlib\*.exe move sharedlib\*.exe %DstDir%\exe\
-if exist sharedlib\*.pdb move sharedlib\*.pdb %DstDir%\exe\
+if exist *.lib move *.lib %TgtLibDir%\
+if exist *.dll move *.dll %TgtLibDir%\
+if exist turbojpeg.pdb move turbojpeg.pdb %TgtLibDir%\
+if exist sharedlib\*.lib move sharedlib\*.lib %TgtLibDir%\
+if exist sharedlib\*.dll move sharedlib\*.dll %TgtLibDir%\
+if exist sharedlib\jpeg.pdb move sharedlib\jpeg.pdb %TgtLibDir%\
 
+goto EXE_SKIP
+set StrLibPath=
+call %CcBatDir%\sub\StrLibPath.bat %CcTgtLibPathType% %DstBaseDir%\exe %VcVer% %Arch% %Rt% %Conf%
+set DstExeDir=%StrLibPath%
+if not exist %DstExeDir% mkdir %DstExeDir%
+if exist *.exe move *.exe %DstExeDir%\
+if exist *.pdb move *.pdb %DstExeDir%\
+if exist sharedlib\*.exe move sharedlib\*.exe %DstExeDir%\
+if exist sharedlib\*.pdb move sharedlib\*.pdb %DstExeDir%\
+:EXE_SKIP
+
+:BLD1_RET
+popd
 exit /b
 
 
 :Clean
-if exist Makefile (
-  nmake clean
-  del Makefile
-)
-if exist CMakeFiles (
-  del /S /F /Q CMakeFiles\*.*
-  rmdir /S /Q CMakeFiles
-)
-if exist jconfig.h           del jconfig.h
-if exist jconfigint.h        del jconfigint.h
-if exist CMakeCache.txt      del CMakeCache.txt
-if exist cmake_install.cmake del cmake_install.cmake
-if exist CTestTestfile.cmake del CTestTestfile.cmake
-if exist libjpeg-turbo.nsi   del libjpeg-turbo.nsi
-if exist turbojpeg.exp	     del turbojpeg.exp
-if exist install_manifest.txt del install_manifest.txt
-
-cd simd
-if exist Makefile (
-  nmake clean
-  del Makefile
-)
-if exist CMakeFiles (
-  del /S /F /Q CMakeFiles\*.*
-  rmdir /S /Q CMakeFiles
-)
-if exist cmake_install.cmake del cmake_install.cmake
-cd ..
-cd sharedlib
-if exist Makefile (
-  nmake clean
-  del Makefile
-)
-if exist *.manifest     del *.manifest
-if exist *.manifest.res del *.manifest.res
-if exist *.resource.txt del *.resource.txt
-if exist *.ilk          del *.ilk
-
-if exist CMakeFiles (
-  del /S /F /Q CMakeFiles\*.*
-  rmdir /S /Q CMakeFiles
-)
-if exist cmake_install.cmake del cmake_install.cmake
-if exist jpeg.exp	     del jpeg.exp
-cd ..
-
+del /S /F /Q .\*.*
 exit /b
+
+		if exist Makefile (
+		  nmake clean
+		  del Makefile
+		)
+		if exist CMakeFiles (
+		  del /S /F /Q CMakeFiles\*.*
+		  rmdir /S /Q CMakeFiles
+		)
+		if exist jconfig.h           del jconfig.h
+		if exist jconfigint.h        del jconfigint.h
+		if exist CMakeCache.txt      del CMakeCache.txt
+		if exist cmake_install.cmake del cmake_install.cmake
+		if exist CTestTestfile.cmake del CTestTestfile.cmake
+		if exist libjpeg-turbo.nsi   del libjpeg-turbo.nsi
+		if exist turbojpeg.exp	     del turbojpeg.exp
+		if exist install_manifest.txt del install_manifest.txt
+
+		cd simd
+		if exist Makefile (
+		  nmake clean
+		  del Makefile
+		)
+		if exist CMakeFiles (
+		  del /S /F /Q CMakeFiles\*.*
+		  rmdir /S /Q CMakeFiles
+		)
+		if exist cmake_install.cmake del cmake_install.cmake
+		cd ..
+		cd sharedlib
+		if exist Makefile (
+		  nmake clean
+		  del Makefile
+		)
+		if exist *.manifest     del *.manifest
+		if exist *.manifest.res del *.manifest.res
+		if exist *.resource.txt del *.resource.txt
+		if exist *.ilk          del *.ilk
+
+		if exist CMakeFiles (
+		  del /S /F /Q CMakeFiles\*.*
+		  rmdir /S /Q CMakeFiles
+		)
+		if exist cmake_install.cmake del cmake_install.cmake
+		if exist jpeg.exp	     del jpeg.exp
+		cd ..
+
+		exit /b
 
 
 :ReplaceMTtoMD
@@ -183,22 +191,6 @@ exit /b
 ..\bld_lib_bat\tiny_replstr.exe -x ++ "/MT" "/MD" -- %1
 exit /b
 
-rem	:Rep1MTtoMD
-rem	set TgtReplFile=%1
-rem	set BakReplFile=%1.bak
-rem	if exist %BakReplFile% del %BakReplFile%
-rem	move %TgtReplFile% %BakReplFile%
-rem	type nul >%TgtReplFile%
-rem	for /f "delims=" %%A in (%BakReplFile%) do (
-rem	    set line=%%A
-rem	    call :Rep1SubMTtoMD
-rem	)
-rem	exit /b
-rem	:Rep1SubMTtoMD
-rem	echo %line:/MT=/MD%>>%TgtReplFile%
-rem	exit /b
-
-
 :ReplaceMDtoMT
 for /R %%i in (CMakeCache.txt) do (
   if exist %%i call :Rep1MDtoMT %%i
@@ -208,18 +200,3 @@ exit /b
 :Rep1MDtoMT
 ..\bld_lib_bat\tiny_replstr.exe -x ++ "/MD" "/MT" -- %1
 exit /b
-
-rem	:Rep1MDtoMT
-rem	set TgtReplFile=%1
-rem	set BakReplFile=%1.bak
-rem	if exist %BakReplFile% del %BakReplFile%
-rem	move %TgtReplFile% %BakReplFile%
-rem	type nul >%TgtReplFile%
-rem	for /f "delims=" %%A in (%BakReplFile%) do (
-rem	    set line=%%A
-rem	    call :Rep1SubMDtoMT
-rem	)
-rem	exit /b
-rem	:Rep1SubMDtoMT
-rem	echo %line:/MD=/MT%>>%TgtReplFile%
-rem	exit /b

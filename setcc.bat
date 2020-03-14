@@ -8,9 +8,9 @@ set LIB=
 if /i "%ProgramFiles(x86)%"=="" set "ProgramFiles(x86)=%ProgramFiles%"
 
 if "%setcc_save_path%"==""    set "setcc_save_path=%path%"
+
 if "%setcc_save_lib%"==""     set "setcc_save_lib=%LIB%"
 if "%setcc_save_include%"=="" set "setcc_save_include=%INCLUDE%"
-
 set "LIB=%setcc_save_lib%"
 set "INCLUDE=%setcc_save_include%"
 
@@ -149,6 +149,7 @@ rem ## vc ######################################
     set COMPILER=vc142
     set VCVARS_BAT=vcvars32.bat
     set VCYEAR=2019
+    goto L_VC141_SKIP_1
 :L_VC141x64
     set COMPILER=vc141x64
     set VCVARS_BAT=vcvars64.bat
@@ -160,12 +161,12 @@ rem ## vc ######################################
     set VCYEAR=2017
 :L_VC141_SKIP_1
     set "PATH=%setcc_base_path%"
-    if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\%VCYEAR%\Enterprise\Common7\Tools\VsMSBuildCmd.bat"   goto VC141_Enterprise64
-    if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\%VCYEAR%\Professional\Common7\Tools\VsMSBuildCmd.bat" goto VC141_Professional64
-    if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\%VCYEAR%\Community\Common7\Tools\VsMSBuildCmd.bat"    goto VC141_Community64
-    if exist "%ProgramFiles%\Microsoft Visual Studio\%VCYEAR%\Enterprise\Common7\Tools\VsMSBuildCmd.bat"   goto VC141_Enterprise
-    if exist "%ProgramFiles%\Microsoft Visual Studio\%VCYEAR%\Professional\Common7\Tools\VsMSBuildCmd.bat" goto VC141_Professional
     if exist "%ProgramFiles%\Microsoft Visual Studio\%VCYEAR%\Community\Common7\Tools\VsMSBuildCmd.bat"    goto VC141_Community
+    if exist "%ProgramFiles%\Microsoft Visual Studio\%VCYEAR%\Professional\Common7\Tools\VsMSBuildCmd.bat" goto VC141_Professional
+    if exist "%ProgramFiles%\Microsoft Visual Studio\%VCYEAR%\Enterprise\Common7\Tools\VsMSBuildCmd.bat"   goto VC141_Enterprise
+    if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\%VCYEAR%\Community\Common7\Tools\VsMSBuildCmd.bat"    goto VC141_Community64
+    if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\%VCYEAR%\Professional\Common7\Tools\VsMSBuildCmd.bat" goto VC141_Professional64
+    if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\%VCYEAR%\Enterprise\Common7\Tools\VsMSBuildCmd.bat"   goto VC141_Enterprise64
     echo ERROR: Not found "Microsoft Visual Studio %VCYEAR%"
     goto L_END
 :VC141_Enterprise64
@@ -507,5 +508,5 @@ rem ## other ######################################
 
 
 :L_END
-rem set setcc_base_path=
+set setcc_base_path=
 set CcNameArch=

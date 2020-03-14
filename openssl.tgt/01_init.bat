@@ -1,6 +1,6 @@
 set TgtName=openssl
 set TgtDir=
-set TgtGit=https://github.com/openssl/openssl.git
+set GitUrl=https://github.com/openssl/openssl.git
 set SrcIncSubDir=include\openssl
 set SrcLibSubDir=
 set InstallIncSubDir=openssl

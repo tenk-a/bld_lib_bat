@@ -12,12 +12,6 @@ set HasDbg=
 set HasRtSta=
 set HasRtDll=
 set HasTest=
-set LibDir=
-set StrPrefix=
-set StrRel=_release
-set StrDbg=_debug
-set StrRtSta=_static
-set StrRtDll=
 
 :ARG_LOOP
   set ARG=%1
@@ -29,22 +23,9 @@ set StrRtDll=
   if /I "%ARG%"=="debug"    set HasDbg=d
   if /I "%ARG%"=="test"     set HasTest=1
 
-  if /I "%ARG:~0,7%"=="LibDir:"     set LibDir=%ARG:~7%
-  if /I "%ARG:~0,10%"=="LibPrefix:" set StrPrefix=%ARG:~10%
-  if /I "%ARG:~0,9%"=="LibRtSta:"   set StrRtSta=%ARG:~9%
-  if /I "%ARG:~0,9%"=="LibRtDll:"   set StrRtDll=%ARG:~9%
-  if /I "%ARG:~0,7%"=="LibRel:"     set StrRel=%ARG:~7%
-  if /I "%ARG:~0,7%"=="LibDbg:"     set StrDbg=%ARG:~7%
-
   shift
 goto ARG_LOOP
 :ARG_LOOP_EXIT
-
-if "%StrPrefix%"=="" (
-  if not "%VcVer%"=="" (
-    if "%StrPrefix%"=="" set StrPrefix=%VcVer%_
-  )
-)
 
 if "%HasRtSta%%HasRtDll%"=="" (
   set HasRtSta=S
@@ -55,70 +36,74 @@ if "%HasRel%%HasDbg%"=="" (
   set HasDbg=d
 )
 
-if "%LibDir%"=="" set LibDir=lib
-if not exist %LibDir% mkdir %LibDir%
-
-if "%HasRtSta%%HasRel%"=="Sr" call :Bld1 static release %StrPrefix%%Arch%%StrRtSta%%StrRel%
+if "%HasRtSta%%HasRel%"=="Sr" call :Bld1 static release
 if errorlevel 1 goto ERR
 
-if "%HasRtSta%%HasDbg%"=="Sd" call :Bld1 static debug   %StrPrefix%%Arch%%StrRtSta%%StrDbg%
+if "%HasRtSta%%HasDbg%"=="Sd" call :Bld1 static debug
 if errorlevel 1 goto ERR
 
-if "%HasRtDll%%HasRel%"=="Lr" call :Bld1 rtdll  release %StrPrefix%%Arch%%StrRtDll%%StrRel%
+if "%HasRtDll%%HasRel%"=="Lr" call :Bld1 rtdll  release
 if errorlevel 1 goto ERR
 
-if "%HasRtDll%%HasDbg%"=="Ld" call :Bld1 rtdll  debug   %StrPrefix%%Arch%%StrRtDll%%StrDbg%
+if "%HasRtDll%%HasDbg%"=="Ld" call :Bld1 rtdll  debug
 if errorlevel 1 goto ERR
 
 goto END
 
 
 :Bld1
-set RtType=%1
-set BldType=%2
+set Rt=%1
+set Conf=%2
 set Target=%3
 
-
-
-
-if "%RtType%"=="rtdll" (
+if "%Rt%"=="rtdll" (
   set RtOpts=-MD
 ) else (
   set RtOpts=-MT
 )
-if "%BldType%"=="debug" (
+if "%Conf%"=="debug" (
   set BldOpts=-O2 -Zi
   set RtOpts=%RtOpts%d
 ) else (
   set BldOpts=-O2 -DNDEBUG
 )
 
+if not exist win32/Maikefile.vc call :MkMakefileVC
 set CFLAGS=-nologo -DWIN32 -W3 -Oy- -Fd"zlib" %RtOpts% %BldOpts%
-nmake -f win32/Makefile.msc "CFLAGS=%CFLAGS%"
+nmake -f win32/Makefile.vc.orig "CFLAGS=%CFLAGS%"
 if errorlevel 1 exit /b 1
 
-set DstDir=%LibDir%\%Target%
-if not exist %DstDir% mkdir %DstDir%
+set StrLibPath=
+call %CcBatDir%\sub\StrLibPath.bat %CcTgtLibPathType% %CcTgtLibDir% %VcVer% %Arch% %Rt% %Conf%
+set TgtLibDir=%StrLibPath%
+if not exist %TgtLibDir% mkdir %TgtLibDir%
 
-if /I exist *.lib move *.lib %DstDir%\
-if /I exist *.dll move *.dll %DstDir%\
-if /I exist zlib.pdb move zlib.pdb %DstDir%\
-if /I exist zlib1.pdb move zlib1.pdb %DstDir%\
+if /I exist *.lib move *.lib %TgtLibDir%\
+if /I exist *.dll move *.dll %TgtLibDir%\
+if /I exist zlib.pdb move zlib.pdb %TgtLibDir%\
+if /I exist zlib1.pdb move zlib1.pdb %TgtLibDir%\
 
 if not "%HasTest%"=="1" goto TEST_SKIP
-nmake -f win32/Makefile.msc test
+nmake -f win32/Makefile.vc.orig test
 rem if errorlevel 1 exit /b 1
 if exist foo.gz del foo.gz
 if not exist test\exe mkdir test\exe
-set DstDir=test\exe\%Target%
-if not exist %DstDir% mkdir %DstDir%
-if /I exist *.exe move *.exe %DstDir%\
-if /I exist *.pdb move *.pdb %DstDir%\
+set TgtLibDir=test\exe\%Target%
+if not exist %TgtLibDir% mkdir %TgtLibDir%
+if /I exist *.exe move *.exe %TgtLibDir%\
+if /I exist *.pdb move *.pdb %TgtLibDir%\
 :TEST_SKIP
 
-del *.obj *.res *.manifest *.exp
+if exist *.obj del *.obj
+if exist *.res del *.res
+if exist *.manifest del *.manifest
+if exist *.exp del *.exp
 
 :Bld1_Exit
+exit /b
+
+:MkMakefileVC
+%CcBatDir%\tiny_replstr.exe ++ "-base:0x5A4C0000 " " " -- win32\Makefile.msc > win32\Makefile.vc.orig
 exit /b
 
 :ERR

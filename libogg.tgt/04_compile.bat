@@ -103,19 +103,21 @@ if "%HasRtSta%%HasDbg%"=="Sd" call :Bld1 debug   %SlnDir%
 goto :END
 
 :Bld1
-set BldType=%1
+set Conf=%1
 set sdir=%2
 echo %sdir%
 pushd win32\%sdir%
-msbuild libogg.sln  /t:Rebuild /p:Configuration=%BldType% /p:Platform=%Arch%
+msbuild libogg.sln  /t:Rebuild /p:Configuration=%Conf% /p:Platform=%Arch%
+if exist %Arch%\%Conf%\libogg.lib copy %Arch%\%Conf%\libogg.lib %Arch%\%Conf%\libogg_static.lib
 popd
+
 exit /b
 
 :gen_rtdll_sln
 pushd win32
 if not exist %SlnDir%_rtdll mkdir %SlnDir%_rtdll
 copy /b %SlnDir%\*.* %SlnDir%_rtdll\
-..\..\bld_lib_bat\tiny_replstr -x ++ MultiThreaded MultiThreadedDLL MultiThreadedDLLDebug MultiThreadedDebugDLL -- %SlnDir%_rtdll\libogg.vcxproj
+..\..\bld_lib_bat\tiny_replstr -x ++ MultiThreaded MultiThreadedDLL MultiThreadedDebug MultiThreadedDebugDLL -- %SlnDir%_rtdll\libogg.vcxproj
 popd
 exit /b
 

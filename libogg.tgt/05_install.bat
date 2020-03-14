@@ -69,7 +69,7 @@ set SrcLibDir=%TgtDir%\win32\%SlnDir%\%Arch%\%Conf%
 if not exist %SrcLibDir% exit /b 1
 
 set StrLibPath=
-call sub\StrLibPath.bat %CcInstallPathType% %CcInstallLibDir% %VcVer% %Arch% %Rt% %Conf%
+call %CcBatDir%\sub\StrLibPath.bat %CcInstallPathType% %CcInstallLibDir% %VcVer% %Arch% %Rt% %Conf%
 set DstLibDir=%StrLibPath%
 if "%DstLibDir%"=="" (
   echo [ERROR] No %%CcInstallPathType%%

@@ -1,7 +1,7 @@
 set TgtName=libogg
-set TgtDir=
-set TgtZipUrl=http://downloads.xiph.org/releases/ogg/libogg-1.3.4.zip
-set TgtZip=libogg-1.3.4
+set TgtDir=libogg-1.3.4
+set ZipUrl=http://downloads.xiph.org/releases/ogg/libogg-1.3.4.zip
+set ZipDir=libogg-1.3.4
 set SrcIncSubDir=include\ogg
 set InstallIncSubDir=ogg
 set InstallLibSubDir=

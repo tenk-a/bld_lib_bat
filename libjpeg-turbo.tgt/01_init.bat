@@ -1,9 +1,9 @@
 set TgtName=libjpeg-turbo
 set TgtDir=
-set TgtGit=https://github.com/libjpeg-turbo/libjpeg-turbo.git
+set GitUrl=https://github.com/libjpeg-turbo/libjpeg-turbo.git
 set SrcIncSubDir=
 set InstallIncSubDir=libjpeg-turbo
-set InstallLibSubDir=
+set InstallLibSubDir=libjpeg-turbo
 set hdr1=jpeglib.h
 set hdr2=jconfig.h
 set hdr3=jmorecfg.h
@@ -15,3 +15,4 @@ set hdr8=
 set hdr9=
 set Arg=
 set NeedTinyReplStr=1
+set CcTgtBldDir=compile
