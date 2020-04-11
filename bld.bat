@@ -291,10 +291,13 @@ if "%CurArch%"=="" set CurArch=%FlagX64%
 if "%CurArch%"=="" set CurArch=Win32
 
 rem make replace tool
+set TinyReplStr=%CcBatDir%\sub\tiny_replstr.exe
 if "%NeedTinyReplStr%"=="" goto TinyReplStr_SKIP
-if exist tiny_replstr.exe  goto TinyReplStr_SKIP
+if exist %TinyReplStr% goto TinyReplStr_SKIP
 call :SetCompiler %VcVer% %CurArch%
+pushd %CcBatDir%\sub
 call %CcBatDir%\sub\gen_replstr.bat
+popd
 :TinyReplStr_SKIP
 
 set Arg=%Arg% %HasRtSta% %HasRtDll% %HasDll% %HasRel% %HasDbg% %HasTest% %HasClean%

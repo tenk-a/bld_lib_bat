@@ -140,7 +140,7 @@ for /R %%i in (CMakeCache.txt) do (
 )
 exit /b
 :Rep1MTtoMD
-..\bld_lib_bat\tiny_replstr.exe -x ++ "/MT" "/MD" -- %1
+%TinyReplStr% -x ++ "/MT" "/MD" -- %1
 exit /b
 
 :ReplaceMDtoMT
@@ -150,7 +150,7 @@ for /R %%i in (CMakeCache.txt) do (
 exit /b
 
 :Rep1MDtoMT
-..\bld_lib_bat\tiny_replstr.exe -x ++ "/MD" "/MT" -- %1
+%TinyReplStr% -x ++ "/MD" "/MT" -- %1
 exit /b
 
 :END

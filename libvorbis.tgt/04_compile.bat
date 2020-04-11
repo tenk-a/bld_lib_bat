@@ -119,15 +119,15 @@ rem set Target=%StrLibPath%
 pushd win32\%SlnDir%
 
 if not "%OggVer%"=="" (
-  if "%VcVer%"=="vc142" ..\..\..\bld_lib_bat\tiny_replstr -x ++ %SrcOggVerVc10% %OggVer% %SrcOggVerVc10b% %OggVer% VS2010 VS2019 VS2015 VS2019 -- libogg.props
-  if "%VcVer%"=="vc141" ..\..\..\bld_lib_bat\tiny_replstr -x ++ %SrcOggVerVc10% %OggVer% %SrcOggVerVc10b% %OggVer% VS2010 VS2017 VS2015 VS2017 -- libogg.props
-  if "%VcVer%"=="vc140" ..\..\..\bld_lib_bat\tiny_replstr -x ++ %SrcOggVerVc10% %OggVer% %SrcOggVerVc10b% %OggVer% VS2010 VS2015 -- libogg.props
-  if "%VcVer%"=="vc130" ..\..\..\bld_lib_bat\tiny_replstr -x ++ %SrcOggVerVc10% %OggVer% %SrcOggVerVc10b% %OggVer% VS2010 VS2014 -- libogg.props
-  if "%VcVer%"=="vc120" ..\..\..\bld_lib_bat\tiny_replstr -x ++ %SrcOggVerVc10% %OggVer% %SrcOggVerVc10b% %OggVer% VS2010 VS2013 -- libogg.props
-  if "%VcVer%"=="vc110" ..\..\..\bld_lib_bat\tiny_replstr -x ++ %SrcOggVerVc10% %OggVer% %SrcOggVerVc10b% %OggVer% VS2010 VS2012 -- libogg.props
-  if "%VcVer%"=="vc100" ..\..\..\bld_lib_bat\tiny_replstr -x ++ %SrcOggVerVc10% %OggVer% %SrcOggVerVc10b% %OggVer% -- libogg.props
-  if "%VcVer%"=="vc90"  ..\..\..\bld_lib_bat\tiny_replstr -x ++ %SrcOggVerVc9%  %OggVer% -- libogg.props
-  if "%VcVer%"=="vc80"  ..\..\..\bld_lib_bat\tiny_replstr -x ++ %SrcOggVerVc8%  %OggVer% -- libogg.props
+  if "%VcVer%"=="vc142" %TinyReplStr% -x ++ %SrcOggVerVc10% %OggVer% %SrcOggVerVc10b% %OggVer% VS2010 VS2019 VS2015 VS2019 -- libogg.props
+  if "%VcVer%"=="vc141" %TinyReplStr% -x ++ %SrcOggVerVc10% %OggVer% %SrcOggVerVc10b% %OggVer% VS2010 VS2017 VS2015 VS2017 -- libogg.props
+  if "%VcVer%"=="vc140" %TinyReplStr% -x ++ %SrcOggVerVc10% %OggVer% %SrcOggVerVc10b% %OggVer% VS2010 VS2015 -- libogg.props
+  if "%VcVer%"=="vc130" %TinyReplStr% -x ++ %SrcOggVerVc10% %OggVer% %SrcOggVerVc10b% %OggVer% VS2010 VS2014 -- libogg.props
+  if "%VcVer%"=="vc120" %TinyReplStr% -x ++ %SrcOggVerVc10% %OggVer% %SrcOggVerVc10b% %OggVer% VS2010 VS2013 -- libogg.props
+  if "%VcVer%"=="vc110" %TinyReplStr% -x ++ %SrcOggVerVc10% %OggVer% %SrcOggVerVc10b% %OggVer% VS2010 VS2012 -- libogg.props
+  if "%VcVer%"=="vc100" %TinyReplStr% -x ++ %SrcOggVerVc10% %OggVer% %SrcOggVerVc10b% %OggVer% -- libogg.props
+  if "%VcVer%"=="vc90"  %TinyReplStr% -x ++ %SrcOggVerVc9%  %OggVer% -- libogg.props
+  if "%VcVer%"=="vc80"  %TinyReplStr% -x ++ %SrcOggVerVc8%  %OggVer% -- libogg.props
 )
 call :DelIntDir
 if %Rt%==static (
@@ -157,13 +157,13 @@ exit /b
 :gen_rtdll1
 set SrcFile=%1
 set DstFile=%SrcFile:_static=_rtdll%
-..\..\..\bld_lib_bat\tiny_replstr ++ MultiThreadedDLL MultiThreaded MultiThreadedDebugDLL MultiThreadedDebug MultiThreaded MultiThreadedDLL MultiThreadedDLLDebug MultiThreadedDebugDLL _static _rtdll -- %SrcFile% >%DstFile%
+%TinyReplStr% ++ MultiThreadedDLL MultiThreaded MultiThreadedDebugDLL MultiThreadedDebug MultiThreaded MultiThreadedDLL MultiThreadedDLLDebug MultiThreadedDebugDLL _static _rtdll -- %SrcFile% >%DstFile%
 exit /b
 
 
 :gen_static
 for /R %1 %%i in (*_static.vcxproj) do (
-  ..\..\..\bld_lib_bat\tiny_replstr -x ++ MultiThreadedDLL MultiThreaded MultiThreadedDebugDLL MultiThreadedDebug -- %%i
+  %TinyReplStr% -x ++ MultiThreadedDLL MultiThreaded MultiThreadedDebugDLL MultiThreadedDebug -- %%i
 )
 exit /b
 

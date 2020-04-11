@@ -38,13 +38,13 @@ if "%HasRel%%HasDbg%"=="" (
 
 if "%CcWinGnuMake%"=="" set CcWinGnuMake=mingw32-make.exe
 
-if not exist Makefile.win32mt.common ..\bld_lib_bat\tiny_replstr.exe ++ -MDd -$(RTOPT)d  -MD "-$(RTOPT) -DNDEBUG" -- Makefile.win32.common >Makefile.win32mt.common
-if not exist Makefile.win32mt        ..\bld_lib_bat\tiny_replstr.exe ++ Makefile.win32.common Makefile.win32mt.common "pixman -f Makefile.win32" "pixman -f Makefile.win32mt all" "all clean" "clean" -- Makefile.win32 >Makefile.win32mt
+if not exist Makefile.win32mt.common %TinyReplStr% ++ -MDd -$(RTOPT)d  -MD "-$(RTOPT) -DNDEBUG" -- Makefile.win32.common >Makefile.win32mt.common
+if not exist Makefile.win32mt        %TinyReplStr% ++ Makefile.win32.common Makefile.win32mt.common "pixman -f Makefile.win32" "pixman -f Makefile.win32mt all" "all clean" "clean" -- Makefile.win32 >Makefile.win32mt
 
-if not exist pixman\Makefile.win32mt ..\bld_lib_bat\tiny_replstr.exe ++ Makefile.win32.common Makefile.win32mt.common -- pixman\Makefile.win32 >pixman\Makefile.win32mt
+if not exist pixman\Makefile.win32mt %TinyReplStr% ++ Makefile.win32.common Makefile.win32mt.common -- pixman\Makefile.win32 >pixman\Makefile.win32mt
 
 call :GetPixmanVersion
-..\bld_lib_bat\tiny_replstr.exe ++ @PIXMAN_VERSION_MAJOR@ %PIXMAN_VERSION_MAJOR% @PIXMAN_VERSION_MINOR@ %PIXMAN_VERSION_MINOR% @PIXMAN_VERSION_MICRO@ %PIXMAN_VERSION_MICRO% -- pixman\pixman-version.h.in >pixman\pixman-version.h
+%TinyReplStr% ++ @PIXMAN_VERSION_MAJOR@ %PIXMAN_VERSION_MAJOR% @PIXMAN_VERSION_MINOR@ %PIXMAN_VERSION_MINOR% @PIXMAN_VERSION_MICRO@ %PIXMAN_VERSION_MICRO% -- pixman\pixman-version.h.in >pixman\pixman-version.h
 
 if "%HasRtSta%%HasRel%"=="Sr" call :Bld1 static release
 if "%HasRtSta%%HasDbg%"=="Sd" call :Bld1 static debug

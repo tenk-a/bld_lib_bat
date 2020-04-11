@@ -133,7 +133,7 @@ for /r %%i in (*.vcxproj ) do if exist %%i call :Rep1MDtoMT %%i
 exit /b
 
 :Rep1MDtoMT
-%CcBatDir%\tiny_replstr.exe -x ++ MultiThreadedDLL MultiThreaded MultiThreadedDebugDLL MultiThreadedDebug -- %1
+%TinyReplStr% -x ++ MultiThreadedDLL MultiThreaded MultiThreadedDebugDLL MultiThreadedDebug -- %1
 exit /b
 
 

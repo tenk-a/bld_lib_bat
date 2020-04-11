@@ -117,7 +117,7 @@ exit /b
 pushd win32
 if not exist %SlnDir%_rtdll mkdir %SlnDir%_rtdll
 copy /b %SlnDir%\*.* %SlnDir%_rtdll\
-..\..\bld_lib_bat\tiny_replstr -x ++ MultiThreaded MultiThreadedDLL MultiThreadedDebug MultiThreadedDebugDLL -- %SlnDir%_rtdll\libogg.vcxproj
+%TinyReplStr% -x ++ MultiThreaded MultiThreadedDLL MultiThreadedDebug MultiThreadedDebugDLL -- %SlnDir%_rtdll\libogg.vcxproj
 popd
 exit /b
 

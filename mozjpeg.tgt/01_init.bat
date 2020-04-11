@@ -15,3 +15,4 @@ set hdr8=
 set hdr9=
 set Arg=
 set CcTgtBldDir=compile
+set NeedTinyReplStr=1

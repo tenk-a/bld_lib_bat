@@ -14,3 +14,4 @@ set hdr7=
 set hdr8=
 set hdr9=
 set Arg=
+set NeedTinyReplStr=1

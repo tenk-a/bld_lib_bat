@@ -82,7 +82,7 @@ perl Configure %ArchType% %ShardOpt%
 nmake clean
 
 if not "%Conf%"=="rtdll" goto SKIP1
-%CcBatDir\tiny_replstr -x ++ /MT /MD -- makefile
+%TinyReplStr% -x ++ /MT /MD -- makefile
 :SKIP1
 
 nmake

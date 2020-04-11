@@ -43,7 +43,7 @@ if "%VcVer%"=="vc142" set ADD_COPTS=-utf-8
 
 if not exist build\Makefile.win32.common.orig	copy build\Makefile.win32.common build\Makefile.win32.common.orig
 
-"%CcBatDir%\tiny_replstr.exe" ++ "CFG_CFLAGS := -MDd -Od -Zi" "CFG_CFLAGS := -$(RTOPT)d -Od -Zi %ADD_COPTS%" "CFG_CFLAGS := -MD -O2" "CFG_CFLAGS := -$(RTOPT) -DNDEBUG -O2 %ADD_COPTS%" "PIXMAN_LIBS := $(PIXMAN_PATH)/pixman/$(CFG)/pixman-1.lib" "PIXMAN_LIBS := $(PIXMAN_LIB_PATH)/pixman-1.lib" "CAIRO_LIBS +=  $(LIBPNG_PATH)/libpng.lib" "CAIRO_LIBS +=  $(LIBPNG_LIB_PATH)/libpng.lib" "CAIRO_LIBS += $(ZLIB_PATH)/zdll.lib" "CAIRO_LIBS += $(ZLIB_LIB_PATH)/zdll.lib" -- build\Makefile.win32.common.orig >build\Makefile.win32.common
+"%TinyReplStr%" ++ "CFG_CFLAGS := -MDd -Od -Zi" "CFG_CFLAGS := -$(RTOPT)d -Od -Zi %ADD_COPTS%" "CFG_CFLAGS := -MD -O2" "CFG_CFLAGS := -$(RTOPT) -DNDEBUG -O2 %ADD_COPTS%" "PIXMAN_LIBS := $(PIXMAN_PATH)/pixman/$(CFG)/pixman-1.lib" "PIXMAN_LIBS := $(PIXMAN_LIB_PATH)/pixman-1.lib" "CAIRO_LIBS +=  $(LIBPNG_PATH)/libpng.lib" "CAIRO_LIBS +=  $(LIBPNG_LIB_PATH)/libpng.lib" "CAIRO_LIBS += $(ZLIB_PATH)/zdll.lib" "CAIRO_LIBS += $(ZLIB_LIB_PATH)/zdll.lib" -- build\Makefile.win32.common.orig >build\Makefile.win32.common
 
 set "SV_PATH=%PATH%"
 set "PATH=%CcMsys1Paths%;%PATH%"

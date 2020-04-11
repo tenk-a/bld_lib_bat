@@ -20,3 +20,4 @@ set CcTgtLibDir=lib
 rem set ZlibDir=%CcLibsRoot%\zlib
 rem set PngDir=%CcLibsRoot%\libpng
 rem set JpegDir=%CcLibsRoot%\jpeg
+set NeedTinyReplStr=1

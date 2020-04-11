@@ -103,7 +103,7 @@ if exist *.exp del *.exp
 exit /b
 
 :MkMakefileVC
-%CcBatDir%\tiny_replstr.exe ++ "-base:0x5A4C0000 " " " -- win32\Makefile.msc > win32\Makefile.vc.orig
+%TinyReplStr% ++ "-base:0x5A4C0000 " " " -- win32\Makefile.msc > win32\Makefile.vc.orig
 exit /b
 
 :ERR

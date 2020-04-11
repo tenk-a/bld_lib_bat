@@ -104,7 +104,7 @@ for /r %%i in (*.vcxproj src\*.vcxproj) do (
 exit /b
 
 :Rep1MDtoMT
-%CcBatDir%\tiny_replstr.exe -x ++ MultiThreadedDLL MultiThreaded MultiThreadedDebugDLL MultiThreadedDebug -- %1
+%TinyReplStr% -x ++ MultiThreadedDLL MultiThreaded MultiThreadedDebugDLL MultiThreadedDebug -- %1
 exit /b
 
 

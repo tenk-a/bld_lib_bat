@@ -11,13 +11,13 @@ rem Directory for installing libraries.
 set CcLibsRoot=..
 
 rem Include directory containing build results.
-set CcInstallIncDir=..\include
+set CcInstallIncDir=..\..\include
 
 rem Lib directory containing build results.
-set CcInstallLibDir=..\lib
+set CcInstallLibDir=..\..\lib
 
 rem dll directory containing build results.
-set CcInstallDllDir=..\dll
+set CcInstallDllDir=..\..\dll
 
 rem Lib directory path type.
 rem D_=Directory J_=Join   V=VC-Name A=Arch R=Runtime
