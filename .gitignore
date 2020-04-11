@@ -4,7 +4,7 @@ tmp
 *.tmp
 sav
 *.sav
-libs_config.bat
+bld_config.bat
 *.exe
 *.obj
 *.pdb
