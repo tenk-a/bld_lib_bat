@@ -91,6 +91,24 @@ set NoBuild=
 set Install=1
 set NoInstall=
 set force=
+set Required1=
+set Required2=
+set Required3=
+set Required4=
+set Required5=
+set Required6=
+set Required7=
+set Required8=
+set Required9=
+set Required1Dir=
+set Required2Dir=
+set Required3Dir=
+set Required4Dir=
+set Required5Dir=
+set Required6Dir=
+set Required7Dir=
+set Required8Dir=
+set Required9Dir=
 
 set VcVer=
 set Arch=
@@ -120,6 +138,7 @@ if not exist %CcInstallIncDir% goto SKIP_1b
  set CcInstallIncDir=%CD%
  popd
 :SKIP_1b
+pause
 if not exist %CcInstallLibDir% goto SKIP_1c
   pushd %CcInstallLibDir%
   set CcInstallLibDir=%CD%
@@ -236,6 +255,17 @@ if "%TgtDir%"=="" (
   echo ERROR: Not found target library directory.
   goto END
 )
+
+if not "%Required1%"=="" call :Required %Required1% %Required1Dir%
+if not "%Required2%"=="" call :Required %Required2% %Required2Dir%
+if not "%Required3%"=="" call :Required %Required3% %Required3Dir%
+if not "%Required4%"=="" call :Required %Required4% %Required4Dir%
+if not "%Required5%"=="" call :Required %Required5% %Required5Dir%
+if not "%Required6%"=="" call :Required %Required6% %Required6Dir%
+if not "%Required7%"=="" call :Required %Required7% %Required7Dir%
+if not "%Required8%"=="" call :Required %Required8% %Required8Dir%
+if not "%Required9%"=="" call :Required %Required9% %Required9Dir%
+
 if "%DL_only%%force%"=="11" call :Download
 if not exist %CcLibsRoot%\%TgtDir% call :Download
 if "%DL_only%"=="1" goto END
@@ -310,6 +340,22 @@ if "%Install%"=="1" call :InstallCopy
 
 goto END
 
+rem
+rem
+:Required
+set ReqTgt=%1
+set ReqDir=%2
+if "%ReqDir%"=="" set ReqDir=%ReqTgt%
+if not exist %ReqTgt%.tgt goto Required_ERR
+if exist %CcLibsRoot%\%ReqDir% exit /b
+rem call Bld.bat %ReqTgt% %VcVer% %FlagX64% %FlagX86% %HasRtSta% %HasRtDll% %HasDll% %HasRel% %HasDbg%
+call Bld.bat %ReqTgt% %VcVer% %FlagX64% %FlagX86% %HasRtSta% %HasRtDll% %HasDll% %HasRel% %HasDbg%
+exit /b %ERRORLEVEL%
+
+:Required_ERR
+@echo [ERROR] %TgtConf%: no %ReqTgt%.tgt
+exit 1
+goto END
 
 rem
 rem

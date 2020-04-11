@@ -15,6 +15,7 @@ set hdr7=
 set hdr8=
 set hdr9=
 set Arg=
+set Required1=zlib
 set ZlibIncDir=%CcLibsRoot%\zlib
 set ZlibLibDir=%CcLibsRoot%\zlib\lib
 set ZlibFile=zlib.lib

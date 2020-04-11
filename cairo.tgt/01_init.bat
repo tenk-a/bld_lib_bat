@@ -14,4 +14,5 @@ set hdr7=
 set hdr8=
 set hdr9=
 set Arg=
+set Required1=pixman
 set NeedTinyReplStr=1
