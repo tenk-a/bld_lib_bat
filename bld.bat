@@ -2,8 +2,9 @@
 @rem author Masahi Kitamura
 @rem This batch-file license: boost software license version 1.0
 @setlocal
-@set echo_flag=on
-@if %echo_flag%==off @echo %echo_flag%
+@set echo_flag=off
+@rem @set echo_flag=on
+@if "%echo_flag%"=="off" @echo %echo_flag%
 pushd %~dp0
 goto BEGIN
 
@@ -138,17 +139,16 @@ if not exist %CcInstallIncDir% goto SKIP_1b
  set CcInstallIncDir=%CD%
  popd
 :SKIP_1b
-pause
 if not exist %CcInstallLibDir% goto SKIP_1c
   pushd %CcInstallLibDir%
   set CcInstallLibDir=%CD%
   popd
 :SKIP_1c
-if not exist %CcInstallDllDir% goto SKIP_1c
+if not exist %CcInstallDllDir% goto SKIP_1d
   pushd %CcInstallDllDir%
   set CcInstallDllDir=%CD%
   popd
-:SKIP_1c
+:SKIP_1d
 
 call %TgtCnfDir%\01_init.bat
 
@@ -198,6 +198,9 @@ set Arg=%Arg% %CcBld1Arg%
   if /I "%1"=="vc2015"   set VcVer=vc140
   if /I "%1"=="vc2017"   set VcVer=vc141
   if /I "%1"=="vc2019"   set VcVer=vc142
+
+  if /I "%1"=="clang"    set VcVer=clang
+  if /I "%1"=="gcc"      set VcVer=gcc
 
   if /I "%1"=="force"    set force=1
   if /I "%1"=="DL"       set DL_only=1
@@ -277,27 +280,27 @@ if not exist "%CcLibsRoot%\%TgtDir%" (
 
 set FoundCompiler=
 if not "%VcVer%"=="" goto SKIP_VC_VER
-  if /I not "%PATH:Microsoft Visual Studio .NET 2003=%"=="%PATH%" set VcVer=vc71
-  if /I not "%PATH:Microsoft Visual Studio 8=%"=="%PATH%"    set VcVer=vc80
-  if /I not "%PATH:Microsoft Visual Studio 9.0=%"=="%PATH%"  set VcVer=vc90
-  if /I not "%PATH:Microsoft Visual Studio 10.0=%"=="%PATH%" set VcVer=vc100
-  if /I not "%PATH:Microsoft Visual Studio 11.0=%"=="%PATH%" set VcVer=vc110
-  if /I not "%PATH:Microsoft Visual Studio 12.0=%"=="%PATH%" set VcVer=vc120
-  if /I not "%PATH:Microsoft Visual Studio 13.0=%"=="%PATH%" set VcVer=vc130
-  if /I not "%PATH:Microsoft Visual Studio 14.0=%"=="%PATH%" set VcVer=vc140
-  if /I not "%PATH:Microsoft Visual Studio\2017=%"=="%PATH%" set VcVer=vc141
-  if /I not "%PATH:Microsoft Visual Studio\2019=%"=="%PATH%" set VcVer=vc142
+  @if /I not "%PATH:Microsoft Visual Studio .NET 2003=%"=="%PATH%" set VcVer=vc71
+  @if /I not "%PATH:Microsoft Visual Studio 8=%"=="%PATH%"    set VcVer=vc80
+  @if /I not "%PATH:Microsoft Visual Studio 9.0=%"=="%PATH%"  set VcVer=vc90
+  @if /I not "%PATH:Microsoft Visual Studio 10.0=%"=="%PATH%" set VcVer=vc100
+  @if /I not "%PATH:Microsoft Visual Studio 11.0=%"=="%PATH%" set VcVer=vc110
+  @if /I not "%PATH:Microsoft Visual Studio 12.0=%"=="%PATH%" set VcVer=vc120
+  @if /I not "%PATH:Microsoft Visual Studio 13.0=%"=="%PATH%" set VcVer=vc130
+  @if /I not "%PATH:Microsoft Visual Studio 14.0=%"=="%PATH%" set VcVer=vc140
+  @if /I not "%PATH:Microsoft Visual Studio\2017=%"=="%PATH%" set VcVer=vc141
+  @if /I not "%PATH:Microsoft Visual Studio\2019=%"=="%PATH%" set VcVer=vc142
   if not "%VcVer%"=="" set FoundCompiler=Found
   if /I not "%FoundCompiler%%FlagX86%%FlagX64%"=="Found" goto ARCH_SKIP1
-    if "%VcVer%"=="vc142"    if /I not "%PATH:\bin\HostX64\x64=%"=="%PATH%" set FlagX64=x64
-    if "%VcVer%"=="vc141"    if /I not "%PATH:\bin\HostX64\x64=%"=="%PATH%" set FlagX64=x64
-    if /I not "%PATH:Microsoft Visual Studio 14.0\VC\BIN\amd64=%"=="%PATH%" set FlagX64=x64
-    if /I not "%PATH:Microsoft Visual Studio 13.0\VC\BIN\amd64=%"=="%PATH%" set FlagX64=x64
-    if /I not "%PATH:Microsoft Visual Studio 12.0\VC\BIN\amd64=%"=="%PATH%" set FlagX64=x64
-    if /I not "%PATH:Microsoft Visual Studio 11.0\VC\BIN\amd64=%"=="%PATH%" set FlagX64=x64
-    if /I not "%PATH:Microsoft Visual Studio 10.0\VC\BIN\amd64=%"=="%PATH%" set FlagX64=x64
-    if /I not "%PATH:Microsoft Visual Studio 9.0\VC\BIN\amd64=%"=="%PATH%"  set FlagX64=x64
-    if /I not "%PATH:Microsoft Visual Studio 8\VC\BIN\amd64=%"=="%PATH%"    set FlagX64=x64
+    @if "%VcVer%"=="vc142"    if /I not "%PATH:\bin\HostX64\x64=%"=="%PATH%" set FlagX64=x64
+    @if "%VcVer%"=="vc141"    if /I not "%PATH:\bin\HostX64\x64=%"=="%PATH%" set FlagX64=x64
+    @if /I not "%PATH:Microsoft Visual Studio 14.0\VC\BIN\amd64=%"=="%PATH%" set FlagX64=x64
+    @if /I not "%PATH:Microsoft Visual Studio 13.0\VC\BIN\amd64=%"=="%PATH%" set FlagX64=x64
+    @if /I not "%PATH:Microsoft Visual Studio 12.0\VC\BIN\amd64=%"=="%PATH%" set FlagX64=x64
+    @if /I not "%PATH:Microsoft Visual Studio 11.0\VC\BIN\amd64=%"=="%PATH%" set FlagX64=x64
+    @if /I not "%PATH:Microsoft Visual Studio 10.0\VC\BIN\amd64=%"=="%PATH%" set FlagX64=x64
+    @if /I not "%PATH:Microsoft Visual Studio 9.0\VC\BIN\amd64=%"=="%PATH%"  set FlagX64=x64
+    @if /I not "%PATH:Microsoft Visual Studio 8\VC\BIN\amd64=%"=="%PATH%"    set FlagX64=x64
     if "%FlagX64%"=="" set FlagX86=Win32
     set FoundCompiler=%FlagX64%%FlagX86%
     goto ARCH_SKIP2
@@ -305,16 +308,19 @@ if not "%VcVer%"=="" goto SKIP_VC_VER
     set FoundCompiler=
   :ARCH_SKIP2
 :SKIP_VC_VER
-if "%VcVer%"=="" (
-  goto ERR
-)
+if "%VcVer%"=="" goto ERR
 
 set LibPrefix=%VcVer%_
 
+set "%VcVer%"=="clang" set FlagX64=x64
+set "%VcVer%"=="gcc"   set FlagX64=x64
+
+rem echo %FlagX64%
 if "%FlagX86%%FlagX64%"=="" (
   set FlagX86=Win32
   set FlagX64=x64
 )
+rem echo %FlagX64%
 
 set CurArch=%FoundCompiler%
 if "%CurArch%"=="" set CurArch=%FlagX64%
@@ -410,6 +416,7 @@ if not "%FlagX64%"=="x64" goto BUILD_SKIP64
   if not ERRORLEVEL 0 set NoInstall=1
 :BUILD_SKIP64
 if not "%FlagX86%"=="Win32" goto BUILD_SKIP32
+  if "%NoInstall%"=="1" goto BULD_SKIP32
   call :SetCompiler %VcVer% Win32
   call %TgtCnfDir%\04_compile.bat %VcVer% Win32 %Arg%
   if not ERRORLEVEL 0 set NoInstall=1
@@ -419,8 +426,9 @@ exit /b
 
 :SetCompiler
 if "%FoundCompiler%"=="%2" exit /b
-call setcc.bat %1 %2
-if not %echo_flag%==off @echo on
+call %CcBatDir%\setcc.bat %1 %2
+if not ERRORLEVEL 0 exit 1
+if not "%echo_flag%"=="off" @echo on
 exit /b
 
 

@@ -1,9 +1,11 @@
+set TgtVer=1_75_0
+set TgtVer2=1.75.0
 set TgtName=boost
-set TgtDir=boost_1_72_0
+set TgtDir=boost_%TgtVer%
 set GitUrl=
 set GitBranch=
-set ZipUrl=https://dl.bintray.com/boostorg/release/1.72.0/source/boost_1_72_0.zip
-set ZipDir=boost_1_72_0
+set ZipUrl=https://dl.bintray.com/boostorg/release/%TgtVer2%/source/boost_%TgtVer%.zip
+set ZipDir=boost_%TgtVer%
 set SrcIncSubDir=
 set InstallIncSubDir=boost
 set InstallLibSubDir=boost

@@ -37,6 +37,9 @@ if "%VcVer%"=="vc130" set ToolSet=msvc-13.0
 if "%VcVer%"=="vc140" set ToolSet=msvc-14.0
 if "%VcVer%"=="vc141" set ToolSet=msvc-14.1
 if "%VcVer%"=="vc142" set ToolSet=msvc-14.2
+if "%VcVer%"=="clang" set ToolSet=clang
+if "%VcVer%"=="gcc"   set ToolSet=gcc
+if "%VcVer%"=="g++"   set ToolSet=gcc
 
 if "%ToolSet%"=="" (
  echo Bad %%VcVer%%

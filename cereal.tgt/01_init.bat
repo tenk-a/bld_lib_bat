@@ -1,0 +1,17 @@
+set TgtName=cereal
+set TgtDir=
+set GitUrl=https://github.com/USCiLab/cereal.git
+set SrcIncSubDir=
+set InstallIncSubDir=
+set InstallLibSubDir=
+set hdr1=
+set hdr2=
+set hdr3=
+set hdr4=
+set hdr5=
+set hdr6=
+set hdr7=
+set hdr8=
+set hdr9=
+set Arg=
+set NoBuild=1

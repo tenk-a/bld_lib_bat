@@ -75,22 +75,35 @@ if /i "%CcNameArch%"=="vc7"        goto L_VC70
 if /i "%CcNameArch%"=="vc6"        goto L_VC6
 
 rem
-if /i "%CcNameArch%"=="cygwin32"   goto L_CYGWIN32
-if /i "%CcNameArch%"=="cygwin64"   goto L_CYGWIN64
 if /i "%CcNameArch%"=="msys2"      goto L_MSYS2_64
 if /i "%CcNameArch%"=="msys2_32"   goto L_MSYS2_32
 if /i "%CcNameArch%"=="msys2_64"   goto L_MSYS2_64
 if /i "%CcNameArch%"=="msys32"     goto L_MSYS2_32
 if /i "%CcNameArch%"=="msys64"     goto L_MSYS2_64
+
+if /i "%CcNameArch%"=="clang"      goto L_MSYS2_64
 if /i "%CcNameArch%"=="clang64"    goto L_MSYS2_64
+if /i "%CcNameArch%"=="clangx64"   goto L_MSYS2_64
+if /i "%CcNameArch%"=="clang32"    goto L_MSYS2_32
+if /i "%CcNameArch%"=="clangx86"   goto L_MSYS2_32
+
+if /i "%CcNameArch%"=="gcc"        goto L_MSYS2_64
+if /i "%CcNameArch%"=="gcc64"      goto L_MSYS2_64
+if /i "%CcNameArch%"=="gccx64"     goto L_MSYS2_64
+if /i "%CcNameArch%"=="gcc32"      goto L_MSYS2_32
+if /i "%CcNameArch%"=="gccx86"     goto L_MSYS2_32
+
 if /i "%CcNameArch%"=="msys2clang32" goto L_MSYS2_32
 if /i "%CcNameArch%"=="msys2clang64" goto L_MSYS2_64
 if /i "%CcNameArch%"=="msys2mingw32" goto L_MSYS2_32
 if /i "%CcNameArch%"=="msys2mingw64" goto L_MSYS2_64
+
 if /i "%CcNameArch%"=="mingw32"    goto L_MINGW32
 if /i "%CcNameArch%"=="mingw64"    goto L_MINGW64
 if /i "%CcNameArch%"=="tdm32"      goto L_TDM32
 if /i "%CcNameArch%"=="tdm64"      goto L_TDM64
+if /i "%CcNameArch%"=="cygwin32"   goto L_CYGWIN32
+if /i "%CcNameArch%"=="cygwin64"   goto L_CYGWIN64
 if /i "%CcNameArch%"=="orangec"    goto L_ORANGEC
 if /i "%CcNameArch%"=="occ"        goto L_ORANGEC
 if /i "%CcNameArch%"=="dmc"        goto L_DMC
@@ -126,6 +139,8 @@ if /i "%CcNameArch%"=="ldc2"        goto L_LDC2
 if /i "%CcNameArch%"=="go"          goto L_GO
 if /i "%CcNameArch%"=="java"        goto L_JAVA
 
+@echo Unkown %CcNameArch%
+@echo --
 
 @echo setcc [COMPILER] [x86/x64]
 @echo   COMPILER:
@@ -135,7 +150,10 @@ if /i "%CcNameArch%"=="java"        goto L_JAVA
 @echo       tdm64,mingw64,cygwin64
 @echo       tinyc,pcc,pellesc,lccwin
 @echo       tinyc64,pcc64,pellesc64,lccwin64
-@goto L_END
+@rem @goto L_END
+set setcc_base_path=
+set CcNameArch=
+exit 1
 
 
 rem ## vc ######################################
@@ -161,12 +179,12 @@ rem ## vc ######################################
     set VCYEAR=2017
 :L_VC141_SKIP_1
     set "PATH=%setcc_base_path%"
-    if exist "%ProgramFiles%\Microsoft Visual Studio\%VCYEAR%\Community\Common7\Tools\VsMSBuildCmd.bat"    goto VC141_Community
-    if exist "%ProgramFiles%\Microsoft Visual Studio\%VCYEAR%\Professional\Common7\Tools\VsMSBuildCmd.bat" goto VC141_Professional
-    if exist "%ProgramFiles%\Microsoft Visual Studio\%VCYEAR%\Enterprise\Common7\Tools\VsMSBuildCmd.bat"   goto VC141_Enterprise
-    if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\%VCYEAR%\Community\Common7\Tools\VsMSBuildCmd.bat"    goto VC141_Community64
-    if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\%VCYEAR%\Professional\Common7\Tools\VsMSBuildCmd.bat" goto VC141_Professional64
-    if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\%VCYEAR%\Enterprise\Common7\Tools\VsMSBuildCmd.bat"   goto VC141_Enterprise64
+    @if exist "%ProgramFiles%\Microsoft Visual Studio\%VCYEAR%\Community\Common7\Tools\VsMSBuildCmd.bat"    goto VC141_Community
+    @if exist "%ProgramFiles%\Microsoft Visual Studio\%VCYEAR%\Professional\Common7\Tools\VsMSBuildCmd.bat" goto VC141_Professional
+    @if exist "%ProgramFiles%\Microsoft Visual Studio\%VCYEAR%\Enterprise\Common7\Tools\VsMSBuildCmd.bat"   goto VC141_Enterprise
+    @if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\%VCYEAR%\Community\Common7\Tools\VsMSBuildCmd.bat"    goto VC141_Community64
+    @if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\%VCYEAR%\Professional\Common7\Tools\VsMSBuildCmd.bat" goto VC141_Professional64
+    @if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\%VCYEAR%\Enterprise\Common7\Tools\VsMSBuildCmd.bat"   goto VC141_Enterprise64
     echo ERROR: Not found "Microsoft Visual Studio %VCYEAR%"
     goto L_END
 :VC141_Enterprise64
