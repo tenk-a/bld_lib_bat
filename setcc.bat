@@ -30,6 +30,8 @@ set CcNameArch=%CcName%
 if /I not "%CcArch%"=="Win32" set "CcNameArch=%CcName%%CcArch%"
 
 rem
+if /i "%CcNameArch%"=="vc143"      goto L_VC143
+if /i "%CcNameArch%"=="vc143x64"   goto L_VC143x64
 if /i "%CcNameArch%"=="vc142"      goto L_VC142
 if /i "%CcNameArch%"=="vc142x64"   goto L_VC142x64
 if /i "%CcNameArch%"=="vc141"      goto L_VC141
@@ -52,6 +54,8 @@ if /i "%CcNameArch%"=="vc71"       goto L_VC71
 if /i "%CcNameArch%"=="vc70"       goto L_VC70
 if /i "%CcNameArch%"=="vc60"       goto L_VC6
 
+if /i "%CcNameArch%"=="vc14.3"     goto L_VC143
+if /i "%CcNameArch%"=="vc14.3x64"  goto L_VC143x64
 if /i "%CcNameArch%"=="vc14.2"     goto L_VC142
 if /i "%CcNameArch%"=="vc14.2x64"  goto L_VC142x64
 if /i "%CcNameArch%"=="vc14.1"     goto L_VC141
@@ -158,6 +162,22 @@ exit 1
 
 rem ## vc ######################################
 
+:L_VC143x64
+    set COMPILER=VC143x64
+    set VCVARS_BAT=vcvars64.bat
+    set VCYEAR=2022
+    goto L_VC143_SKIP_1
+:L_VC143
+    set COMPILER=VC143
+    set VCVARS_BAT=vcvars32.bat
+    set VCYEAR=2022
+:L_VC143_SKIP_1
+    set "PATH=%setcc_base_path%"
+    if exist "%ProgramFiles%\Microsoft Visual Studio\%VCYEAR%\Enterprise\Common7\Tools\VsMSBuildCmd.bat"   goto VC141_Enterprise
+    if exist "%ProgramFiles%\Microsoft Visual Studio\%VCYEAR%\Professional\Common7\Tools\VsMSBuildCmd.bat" goto VC141_Professional
+    if exist "%ProgramFiles%\Microsoft Visual Studio\%VCYEAR%\Community\Common7\Tools\VsMSBuildCmd.bat"    goto VC141_Community
+    echo ERROR: Not found "Microsoft Visual Studio %VCYEAR%"
+    goto L_END
 :L_VC142x64
     set COMPILER=vc142x64
     set VCVARS_BAT=vcvars64.bat

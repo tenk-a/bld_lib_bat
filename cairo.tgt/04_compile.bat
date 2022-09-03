@@ -43,7 +43,7 @@ if "%VcVer%"=="vc142" set ADD_COPTS=-utf-8
 
 if not exist build\Makefile.win32.common.orig	copy build\Makefile.win32.common build\Makefile.win32.common.orig
 
-"%TinyReplStr%" ++ "CFG_CFLAGS := -MDd -Od -Zi" "CFG_CFLAGS := -$(RTOPT)d -Od -Zi %ADD_COPTS%" "CFG_CFLAGS := -MD -O2" "CFG_CFLAGS := -$(RTOPT) -DNDEBUG -O2 %ADD_COPTS%" "PIXMAN_LIBS := $(PIXMAN_PATH)/pixman/$(CFG)/pixman-1.lib" "PIXMAN_LIBS := $(PIXMAN_LIB_PATH)/pixman-1.lib" "CAIRO_LIBS +=  $(LIBPNG_PATH)/libpng.lib" "CAIRO_LIBS +=  $(LIBPNG_LIB_PATH)/libpng.lib" "CAIRO_LIBS += $(ZLIB_PATH)/zdll.lib" "CAIRO_LIBS += $(ZLIB_LIB_PATH)/zdll.lib" -- build\Makefile.win32.common.orig >build\Makefile.win32.common
+"%TinyReplStr%" ++ "CFG_CFLAGS := -MDd -Od -Zi" "CFG_CFLAGS := -$(RTOPT)d -Od -Zi %ADD_COPTS%" "CFG_CFLAGS := -MD -O2" "CFG_CFLAGS := -$(RTOPT) -DNDEBUG -O2 %ADD_COPTS%" "PIXMAN_CFLAGS := -I$(PIXMAN_PATH)/pixman/" "PIXMAN_CFLAGS := -I$(PIXMAN_PATH)/" "PIXMAN_LIBS := $(PIXMAN_PATH)/pixman/$(CFG)/pixman-1.lib" "PIXMAN_LIBS := $(PIXMAN_LIB_PATH)/pixman-1.lib" "CAIRO_LIBS +=  $(LIBPNG_PATH)/libpng.lib" "CAIRO_LIBS +=  $(LIBPNG_LIB_PATH)/libpng.lib" "CAIRO_LIBS += $(ZLIB_PATH)/zdll.lib" "CAIRO_LIBS += $(ZLIB_LIB_PATH)/zdll.lib" -- build\Makefile.win32.common.orig >build\Makefile.win32.common
 
 set "SV_PATH=%PATH%"
 set "PATH=%CcMsys1Paths%;%PATH%"
@@ -85,9 +85,10 @@ if "%DstLibDir%"=="" (
 )
 
 pushd src
-rem set MINC=%CcInstallIncDir%
-set MINC=../../include
+set MINC=%CcInstallIncDir%
 set MLIB=%DstLibDir%
+rem set PIXMAN_PATH=../../pixman
+rem echo make -f Makefile.win32 "CFG=%Conf%" "RTOPT=%RTOPT%" "PIXMAN_PATH=%MINC%" "LIBPNG_PATH=%MINC%" "ZLIB_PATH=%MINC%" "PIXMAN_LIB_PATH=%MLIB%" "LIBPNG_LIB_PATH=%MLIB%" "ZLIB_LIB_PATH=%MLIB%"
 make -f Makefile.win32 "CFG=%Conf%" "RTOPT=%RTOPT%" "PIXMAN_PATH=%MINC%" "LIBPNG_PATH=%MINC%" "ZLIB_PATH=%MINC%" "PIXMAN_LIB_PATH=%MLIB%" "LIBPNG_LIB_PATH=%MLIB%" "ZLIB_LIB_PATH=%MLIB%"
 popd
 

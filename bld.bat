@@ -5,7 +5,7 @@
 @set echo_flag=off
 @rem @set echo_flag=on
 @if "%echo_flag%"=="off" @echo %echo_flag%
-pushd %~dp0
+@pushd %~dp0
 goto BEGIN
 
 :ERR
@@ -35,9 +35,9 @@ set CcTgtLibPathType=J_VA
 set CcTgtLibDir=lib
 set CcTgtBldDir=build
 set CcInstallPathType=D_VA
-set CcInstallIncDir=..\include
-set CcInstallLibDir=..\lib
-set CcInstallDllDir=..\dll
+set CcInstallIncDir=..\3rdparty\include
+set CcInstallLibDir=..\3rdparty\lib
+set CcInstallDllDir=..\3rdparty\dll
 set CcStrRtDll=
 set CcStrStatic=_static
 set CcStrDll=_dll
@@ -134,21 +134,31 @@ if /I not "%A:~0,4%"=="sub:" goto SKIP1
   shift
 :SKIP1
 
-if not exist %CcInstallIncDir% goto SKIP_1b
+if not "%CcInstallIncDir%"=="" goto SKIP_1b
  pushd %CcInstallIncDir%
  set CcInstallIncDir=%CD%
  popd
 :SKIP_1b
-if not exist %CcInstallLibDir% goto SKIP_1c
+if not "%CcInstallLibDir%"=="" goto SKIP_1c
   pushd %CcInstallLibDir%
   set CcInstallLibDir=%CD%
   popd
 :SKIP_1c
-if not exist %CcInstallDllDir% goto SKIP_1d
+if not "%CcInstallDllDir%"=="" goto SKIP_1d
   pushd %CcInstallDllDir%
   set CcInstallDllDir=%CD%
   popd
 :SKIP_1d
+
+if exist %CcInstallIncDir% goto SKIP_2b
+  mkdir -p %CcInstallIncDir%
+:SKIP_2b
+if exist %CcInstallLibDir% goto SKIP_2c
+  mkdir -p %CcInstallLibDir%
+:SKIP_2c
+if exist %CcInstallDllDir% goto SKIP_2d
+  mkdir -p %CcInstallDllDir%
+:SKIP_2d
 
 call %TgtCnfDir%\01_init.bat
 
@@ -188,6 +198,7 @@ set Arg=%Arg% %CcBld1Arg%
   if /I "%1"=="vc140"    set VcVer=vc140
   if /I "%1"=="vc141"    set VcVer=vc141
   if /I "%1"=="vc142"    set VcVer=vc142
+  if /I "%1"=="vc143"    set VcVer=vc143
 
   if /I "%1"=="vc2003"   set VcVer=vc71
   if /I "%1"=="vc2005"   set VcVer=vc80
@@ -198,6 +209,7 @@ set Arg=%Arg% %CcBld1Arg%
   if /I "%1"=="vc2015"   set VcVer=vc140
   if /I "%1"=="vc2017"   set VcVer=vc141
   if /I "%1"=="vc2019"   set VcVer=vc142
+  if /I "%1"=="vc2022"   set VcVer=vc143
 
   if /I "%1"=="clang"    set VcVer=clang
   if /I "%1"=="gcc"      set VcVer=gcc

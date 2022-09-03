@@ -14,5 +14,7 @@ set hdr7=
 set hdr8=
 set hdr9=
 set Arg=
+set Required1=zlib
+set Required2=libpng
 set CcTgtBldDir=compile
 set NeedTinyReplStr=1
